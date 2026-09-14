@@ -1,6 +1,6 @@
 # Statistical Analysis Plan: Cross-Language Parity Program
 
-- Status: M0, M2, M3, and M4 classical specifications approved
+- Status: M0, M2, M3, M4, and M5A classical specifications approved
 - Version: 0.1.0
 - Date: 2026-09-13
 - Statistical owner/reviewer: Joshua Myers; M0 approval recorded 2026-09-14
@@ -119,9 +119,13 @@ on 2026-09-14.
 
 `docs/MILESTONE_5.md` defines the planned strict coefficient-table protocol,
 narrow fitted-Statsmodels adapter, semantic coefficient renderer, and
-frequentist random-effects meta-analysis boundary. K1–K4 and MA1–MA4 remain
-unapproved; inferential implementation and acceptance fixtures must stop until
-Joshua Myers approves the separate M5 statistical method specification.
+frequentist random-effects meta-analysis boundary.
+`docs/M5_STATISTICAL_METHODS.md` proposes K1–K4 for M5A: strict estimate-only,
+interval, full-t, and full-z table profiles; an exact fitted-OLS adapter with
+nonrobust/HC3 covariance provenance; deterministic selection/render semantics;
+and explicit limits. Joshua Myers approved K1–K4 without revision on
+2026-09-14, authorizing M5A implementation. MA1–MA4 remain unapproved, so M5B
+inferential implementation and acceptance fixtures remain blocked.
 
 ## Diagnostics and validation
 
@@ -156,4 +160,5 @@ Joshua Myers approves the separate M5 statistical method specification.
   upstream adaptations on 2026-09-14 and approved the M2 classical
   specification on the same date. Joshua Myers approved the M3 classical
   comparison specification and the M4 classical categorical specification on
-  2026-09-14. Later method families require separate approvals under this plan.
+  2026-09-14, and approved M5A K1–K4 on that date. Later method families,
+  including M5B MA1–MA4, require separate approvals under this plan.

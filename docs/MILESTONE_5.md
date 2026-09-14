@@ -1,6 +1,6 @@
 # Milestone M5: Coefficients and Frequentist Meta-analysis
 
-- Status: Detailed contract ready; statistical-method approval required
+- Status: M5A methods approved; implementation ready; M5B methods pending
 - Contract date: 2026-09-14
 - Target duration: 4–6 weeks
 - Product and statistical owner: Joshua Myers
@@ -33,11 +33,12 @@ composition, resource, compatibility, oracle, benchmark, package-isolation,
 and accountable-review contracts remain in force unless an approved M5
 decision explicitly supersedes one.
 
-Before implementation begins, M5 must resolve coefficient identity and scale,
-reported-inference validation, model-adapter provenance, null/reference values,
-meta-analytic estimand, sampling model, between-study variance estimation,
-pooled inference, heterogeneity, prediction, small-study behavior, resource
-limits, and compatibility dispositions described below.
+Before implementation of each track begins, M5 must resolve that track's
+applicable decisions: coefficient identity and scale, reported-inference
+validation, model-adapter provenance, null/reference values, meta-analytic
+estimand, sampling model, between-study variance estimation, pooled inference,
+heterogeneity, prediction, small-study behavior, resource limits, and
+compatibility dispositions described below.
 
 ## Pinned upstream surface audited for scope
 
@@ -99,7 +100,7 @@ contract amendment.
 | Deliverable | Acceptance evidence | Track | Status |
 |---|---|---|---|
 | Pinned-surface audit | Exact upstream signature, data/model behavior, plot layers, meta modes, and deliberate Python adaptations recorded | Both | Complete |
-| Approved method specification | Reviewed K1–K4 and MA1–MA4 records covering every retained inferential path | Both | Blocking |
+| Approved method specification | Reviewed K1–K4 and MA1–MA4 records covering every retained inferential path | Both | K1–K4 complete; MA1–MA4 pending |
 | Coefficient data boundary | Typed table protocol, composite identity, stable order, complete-field profiles, immutable arrays, exclusions, and failure tests | M5A | Planned |
 | Statsmodels adapters | Exact class allowlist, public-field extraction, covariance/test provenance, no refit, and adversarial fake-object rejection | M5A | Planned |
 | Shared coefficient analysis | Display-only and inferential inputs produce one renderer-independent analysis/result contract | M5A | Planned |
@@ -416,8 +417,8 @@ The retained M5 benchmark must:
 - A pass must add focused implementation/tests, analytic/independent or oracle
   evidence, a retained benchmark, a full production gate, or a meaningfully
   different adversarial review.
-- Stop before inferential implementation when any K1–K4 or MA1–MA4 choice lacks
-  Joshua Myers's approval.
+- Stop before inferential implementation when any decision applicable to that
+  track—K1–K4 for M5A or MA1–MA4 for M5B—lacks Joshua Myers's approval.
 - Stop a model adapter on ambiguous class identity, parameter names, coefficient
   scale, covariance/test provenance, degrees of freedom, fitted sample, or
   confidence semantics.

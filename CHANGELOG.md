@@ -61,3 +61,8 @@
 - Added the detailed M5 contract for strict coefficient tables, approved fitted-
   Statsmodels adapters, semantic dot-and-whisker rendering, frequentist random-
   effects meta-analysis, explicit method gates, and `0.3` acceptance.
+- Added the approval-ready M5A K1–K4 coefficient-method proposal and pending
+  accountable sign-off/verification records; implementation remains stopped at
+  the required statistical-review gate.
+- Recorded Joshua Myers's approval of the M5A coefficient methods without
+  revision, authorizing implementation while MA1–MA4 remain pending for M5B.

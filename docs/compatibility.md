@@ -115,8 +115,9 @@ pairwise hypotheses, 20 groups, and weighted total 1,000,000,000.
 and narrow fitted-Statsmodels adapter rather than universal R-style model
 tidying. M5 requires estimate-only and approved inferential coefficient modes,
 plus one approved frequentist random-effects meta-analysis over independent,
-comparable study estimates. Exact K1–K4/MA1–MA4 method decisions remain blocked
-pending Joshua Myers's approval.
+comparable study estimates. Joshua Myers approved K1–K4 for strict
+estimate/interval/full-inference tables and an exact fitted-OLS adapter. M5A
+implementation is authorized; MA1–MA4 and M5B remain blocked pending approval.
 
 Robust/Bayesian meta-analysis, Bayes-factor captions, automatic term creation,
 heuristic duplicate-term concatenation, arbitrary model dispatch, ANOVA effect
