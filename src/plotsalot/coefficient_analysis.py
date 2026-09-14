@@ -6,7 +6,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from importlib import import_module
 from math import sqrt
-from typing import Protocol, cast
+from typing import Literal, Protocol, cast, overload
 
 import numpy as np
 
@@ -25,6 +25,16 @@ from plotsalot.coefficient_result import (
     MetaConvergenceResult,
     PooledEffectResult,
     PredictionResult,
+)
+from plotsalot.coefficient_table_analysis import (
+    DEFAULT_MAX_LABELS as DEFAULT_MAX_COEFFICIENT_LABELS,
+)
+from plotsalot.coefficient_table_analysis import (
+    DEFAULT_MAX_RENDERED_POINTS as DEFAULT_MAX_COEFFICIENT_POINTS,
+)
+from plotsalot.coefficient_table_analysis import (
+    TableCoefficientAnalysis,
+    analyze_coefficients,
 )
 from plotsalot.result import IntervalResult
 
@@ -223,10 +233,12 @@ def _reml(
     )
 
 
+@overload
 def analyze_ggcoefstats(
     data: object,
     *,
-    meta_analytic_effect: bool = False,
+    meta_analytic_effect: Literal[True],
+    estimate_label: str = "",
     estimand: str = "",
     effect_scale: str = "",
     effect_direction: str = "",
@@ -234,17 +246,129 @@ def analyze_ggcoefstats(
     dependence: str = "independent",
     null_value: float = 0.0,
     conf_level: float = 0.95,
+    alpha: float = 0.05,
     stats_labels: bool = True,
     only_significant: bool = False,
+    exclude_intercept: bool = False,
+    sort: str = "none",
+    maximum_coefficients: int = 500,
     maximum_studies: int = DEFAULT_MAX_STUDIES,
-    maximum_rendered_points: int = DEFAULT_MAX_RENDERED_POINTS,
-    maximum_labels: int = DEFAULT_MAX_LABELS,
-) -> CoefficientAnalysis:
-    """Analyze independent aggregate study estimates under approved MA1-MA4."""
+    maximum_rendered_points: int = DEFAULT_MAX_COEFFICIENT_POINTS,
+    maximum_labels: int = DEFAULT_MAX_COEFFICIENT_LABELS,
+) -> CoefficientAnalysis: ...
 
-    if meta_analytic_effect is not True:
+
+@overload
+def analyze_ggcoefstats(
+    data: object,
+    *,
+    meta_analytic_effect: Literal[False] = False,
+    estimate_label: str = "",
+    estimand: str = "",
+    effect_scale: str = "",
+    effect_direction: str = "",
+    effect_units: str = "",
+    dependence: str = "independent",
+    null_value: float = 0.0,
+    conf_level: float = 0.95,
+    alpha: float = 0.05,
+    stats_labels: bool = True,
+    only_significant: bool = False,
+    exclude_intercept: bool = False,
+    sort: str = "none",
+    maximum_coefficients: int = 500,
+    maximum_studies: int = DEFAULT_MAX_STUDIES,
+    maximum_rendered_points: int = DEFAULT_MAX_COEFFICIENT_POINTS,
+    maximum_labels: int = DEFAULT_MAX_COEFFICIENT_LABELS,
+) -> TableCoefficientAnalysis: ...
+
+
+@overload
+def analyze_ggcoefstats(
+    data: object,
+    *,
+    meta_analytic_effect: bool,
+    estimate_label: str = "",
+    estimand: str = "",
+    effect_scale: str = "",
+    effect_direction: str = "",
+    effect_units: str = "",
+    dependence: str = "independent",
+    null_value: float = 0.0,
+    conf_level: float = 0.95,
+    alpha: float = 0.05,
+    stats_labels: bool = True,
+    only_significant: bool = False,
+    exclude_intercept: bool = False,
+    sort: str = "none",
+    maximum_coefficients: int = 500,
+    maximum_studies: int = DEFAULT_MAX_STUDIES,
+    maximum_rendered_points: int = DEFAULT_MAX_COEFFICIENT_POINTS,
+    maximum_labels: int = DEFAULT_MAX_COEFFICIENT_LABELS,
+) -> CoefficientAnalysis | TableCoefficientAnalysis: ...
+
+
+def analyze_ggcoefstats(
+    data: object,
+    *,
+    meta_analytic_effect: bool = False,
+    estimate_label: str = "",
+    estimand: str = "",
+    effect_scale: str = "",
+    effect_direction: str = "",
+    effect_units: str = "",
+    dependence: str = "independent",
+    null_value: float = 0.0,
+    conf_level: float = 0.95,
+    alpha: float = 0.05,
+    stats_labels: bool = True,
+    only_significant: bool = False,
+    exclude_intercept: bool = False,
+    sort: str = "none",
+    maximum_coefficients: int = 500,
+    maximum_studies: int = DEFAULT_MAX_STUDIES,
+    maximum_rendered_points: int = DEFAULT_MAX_COEFFICIENT_POINTS,
+    maximum_labels: int = DEFAULT_MAX_COEFFICIENT_LABELS,
+) -> CoefficientAnalysis | TableCoefficientAnalysis:
+    """Analyze an approved M5A coefficient or explicit M5B meta-analysis input."""
+
+    if type(meta_analytic_effect) is not bool:
+        raise TypeError("meta_analytic_effect must be boolean")
+    if not meta_analytic_effect:
+        if (
+            estimand
+            or dependence != "independent"
+            or maximum_studies != DEFAULT_MAX_STUDIES
+        ):
+            raise ValueError(
+                "meta-analysis-only options cannot be used in coefficient mode"
+            )
+        return analyze_coefficients(
+            data,
+            estimate_label=estimate_label,
+            effect_scale=effect_scale,
+            effect_direction=effect_direction,
+            effect_units=effect_units,
+            null_value=null_value,
+            conf_level=conf_level,
+            alpha=alpha,
+            stats_labels=stats_labels,
+            only_significant=only_significant,
+            exclude_intercept=exclude_intercept,
+            sort=sort,
+            maximum_coefficients=maximum_coefficients,
+            maximum_rendered_points=maximum_rendered_points,
+            maximum_labels=maximum_labels,
+        )
+    if (
+        estimate_label
+        or alpha != 0.05
+        or exclude_intercept
+        or sort != "none"
+        or maximum_coefficients != 500
+    ):
         raise ValueError(
-            "M5B requires meta_analytic_effect=True; coefficient mode is pending M5A"
+            "coefficient-only options cannot be used in meta-analysis mode"
         )
     declarations = tuple(
         _string_option(value, label)

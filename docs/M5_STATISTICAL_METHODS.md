@@ -4,7 +4,7 @@
 - Version: 0.1.0
 - Date: 2026-09-14
 - Statistical owner/reviewer: Joshua Myers
-- Applies to: approved M5A coefficient plots and proposed M5B frequentist
+- Applies to: approved M5A coefficient plots and approved M5B frequentist
   random-effects meta-analysis
 
 ## Provenance and compatibility target

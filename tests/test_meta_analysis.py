@@ -177,7 +177,7 @@ class MetaAnalysisTests(unittest.TestCase):
     def test_meta_options_and_resources_fail_explicitly(self) -> None:
         data = _frame([0.0, 1.0, 2.0], [0.5] * 3)
 
-        def call(**kwargs: object):
+        def call(**kwargs: object) -> object:
             options: dict[str, object] = {
                 "meta_analytic_effect": True,
                 "estimand": "effect",

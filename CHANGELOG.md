@@ -82,3 +82,11 @@
   normal/modified-Hartung–Knapp comparison values.
 - Recorded Joshua Myers's independent review and acceptance of the M5B technical
   candidate; M5A and the combined M5/`0.3` gate remain open.
+- Added M5A estimate-only, interval, full-t, and full-z coefficient tables;
+  structured identity and intercept audits; and exact fitted Statsmodels OLS
+  adaptation for nonrobust and HC3 covariance.
+- Extended schema-v1 results and `ggcoefstats` rendering across coefficient and
+  meta-analysis modes, with pinned-R/base-R OLS evidence, adversarial tests, and
+  a retained 10/100/500-term plus model-adapter benchmark.
+- Recorded Joshua Myers's independent M5A review, M5A acceptance, and final
+  combined M5/`0.3` approval after the complete production gate, closing M5.

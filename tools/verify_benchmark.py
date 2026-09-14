@@ -11,6 +11,7 @@ RESULT = ROOT / "benchmarks" / "results" / "m0-baseline.json"
 M2_RESULT = ROOT / "benchmarks" / "results" / "m2-baseline.json"
 M3_RESULT = ROOT / "benchmarks" / "results" / "m3-baseline.json"
 M4_RESULT = ROOT / "benchmarks" / "results" / "m4-baseline.json"
+M5A_RESULT = ROOT / "benchmarks" / "results" / "m5a-baseline.json"
 M5B_RESULT = ROOT / "benchmarks" / "results" / "m5b-baseline.json"
 
 
@@ -190,6 +191,28 @@ def verify_benchmark() -> None:
                 raise AssertionError(f"{grid_name}.{size}: invalid phase mapping")
             for phase in phases:
                 _verify_summary(values.get(phase), f"{grid_name}.{size}.{phase}")
+
+    m5a = json.loads(M5A_RESULT.read_text())
+    if m5a.get("schema_version") != 1:
+        raise AssertionError("unsupported M5A benchmark schema")
+    measurement = m5a.get("measurement", {})
+    if measurement.get("repeats") != 5:
+        raise AssertionError("M5A baseline must retain five samples")
+    if measurement.get("input_frame_and_model_fit") != "outside measured phases":
+        raise AssertionError("M5A input/model-fit boundary must be explicit")
+    table_results = m5a.get("table_results")
+    if not isinstance(table_results, dict) or set(table_results) != {
+        "10",
+        "100",
+        "500",
+    }:
+        raise AssertionError("M5A coefficient-count grid does not match its contract")
+    for count, phases in table_results.items():
+        if not isinstance(phases, dict):
+            raise AssertionError(f"M5A {count}: invalid phases")
+        for phase in ("selection", "analysis", "render"):
+            _verify_summary(phases.get(phase), f"M5A.{count}.{phase}")
+    _verify_summary(m5a.get("model_adapter"), "M5A.model_adapter")
 
     m5b = json.loads(M5B_RESULT.read_text())
     if m5b.get("schema_version") != 1:

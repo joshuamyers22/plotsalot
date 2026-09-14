@@ -125,7 +125,11 @@ strict estimate-only,
 interval, full-t, and full-z table profiles; an exact fitted-OLS adapter with
 nonrobust/HC3 covariance provenance; deterministic selection/render semantics;
 and explicit limits. Joshua Myers approved K1–K4 without revision on
-2026-09-14, authorizing M5A implementation. The same method file specifies the
+2026-09-14. M5A now implements all four table profiles, exact fitted-OLS
+adaptation, typed results, and semantic rendering; its Python, pinned-R, and
+performance gates pass. Joshua Myers independently reviewed and accepted the
+M5A candidate on 2026-09-14.
+The same method file specifies the
 approved MA1–MA4 methods for M5B: strict independent study estimates,
 intercept-only REML,
 modified Hartung–Knapp pooled inference, bounded prediction behavior, and
@@ -135,7 +139,7 @@ The M5B technical core now implements that approved study boundary, REML,
 modified Hartung–Knapp, prediction, and heterogeneity path. Its independent
 likelihood/analytic fixtures, pinned-R oracle, and Python production gates pass;
 Joshua Myers independently reviewed and accepted the M5B technical candidate on
-2026-09-14. Shared M5A integration and final M5/`0.3` acceptance remain open.
+2026-09-14 and accepted the final combined M5/`0.3` candidate on that date.
 
 ## Diagnostics and validation
 

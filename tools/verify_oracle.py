@@ -7,9 +7,11 @@ import csv
 import hashlib
 import json
 import math
+from importlib import import_module
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import polars as pl
 
 from plotsalot import (
@@ -58,6 +60,11 @@ M4_RAW_FIXTURES = tuple(
 )
 M5B_INPUT_FIXTURES = ("m5b-meta",)
 M5B_RAW_FIXTURES = ("m5b-meta-ggstatsplot.R",)
+M5A_INPUT_FIXTURES = ("m5a-coefficients", "m5a-ols")
+M5A_RAW_FIXTURES = (
+    "m5a-coefficients-ggstatsplot.R",
+    "m5a-ols-ggstatsplot.R",
+)
 FLOAT_FIELDS = {
     "test_value": lambda result: result.test.null_value,
     "conf_level": lambda result: result.interval.level,
@@ -463,6 +470,95 @@ def _close_m5b(actual: float, expected: str, label: str) -> None:
         raise AssertionError(f"{label}: Python={actual:.17g}, R={reference:.17g}")
 
 
+def _verify_m5a_results() -> None:
+    for filename in M5A_RAW_FIXTURES:
+        path = OUTPUT / filename
+        if not path.is_file() or path.stat().st_size == 0:
+            raise AssertionError(f"missing raw ggstatsplot M5A result: {path}")
+
+    reported = pl.read_csv(INPUT / "m5a-coefficients.csv")
+    table_result = analyze_ggcoefstats(
+        reported,
+        estimate_label="regression coefficient",
+        effect_scale="linear predictor",
+        effect_direction="positive is higher",
+        effect_units="outcome units",
+    ).result
+    if (
+        table_result.inference_profile != "full_t"
+        or table_result.source_kind != "table"
+    ):
+        raise AssertionError("M5A reported-table profile identity differs")
+    for term, row in zip(
+        table_result.terms, reported.iter_rows(named=True), strict=True
+    ):
+        inference = term.inference
+        if inference is None or inference.interval is None:
+            raise AssertionError("M5A reported table lost inference")
+        if (
+            term.identity.term != row["term"]
+            or term.identity.response != row["response"]
+        ):
+            raise AssertionError("M5A reported table identity differs")
+        for actual, field in (
+            (term.estimate, "estimate"),
+            (inference.standard_error, "standard_error"),
+            (inference.statistic, "statistic"),
+            (inference.df, "df"),
+            (inference.p_value, "p_value"),
+            (inference.interval.low, "conf_low"),
+            (inference.interval.high, "conf_high"),
+        ):
+            if actual is None or not math.isclose(
+                actual, float(row[field]), rel_tol=0, abs_tol=0
+            ):
+                raise AssertionError(f"M5A reported table field differs: {field}")
+
+    ols_data = pl.read_csv(INPUT / "m5a-ols.csv")
+    statsmodels = import_module("statsmodels.api")
+    x = np.column_stack((np.ones(ols_data.height), ols_data.get_column("x").to_numpy()))
+    fitted = statsmodels.OLS(ols_data.get_column("y").to_numpy(), x).fit()
+    model_result = analyze_ggcoefstats(
+        fitted,
+        estimate_label="regression coefficient",
+        effect_scale="linear predictor",
+        effect_direction="positive is higher",
+        effect_units="outcome units",
+    ).result
+    with (OUTPUT / "m5a-ols-results.csv").open(newline="") as handle:
+        expected_terms = list(csv.DictReader(handle))
+    for term, expected in zip(model_result.terms, expected_terms, strict=True):
+        inference = term.inference
+        if inference is None or inference.interval is None:
+            raise AssertionError("M5A fitted OLS lost inference")
+        if term.identity.term != expected["term"]:
+            raise AssertionError("M5A fitted OLS term identity differs")
+        for actual, field in (
+            (term.estimate, "estimate"),
+            (inference.standard_error, "standard_error"),
+            (inference.statistic, "statistic"),
+            (inference.df, "df"),
+            (inference.p_value, "p_value"),
+            (inference.interval.low, "interval_low"),
+            (inference.interval.high, "interval_high"),
+        ):
+            if actual is None:
+                raise AssertionError(f"M5A fitted OLS field missing: {field}")
+            _close_m5b(actual, expected[field], f"m5a-ols.{term.identity.term}.{field}")
+    with (OUTPUT / "m5a-ols-summary.csv").open(newline="") as handle:
+        summary = next(csv.DictReader(handle))
+    model = model_result.model_summary
+    if model is None:
+        raise AssertionError("M5A fitted OLS model summary is missing")
+    for actual, field in (
+        (model.nobs, "nobs"),
+        (model.df_model, "df_model"),
+        (model.df_resid, "df_resid"),
+        (model.rank, "rank"),
+    ):
+        _close_m5b(float(actual), summary[field], f"m5a-ols.summary.{field}")
+
+
 def _close_m5b_metafor(actual: float, expected: str, label: str) -> None:
     """Compare with metafor at the accuracy of its iterative tau estimator."""
     reference = float(expected)
@@ -588,6 +684,8 @@ def _manifest_payload() -> dict[str, Any]:
         "m3_raw_fixtures": list(M3_RAW_FIXTURES),
         "m4_input_fixtures": list(M4_INPUT_FIXTURES),
         "m4_raw_fixtures": list(M4_RAW_FIXTURES),
+        "m5a_input_fixtures": list(M5A_INPUT_FIXTURES),
+        "m5a_raw_fixtures": list(M5A_RAW_FIXTURES),
         "m5b_input_fixtures": list(M5B_INPUT_FIXTURES),
         "m5b_raw_fixtures": list(M5B_RAW_FIXTURES),
         "sha256": _hashes(),
@@ -601,6 +699,7 @@ def verify_oracle() -> None:
     _verify_m2_results()
     _verify_m3_results()
     _verify_m4_results()
+    _verify_m5a_results()
     _verify_m5b_results()
     retained = json.loads(MANIFEST.read_text())
     if retained != _manifest_payload():
@@ -616,6 +715,7 @@ def main() -> None:
         _verify_m2_results()
         _verify_m3_results()
         _verify_m4_results()
+        _verify_m5a_results()
         _verify_m5b_results()
         payload = _manifest_payload()
         MANIFEST.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")

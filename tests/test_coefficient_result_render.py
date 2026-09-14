@@ -54,7 +54,7 @@ class CoefficientResultAndRenderTests(unittest.TestCase):
         )
 
         json.dumps(payload, allow_nan=False)
-        self.assertEqual(set(payload), set(schema["required"]))
+        self.assertEqual(set(payload), set(schema["$defs"]["meta_result"]["required"]))
         self.assertEqual(
             set(payload["terms"][0]), set(schema["$defs"]["term"]["required"])
         )

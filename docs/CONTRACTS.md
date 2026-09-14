@@ -2,8 +2,8 @@
 
 These contracts are the M1 foundation extended by the approved M2 univariate
 and correlation records, the approved M3 comparison, composition, and theme
-records, the approved M4 categorical records, and the implemented M5B
-meta-analysis core.
+records, the approved M4 categorical records, and the implemented M5
+coefficient/meta-analysis family.
 
 ## Data boundary
 
@@ -112,11 +112,14 @@ The categorical family follows the same split through `analyze_categorical`,
 labels, totals, colors, subtitles, and p-value annotations from the retained
 result. The convenience functions expose explicit allowlisted signatures.
 
-M5B follows the split through `analyze_ggcoefstats`, `render_ggcoefstats`, and
-`ggcoefstats`. Meta-analysis requires `meta_analytic_effect=True`; ordinary
-coefficient mode fails explicitly until M5A is implemented. The renderer reads
-study, pooled, prediction, heterogeneity, reference-line, label, and annotation
-values from the retained result and never reruns REML or inference.
+M5 follows the split through `analyze_ggcoefstats`, `render_ggcoefstats`, and
+`ggcoefstats`. Ordinary coefficient mode accepts one strict table-wide profile
+or an exact fitted Statsmodels OLS wrapper; meta-analysis requires
+`meta_analytic_effect=True`. Both variants share schema version 1, semantic
+point/interval/reference layers, extraction, composition, and resource policy.
+The renderer reads coefficient or study, pooled, prediction, heterogeneity,
+reference-line, label, and annotation values from the retained result and never
+reruns model fitting, REML, or inference.
 
 ## Plot boundary
 

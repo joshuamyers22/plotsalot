@@ -3,7 +3,7 @@
 `plotsalot` is a planned Python implementation of the statistical-visualization
 workflows in [`ggstatsplot`](https://github.com/IndrajeetPatil/ggstatsplot).
 
-M0 through M4 are complete, including the accepted `0.2` product gate. The
+M0 through M5 are complete, including the accepted `0.3` product gate. The
 project remains pre-release and is not yet ready for production analytical use.
 
 ## Development
@@ -156,8 +156,36 @@ print(analysis.result.omnibus)
 print(analysis.result.cells)
 ```
 
-M5B adds an explicit frequentist random-effects meta-analysis over independent
-aggregate study estimates:
+M5 adds strict coefficient plots and an explicit frequentist random-effects
+meta-analysis. A coefficient table declares its scale and uses exactly one
+estimate-only, interval, full-t, or full-z profile:
+
+```python
+from plotsalot import ggcoefstats
+
+coefficients = pl.DataFrame(
+    {
+        "term": ["intercept", "dose", "age"],
+        "estimate": [0.25, -0.40, 0.08],
+        "conf_low": [-0.15, -0.75, 0.01],
+        "conf_high": [0.65, -0.05, 0.15],
+        "is_intercept": [True, False, False],
+    }
+)
+coefficient_plot = ggcoefstats(
+    coefficients,
+    estimate_label="regression coefficient",
+    effect_scale="linear predictor",
+    effect_direction="positive is higher",
+    effect_units="outcome units",
+    stats_labels=False,
+    exclude_intercept=True,
+)
+```
+
+The fitted-model path accepts only an exact fitted Statsmodels OLS wrapper with
+nonrobust or HC3 covariance. It snapshots the fitted result without refitting.
+The meta-analysis path accepts independent aggregate study estimates:
 
 ```python
 from plotsalot import ggcoefstats
@@ -186,8 +214,9 @@ This path uses the approved intercept-only REML estimator and modified
 Hartung–Knapp inference. It requires explicit comparable-scale and independence
 declarations, never derives effects from raw outcomes, never switches to a
 fixed-effect or fallback estimator, and provides prediction intervals only for
-five or more studies. Ordinary coefficient-table and fitted-model mode remains
-pending M5A verification.
+five or more studies. Coefficient significance labels are available only for
+complete t/z profiles, use reported/model-derived unadjusted p-values, and never
+filter plotted coefficient rows.
 
 One-way calls omit `y` and may supply an exact level-keyed `ratio`. Paired calls
 require the same two levels on `x` and `y`, `paired=True`, and

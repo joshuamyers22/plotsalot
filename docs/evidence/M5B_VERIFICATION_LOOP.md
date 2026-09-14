@@ -22,8 +22,7 @@
 
 ## Current state
 
-- Status: M5B technical candidate independently reviewed and accepted; one
-  combined-M5 implementation-integration finding remains
+- Status: M5B technical candidate independently reviewed and accepted; shared
+  M5A integration passes
 - Technical implementation: M5B core accepted, 2026-09-14
-- Next authorized step: integrate the shared M5A result and renderer path, run
-  the combined gate, and obtain final M5/`0.3` acceptance
+- Milestone outcome: combined gate and final M5/`0.3` acceptance complete

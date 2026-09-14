@@ -24,8 +24,18 @@ from plotsalot.categorical_grouped import (
 from plotsalot.categorical_result import CategoricalResult, CategoricalSampleAudit
 from plotsalot.coefficient import ggcoefstats, render_ggcoefstats
 from plotsalot.coefficient_analysis import CoefficientAnalysis, analyze_ggcoefstats
-from plotsalot.coefficient_data import StudyEffectTable, select_study_effects
-from plotsalot.coefficient_result import CoefficientResult, MetaAnalysisResult
+from plotsalot.coefficient_data import (
+    CoefficientTable,
+    StudyEffectTable,
+    select_coefficients,
+    select_study_effects,
+)
+from plotsalot.coefficient_result import (
+    CoefficientResult,
+    CoefficientTableResult,
+    MetaAnalysisResult,
+)
+from plotsalot.coefficient_table_analysis import TableCoefficientAnalysis
 from plotsalot.comparison import (
     ggbetweenstats,
     ggwithinstats,
@@ -145,6 +155,9 @@ __all__ = [
     "RepeatedSampleAudit",
     "StatsTheme",
     "StudyEffectTable",
+    "CoefficientTable",
+    "CoefficientTableResult",
+    "TableCoefficientAnalysis",
     "StatsPlot",
     "StructuredResult",
     "analyze_categorical",
@@ -205,6 +218,7 @@ __all__ = [
     "render_grouped_ggpiestats",
     "select_categorical_table",
     "select_study_effects",
+    "select_coefficients",
     "select_numeric_pair",
     "select_numeric_sample",
     "theme_ggstatsplot",

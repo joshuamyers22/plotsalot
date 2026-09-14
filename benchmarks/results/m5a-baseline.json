@@ -1,0 +1,375 @@
+{
+  "host": {
+    "machine": "arm64",
+    "platform": "macOS-15.1-arm64-arm-64bit",
+    "python": "3.12.14"
+  },
+  "measurement": {
+    "clock": "time.perf_counter_ns",
+    "input_frame_and_model_fit": "outside measured phases",
+    "memory": "tracemalloc incremental Python allocation peak",
+    "repeats": 5
+  },
+  "model_adapter": {
+    "elapsed_ns": {
+      "max": 4078750,
+      "median": 3913125,
+      "min": 3763292
+    },
+    "python_peak_bytes": {
+      "max": 118266,
+      "median": 118134,
+      "min": 118054
+    },
+    "samples": [
+      {
+        "elapsed_ns": 3857875,
+        "python_peak_bytes": 118266
+      },
+      {
+        "elapsed_ns": 4078750,
+        "python_peak_bytes": 118218
+      },
+      {
+        "elapsed_ns": 3913125,
+        "python_peak_bytes": 118134
+      },
+      {
+        "elapsed_ns": 4004875,
+        "python_peak_bytes": 118094
+      },
+      {
+        "elapsed_ns": 3763292,
+        "python_peak_bytes": 118054
+      }
+    ]
+  },
+  "schema_version": 1,
+  "scope": [
+    "coefficient_table_selection",
+    "coefficient_analysis",
+    "statsmodels_ols_adapter",
+    "ggcoefstats_coefficient_render"
+  ],
+  "table_results": {
+    "10": {
+      "analysis": {
+        "elapsed_ns": {
+          "max": 2291958,
+          "median": 2168875,
+          "min": 2121042
+        },
+        "python_peak_bytes": {
+          "max": 19469,
+          "median": 19469,
+          "min": 19469
+        },
+        "samples": [
+          {
+            "elapsed_ns": 2168875,
+            "python_peak_bytes": 19469
+          },
+          {
+            "elapsed_ns": 2291958,
+            "python_peak_bytes": 19469
+          },
+          {
+            "elapsed_ns": 2220125,
+            "python_peak_bytes": 19469
+          },
+          {
+            "elapsed_ns": 2154291,
+            "python_peak_bytes": 19469
+          },
+          {
+            "elapsed_ns": 2121042,
+            "python_peak_bytes": 19469
+          }
+        ]
+      },
+      "render": {
+        "elapsed_ns": {
+          "max": 45641417,
+          "median": 43521041,
+          "min": 43374750
+        },
+        "python_peak_bytes": {
+          "max": 1002996,
+          "median": 994763,
+          "min": 993120
+        },
+        "samples": [
+          {
+            "elapsed_ns": 43414917,
+            "python_peak_bytes": 1002996
+          },
+          {
+            "elapsed_ns": 45641417,
+            "python_peak_bytes": 994763
+          },
+          {
+            "elapsed_ns": 43521041,
+            "python_peak_bytes": 995924
+          },
+          {
+            "elapsed_ns": 44946042,
+            "python_peak_bytes": 993120
+          },
+          {
+            "elapsed_ns": 43374750,
+            "python_peak_bytes": 993535
+          }
+        ]
+      },
+      "selection": {
+        "elapsed_ns": {
+          "max": 789834,
+          "median": 768750,
+          "min": 731209
+        },
+        "python_peak_bytes": {
+          "max": 10134,
+          "median": 10118,
+          "min": 10094
+        },
+        "samples": [
+          {
+            "elapsed_ns": 789834,
+            "python_peak_bytes": 10134
+          },
+          {
+            "elapsed_ns": 757417,
+            "python_peak_bytes": 10126
+          },
+          {
+            "elapsed_ns": 731209,
+            "python_peak_bytes": 10118
+          },
+          {
+            "elapsed_ns": 768750,
+            "python_peak_bytes": 10110
+          },
+          {
+            "elapsed_ns": 773083,
+            "python_peak_bytes": 10094
+          }
+        ]
+      }
+    },
+    "100": {
+      "analysis": {
+        "elapsed_ns": {
+          "max": 27358708,
+          "median": 26877583,
+          "min": 26627709
+        },
+        "python_peak_bytes": {
+          "max": 190238,
+          "median": 190238,
+          "min": 190238
+        },
+        "samples": [
+          {
+            "elapsed_ns": 26877583,
+            "python_peak_bytes": 190238
+          },
+          {
+            "elapsed_ns": 26637625,
+            "python_peak_bytes": 190238
+          },
+          {
+            "elapsed_ns": 27358708,
+            "python_peak_bytes": 190238
+          },
+          {
+            "elapsed_ns": 26627709,
+            "python_peak_bytes": 190238
+          },
+          {
+            "elapsed_ns": 27229791,
+            "python_peak_bytes": 190238
+          }
+        ]
+      },
+      "render": {
+        "elapsed_ns": {
+          "max": 369793792,
+          "median": 366259666,
+          "min": 364638416
+        },
+        "python_peak_bytes": {
+          "max": 7206464,
+          "median": 7205064,
+          "min": 7202035
+        },
+        "samples": [
+          {
+            "elapsed_ns": 364638416,
+            "python_peak_bytes": 7206464
+          },
+          {
+            "elapsed_ns": 368876917,
+            "python_peak_bytes": 7205336
+          },
+          {
+            "elapsed_ns": 369793792,
+            "python_peak_bytes": 7205064
+          },
+          {
+            "elapsed_ns": 366259666,
+            "python_peak_bytes": 7202035
+          },
+          {
+            "elapsed_ns": 364734416,
+            "python_peak_bytes": 7203749
+          }
+        ]
+      },
+      "selection": {
+        "elapsed_ns": {
+          "max": 1100417,
+          "median": 1068208,
+          "min": 985375
+        },
+        "python_peak_bytes": {
+          "max": 34337,
+          "median": 34321,
+          "min": 34305
+        },
+        "samples": [
+          {
+            "elapsed_ns": 1000958,
+            "python_peak_bytes": 34337
+          },
+          {
+            "elapsed_ns": 1088583,
+            "python_peak_bytes": 34329
+          },
+          {
+            "elapsed_ns": 1068208,
+            "python_peak_bytes": 34321
+          },
+          {
+            "elapsed_ns": 1100417,
+            "python_peak_bytes": 34313
+          },
+          {
+            "elapsed_ns": 985375,
+            "python_peak_bytes": 34305
+          }
+        ]
+      }
+    },
+    "500": {
+      "analysis": {
+        "elapsed_ns": {
+          "max": 459722667,
+          "median": 453088792,
+          "min": 451774542
+        },
+        "python_peak_bytes": {
+          "max": 545150,
+          "median": 545150,
+          "min": 545150
+        },
+        "samples": [
+          {
+            "elapsed_ns": 459722667,
+            "python_peak_bytes": 545150
+          },
+          {
+            "elapsed_ns": 454880417,
+            "python_peak_bytes": 545150
+          },
+          {
+            "elapsed_ns": 453088792,
+            "python_peak_bytes": 545150
+          },
+          {
+            "elapsed_ns": 451774542,
+            "python_peak_bytes": 545150
+          },
+          {
+            "elapsed_ns": 452890750,
+            "python_peak_bytes": 545150
+          }
+        ]
+      },
+      "render": {
+        "elapsed_ns": {
+          "max": 1994368917,
+          "median": 1906779666,
+          "min": 1893837083
+        },
+        "python_peak_bytes": {
+          "max": 34514752,
+          "median": 34513596,
+          "min": 34512825
+        },
+        "samples": [
+          {
+            "elapsed_ns": 1896371167,
+            "python_peak_bytes": 34513596
+          },
+          {
+            "elapsed_ns": 1893837083,
+            "python_peak_bytes": 34514347
+          },
+          {
+            "elapsed_ns": 1906779666,
+            "python_peak_bytes": 34512825
+          },
+          {
+            "elapsed_ns": 1994368917,
+            "python_peak_bytes": 34514752
+          },
+          {
+            "elapsed_ns": 1924640042,
+            "python_peak_bytes": 34513251
+          }
+        ]
+      },
+      "selection": {
+        "elapsed_ns": {
+          "max": 2352500,
+          "median": 2273292,
+          "min": 2236042
+        },
+        "python_peak_bytes": {
+          "max": 135797,
+          "median": 135797,
+          "min": 135797
+        },
+        "samples": [
+          {
+            "elapsed_ns": 2273292,
+            "python_peak_bytes": 135797
+          },
+          {
+            "elapsed_ns": 2352500,
+            "python_peak_bytes": 135797
+          },
+          {
+            "elapsed_ns": 2264667,
+            "python_peak_bytes": 135797
+          },
+          {
+            "elapsed_ns": 2236042,
+            "python_peak_bytes": 135797
+          },
+          {
+            "elapsed_ns": 2343625,
+            "python_peak_bytes": 135797
+          }
+        ]
+      }
+    }
+  },
+  "versions": {
+    "matplotlib": "3.11.2",
+    "numpy": "2.5.3",
+    "polars": "1.44.2",
+    "scipy": "1.18.1",
+    "statsmodels": "0.15.0"
+  }
+}

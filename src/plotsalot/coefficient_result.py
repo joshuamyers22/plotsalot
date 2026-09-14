@@ -508,3 +508,332 @@ class CoefficientResult:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class CoefficientIdentityResult:
+    response: str | None
+    component: str | None
+    group: str | None
+    term: str
+
+    def __post_init__(self) -> None:
+        if not _is_nonempty_string(self.term) or any(
+            value is not None and not _is_nonempty_string(value)
+            for value in (self.response, self.component, self.group)
+        ):
+            raise ValueError("coefficient identity values must be nonempty strings")
+
+    @property
+    def key(self) -> tuple[str, ...]:
+        return tuple(
+            value
+            for value in (self.response, self.component, self.group, self.term)
+            if value is not None
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class ReportedCoefficientInferenceResult:
+    source: Literal["reported", "statsmodels_ols"]
+    interval: IntervalResult | None
+    standard_error: float | None
+    statistic_name: Literal["t", "z"] | None
+    statistic: float | None
+    df: float | None
+    p_value: float | None
+    significant: bool | None
+
+    def __post_init__(self) -> None:
+        if self.source not in {"reported", "statsmodels_ols"}:
+            raise ValueError("coefficient inference source is unsupported")
+        numeric = (self.standard_error, self.statistic, self.df, self.p_value)
+        if any(value is not None and not isfinite(value) for value in numeric):
+            raise ValueError("coefficient inference values must be finite")
+        if self.standard_error is not None and self.standard_error <= 0.0:
+            raise ValueError("coefficient standard error must be positive")
+        if self.df is not None and self.df <= 0.0:
+            raise ValueError("coefficient degrees of freedom must be positive")
+        if self.p_value is not None:
+            _probability(self.p_value, "coefficient p_value")
+        if self.significant is not None and type(self.significant) is not bool:
+            raise ValueError("coefficient significance must be boolean")
+        if self.interval is not None and (
+            self.interval.target != "coefficient"
+            or self.interval.method not in {"reported", "statsmodels_ols"}
+        ):
+            raise ValueError("coefficient interval identity is unsupported")
+
+
+@dataclass(frozen=True, slots=True)
+class ReportedCoefficientTermResult:
+    identity: CoefficientIdentityResult
+    is_intercept: bool
+    source_position: int
+    display_position: int
+    estimate: float
+    inference: ReportedCoefficientInferenceResult | None
+
+    def __post_init__(self) -> None:
+        if type(self.is_intercept) is not bool:
+            raise ValueError("coefficient intercept marker must be boolean")
+        if any(
+            type(value) is not int or value < 0
+            for value in (self.source_position, self.display_position)
+        ):
+            raise ValueError("coefficient positions must be nonnegative integers")
+        if not isfinite(self.estimate):
+            raise ValueError("coefficient estimate must be finite")
+        if (
+            self.inference is not None
+            and self.inference.interval is not None
+            and not self.inference.interval.low
+            <= self.estimate
+            <= self.inference.interval.high
+        ):
+            raise ValueError("coefficient interval must contain its estimate")
+
+
+@dataclass(frozen=True, slots=True)
+class CoefficientModelSummaryResult:
+    model_class: Literal["statsmodels.regression.linear_model.OLS"]
+    result_class: Literal[
+        "statsmodels.regression.linear_model.RegressionResultsWrapper"
+    ]
+    statsmodels_version: str
+    covariance_type: Literal["nonrobust", "HC3"]
+    use_t: bool
+    nobs: int
+    df_model: float
+    df_resid: float
+    rank: int
+    parameter_count: int
+    aic: float | None
+    bic: float | None
+
+    def __post_init__(self) -> None:
+        if (
+            self.model_class != "statsmodels.regression.linear_model.OLS"
+            or self.result_class
+            != "statsmodels.regression.linear_model.RegressionResultsWrapper"
+            or not _is_nonempty_string(self.statsmodels_version)
+            or self.covariance_type not in {"nonrobust", "HC3"}
+            or type(self.use_t) is not bool
+        ):
+            raise ValueError("coefficient model identity is unsupported")
+        if (
+            type(self.nobs) is not int
+            or self.nobs < 1
+            or type(self.rank) is not int
+            or type(self.parameter_count) is not int
+            or self.rank != self.parameter_count
+            or self.parameter_count < 1
+        ):
+            raise ValueError("coefficient model dimensions are invalid")
+        if (
+            not isfinite(self.df_model)
+            or not isfinite(self.df_resid)
+            or self.df_resid <= 0.0
+        ):
+            raise ValueError("coefficient model degrees of freedom are invalid")
+        if any(
+            value is not None and not isfinite(value) for value in (self.aic, self.bic)
+        ):
+            raise ValueError("coefficient model fit summaries must be finite")
+
+
+@dataclass(frozen=True, slots=True)
+class CoefficientTableResourceLimits:
+    maximum_coefficients: int
+    maximum_rendered_points: int
+    maximum_labels: int
+    maximum_identity_columns: int = 8
+    maximum_model_summary_fields: int = 32
+
+    def __post_init__(self) -> None:
+        if any(
+            type(value) is not int or value < 1
+            for value in (
+                self.maximum_coefficients,
+                self.maximum_rendered_points,
+                self.maximum_labels,
+                self.maximum_identity_columns,
+                self.maximum_model_summary_fields,
+            )
+        ):
+            raise ValueError("coefficient table resource limits must be positive")
+
+
+@dataclass(frozen=True, slots=True)
+class CoefficientTableResult:
+    schema_version: int
+    analysis: Literal["ggcoefstats_coefficients"]
+    source_kind: Literal["table", "statsmodels_ols"]
+    inference_profile: Literal["estimate_only", "interval", "full_t", "full_z"]
+    identity_columns: tuple[str, ...]
+    input_rows: int
+    retained_rows: int
+    source_order: tuple[CoefficientIdentityResult, ...]
+    display_order: tuple[CoefficientIdentityResult, ...]
+    terms: tuple[ReportedCoefficientTermResult, ...]
+    excluded_intercepts: tuple[CoefficientIdentityResult, ...]
+    model_summary: CoefficientModelSummaryResult | None
+    estimate_label: str
+    effect_scale: str
+    effect_direction: str
+    effect_units: str
+    null_value: float
+    conf_level: float
+    alpha: float
+    stats_labels: bool
+    only_significant: bool
+    sort: Literal["none", "ascending", "descending"]
+    limits: CoefficientTableResourceLimits
+    warnings: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if self.schema_version != 1 or self.analysis != "ggcoefstats_coefficients":
+            raise ValueError("coefficient table result identity is unsupported")
+        if self.source_kind not in {"table", "statsmodels_ols"}:
+            raise ValueError("coefficient source kind is unsupported")
+        if self.inference_profile not in {
+            "estimate_only",
+            "interval",
+            "full_t",
+            "full_z",
+        }:
+            raise ValueError("coefficient inference profile is unsupported")
+        if self.identity_columns != tuple(
+            name
+            for name in ("response", "component", "group")
+            if name in self.identity_columns
+        ) or len(set(self.identity_columns)) != len(self.identity_columns):
+            raise ValueError("coefficient identity columns are unsupported")
+        if any(
+            not _is_nonempty_string(value)
+            for value in (
+                self.estimate_label,
+                self.effect_scale,
+                self.effect_direction,
+                self.effect_units,
+            )
+        ) or not isfinite(self.null_value):
+            raise ValueError("coefficient scale declarations are invalid")
+        if type(self.input_rows) is not int or type(self.retained_rows) is not int:
+            raise ValueError("coefficient row counts must be integers")
+        if self.input_rows != self.retained_rows + len(self.excluded_intercepts):
+            raise ValueError("coefficient row audit does not reconcile")
+        if self.retained_rows < 1 or len(self.terms) != self.retained_rows:
+            raise ValueError("coefficient result must retain at least one term")
+        if self.source_order != tuple(
+            term.identity
+            for term in sorted(self.terms, key=lambda item: item.source_position)
+        ):
+            raise ValueError("coefficient source order does not reconcile")
+        if self.display_order != tuple(term.identity for term in self.terms):
+            raise ValueError("coefficient display order does not reconcile")
+        if (
+            len({item.key for item in (*self.source_order, *self.excluded_intercepts)})
+            != self.input_rows
+        ):
+            raise ValueError("coefficient identities must be unique")
+        if tuple(term.display_position for term in self.terms) != tuple(
+            range(self.retained_rows)
+        ):
+            raise ValueError("coefficient display positions must be complete")
+        source_positions = tuple(term.source_position for term in self.terms)
+        if len(set(source_positions)) != self.retained_rows or any(
+            position >= self.input_rows for position in source_positions
+        ):
+            raise ValueError("coefficient source positions must be unique and in range")
+        if not isfinite(self.conf_level) or not 0.0 < self.conf_level < 1.0:
+            raise ValueError("conf_level must lie within (0, 1)")
+        if not isfinite(self.alpha) or not 0.0 < self.alpha < 1.0:
+            raise ValueError("alpha must lie within (0, 1)")
+        if (
+            type(self.stats_labels) is not bool
+            or type(self.only_significant) is not bool
+        ):
+            raise ValueError("coefficient label policies must be boolean")
+        if self.only_significant and not self.stats_labels:
+            raise ValueError("only_significant requires stats_labels")
+        if self.sort not in {"none", "ascending", "descending"}:
+            raise ValueError("coefficient sort is unsupported")
+        if self.source_kind == "statsmodels_ols" and self.model_summary is None:
+            raise ValueError("Statsmodels coefficient result requires model summary")
+        if self.source_kind == "table" and self.model_summary is not None:
+            raise ValueError("table coefficient result cannot contain model summary")
+        for term in self.terms:
+            inference = term.inference
+            if self.inference_profile == "estimate_only" and inference is not None:
+                raise ValueError("estimate-only coefficient cannot retain inference")
+            if self.inference_profile != "estimate_only" and inference is None:
+                raise ValueError("coefficient profile requires inference")
+            if inference is None:
+                continue
+            if inference.interval is None:
+                raise ValueError("coefficient inference requires interval")
+            expected_source = (
+                "reported" if self.source_kind == "table" else "statsmodels_ols"
+            )
+            if (
+                inference.source != expected_source
+                or inference.interval.method != expected_source
+            ):
+                raise ValueError(
+                    "coefficient inference provenance does not match source"
+                )
+            if abs(inference.interval.level - self.conf_level) > 1e-15:
+                raise ValueError("coefficient interval level must match result")
+            is_full = self.inference_profile in {"full_t", "full_z"}
+            values = (
+                inference.standard_error,
+                inference.statistic_name,
+                inference.statistic,
+                inference.p_value,
+                inference.significant,
+            )
+            if is_full != all(value is not None for value in values):
+                raise ValueError("coefficient full inference fields are inconsistent")
+            if (
+                self.inference_profile == "interval"
+                and any(value is not None for value in values)
+                or (self.inference_profile == "interval" and inference.df is not None)
+            ):
+                raise ValueError("interval-only profile cannot retain test inference")
+            if self.inference_profile == "full_t" and (
+                inference.statistic_name != "t" or inference.df is None
+            ):
+                raise ValueError("full_t coefficient requires t and df")
+            if self.inference_profile == "full_z" and (
+                inference.statistic_name != "z" or inference.df is not None
+            ):
+                raise ValueError("full_z coefficient requires z without df")
+            if inference.p_value is not None and inference.significant != (
+                inference.p_value < self.alpha
+            ):
+                raise ValueError("coefficient significance must use result alpha")
+        if self.model_summary is not None and (
+            (self.model_summary.use_t and self.inference_profile != "full_t")
+            or (not self.model_summary.use_t and self.inference_profile != "full_z")
+        ):
+            raise ValueError("coefficient model reference distribution is inconsistent")
+        if self.stats_labels and self.inference_profile not in {"full_t", "full_z"}:
+            raise ValueError("statistical labels require a full inference profile")
+        label_count = sum(
+            1
+            for term in self.terms
+            if not self.only_significant
+            or (term.inference is not None and term.inference.significant is True)
+        )
+        if self.stats_labels and label_count > self.limits.maximum_labels:
+            raise ValueError("requested coefficient labels exceed maximum_labels")
+        if self.retained_rows > min(
+            self.limits.maximum_coefficients, self.limits.maximum_rendered_points
+        ):
+            raise ValueError("coefficient count exceeds resource limits")
+        if any(not warning for warning in self.warnings):
+            raise ValueError("coefficient warnings must be nonempty")
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)

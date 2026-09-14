@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from typing import Protocol, cast
 
-import polars as pl
 from matplotlib.colors import is_color_like
 from matplotlib.figure import Figure
 
 from plotsalot.coefficient_analysis import CoefficientAnalysis, analyze_ggcoefstats
-from plotsalot.coefficient_result import CoefficientResult
+from plotsalot.coefficient_result import CoefficientResult, CoefficientTableResult
+from plotsalot.coefficient_table_analysis import TableCoefficientAnalysis
 from plotsalot.plot import PlotAnnotations, StatsPlot
 from plotsalot.theme import StatsTheme, theme_ggstatsplot
 
@@ -118,8 +118,142 @@ def _caption(result: CoefficientResult) -> str:
     )
 
 
+def _identity_label(result: CoefficientTableResult, index: int) -> str:
+    identity = result.terms[index].identity
+    values = tuple(
+        value
+        for value in (
+            identity.response,
+            identity.component,
+            identity.group,
+            identity.term,
+        )
+        if value is not None
+    )
+    return " | ".join(values)
+
+
+def _coefficient_subtitle(result: CoefficientTableResult) -> str:
+    source = (
+        "reported table" if result.source_kind == "table" else "fitted Statsmodels OLS"
+    )
+    if result.inference_profile == "estimate_only":
+        return f"{source}; estimates only; no interval or test inference"
+    if result.inference_profile == "interval":
+        return (
+            f"{source}; reported {result.conf_level:.0%} confidence intervals; no tests"
+        )
+    kind = "Student-t" if result.inference_profile == "full_t" else "normal"
+    return f"{source}; {kind} coefficient inference; two-sided unadjusted p-values"
+
+
+def _coefficient_caption(result: CoefficientTableResult) -> str:
+    text = (
+        f"n terms = {result.retained_rows}; estimate: {result.estimate_label}; "
+        f"scale: {result.effect_scale}; direction: {result.effect_direction}; "
+        f"units: {result.effect_units}; excluded intercepts: "
+        f"{len(result.excluded_intercepts)}"
+    )
+    model = result.model_summary
+    if model is not None:
+        aic = f"{model.aic:.3g}" if model.aic is not None else "unavailable"
+        bic = f"{model.bic:.3g}" if model.bic is not None else "unavailable"
+        text += (
+            f"; OLS {model.covariance_type}, n = {model.nobs}, AIC = {aic}, BIC = {bic}"
+        )
+    return text
+
+
+def _render_coefficients(
+    analysis: TableCoefficientAnalysis,
+    *,
+    title: str | None,
+    results_subtitle: bool,
+    show_intervals: bool,
+    x_label: str | None,
+    point_color: str,
+    theme: StatsTheme | None,
+) -> StatsPlot[CoefficientTableResult]:
+    result = analysis.result
+    figure = Figure(layout="constrained")
+    axes = figure.subplots()
+    renderer = cast(_CoefficientAxes, axes)
+    count = len(result.terms)
+    positions = tuple(float(count - index) for index in range(count))
+    renderer.axvline(result.null_value, color="#666666", linestyle="--", linewidth=1.0)
+    for term, position in zip(result.terms, positions, strict=True):
+        interval = term.inference.interval if term.inference is not None else None
+        xerr = (
+            [[term.estimate - interval.low], [interval.high - term.estimate]]
+            if show_intervals and interval is not None
+            else None
+        )
+        renderer.errorbar(
+            term.estimate,
+            position,
+            xerr=xerr,
+            fmt="o",
+            color=point_color,
+            capsize=3.0,
+            markersize=5.0,
+            label=None,
+            zorder=3,
+        )
+        inference = term.inference
+        visible = (
+            result.stats_labels
+            and inference is not None
+            and inference.p_value is not None
+            and (not result.only_significant or inference.significant is True)
+        )
+        if visible:
+            if inference is None:
+                raise AssertionError("visible coefficient label lost inference")
+            if inference.statistic is None or inference.p_value is None:
+                raise AssertionError("visible coefficient label lost test inference")
+            df_text = f", df = {inference.df:.3g}" if inference.df is not None else ""
+            label = (
+                f"{inference.statistic_name} = {inference.statistic:.3g}"
+                f"{df_text}, {_p_text(inference.p_value)}"
+            )
+            renderer.text(
+                1.01,
+                position,
+                label,
+                transform=axes.get_yaxis_transform(),
+                ha="left",
+                va="center",
+                fontsize="small",
+            )
+    renderer.set_yticks(
+        positions, [_identity_label(result, index) for index in range(count)]
+    )
+    renderer.set_ylim(0.5, float(count) + 0.5)
+    renderer.set_xlabel(x_label or f"{result.estimate_label} ({result.effect_units})")
+    rendered_title = title or "Coefficient estimates"
+    renderer.set_title(rendered_title)
+    subtitle = _coefficient_subtitle(result)
+    caption = _coefficient_caption(result)
+    if results_subtitle:
+        renderer.text(
+            0.5, 1.01, subtitle, transform=axes.transAxes, ha="center", va="bottom"
+        )
+    figure_renderer = cast(_CoefficientFigure, figure)
+    figure_renderer.text(0.01, 0.01, caption, ha="left", va="bottom", fontsize="small")
+    figure_renderer.set_size_inches(
+        8.0, min(24.0, max(4.8, 2.5 + 0.34 * count)), forward=True
+    )
+    (theme or theme_ggstatsplot()).apply(axes)
+    return StatsPlot(
+        figure,
+        {"main": axes},
+        result,
+        PlotAnnotations(rendered_title, subtitle, caption),
+    )
+
+
 def render_ggcoefstats(
-    analysis: CoefficientAnalysis,
+    analysis: CoefficientAnalysis | TableCoefficientAnalysis,
     *,
     title: str | None = None,
     results_subtitle: bool = True,
@@ -129,8 +263,8 @@ def render_ggcoefstats(
     point_color: str = "#4c78a8",
     pooled_color: str = "#e45756",
     theme: StatsTheme | None = None,
-) -> StatsPlot[CoefficientResult]:
-    """Render one typed M5B analysis without recomputing statistics."""
+) -> StatsPlot[CoefficientResult] | StatsPlot[CoefficientTableResult]:
+    """Render one typed M5 coefficient analysis without recomputing statistics."""
 
     for value, label in (
         (results_subtitle, "results_subtitle"),
@@ -146,6 +280,17 @@ def render_ggcoefstats(
         raise ValueError("title must be nonempty when supplied")
     if x_label is not None and not x_label:
         raise ValueError("x_label must be nonempty when supplied")
+
+    if isinstance(analysis, TableCoefficientAnalysis):
+        return _render_coefficients(
+            analysis,
+            title=title,
+            results_subtitle=results_subtitle,
+            show_intervals=show_intervals,
+            x_label=x_label,
+            point_color=point_color,
+            theme=theme,
+        )
 
     result = analysis.result
     figure = Figure(layout="constrained")
@@ -252,9 +397,10 @@ def render_ggcoefstats(
 
 
 def ggcoefstats(
-    data: pl.DataFrame,
+    data: object,
     *,
     meta_analytic_effect: bool = False,
+    estimate_label: str = "",
     estimand: str = "",
     effect_scale: str = "",
     effect_direction: str = "",
@@ -262,8 +408,12 @@ def ggcoefstats(
     dependence: str = "independent",
     null_value: float = 0.0,
     conf_level: float = 0.95,
+    alpha: float = 0.05,
     stats_labels: bool = True,
     only_significant: bool = False,
+    exclude_intercept: bool = False,
+    sort: str = "none",
+    maximum_coefficients: int = 500,
     maximum_studies: int = 500,
     maximum_rendered_points: int = 500,
     maximum_labels: int = 200,
@@ -275,12 +425,13 @@ def ggcoefstats(
     point_color: str = "#4c78a8",
     pooled_color: str = "#e45756",
     theme: StatsTheme | None = None,
-) -> StatsPlot[CoefficientResult]:
-    """Analyze and render the explicit M5B meta-analysis mode."""
+) -> StatsPlot[CoefficientResult] | StatsPlot[CoefficientTableResult]:
+    """Analyze and render an approved M5 coefficient or meta-analysis input."""
 
     analysis = analyze_ggcoefstats(
         data,
         meta_analytic_effect=meta_analytic_effect,
+        estimate_label=estimate_label,
         estimand=estimand,
         effect_scale=effect_scale,
         effect_direction=effect_direction,
@@ -288,8 +439,12 @@ def ggcoefstats(
         dependence=dependence,
         null_value=null_value,
         conf_level=conf_level,
+        alpha=alpha,
         stats_labels=stats_labels,
         only_significant=only_significant,
+        exclude_intercept=exclude_intercept,
+        sort=sort,
+        maximum_coefficients=maximum_coefficients,
         maximum_studies=maximum_studies,
         maximum_rendered_points=maximum_rendered_points,
         maximum_labels=maximum_labels,

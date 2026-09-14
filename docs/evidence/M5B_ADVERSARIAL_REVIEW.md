@@ -19,7 +19,7 @@
 | M5B-AR-007 | `only_significant` could alter study membership or pooling | Blocking | Compute and retain every study before applying label visibility; renderer consults the display policy only for text | renderer label and result-count tests |
 | M5B-AR-008 | Large label/point requests could create unbounded work or silent sampling | Blocking | Default to 500 studies/points and 200 labels, cap explicit overrides at 1,000, and fail before figure creation | ceiling and invalid-resource tests; retained 500-study grid |
 | M5B-AR-009 | Upstream parametric wording could imply inferential equivalence | Blocking, closed | Classify Python M5B as adapted because pooled inference uses modified Hartung–Knapp rather than upstream normal inference | raw pinned-ggstatsplot object plus base-R and metafor normal/`adhoc` oracle comparisons |
-| M5B-AR-010 | A meta-only implementation cannot yet prove the shared M5A/M5B result/renderer promise | Blocking for M5/`0.3`; carried forward | Reserve and implement the shared coefficient result/renderer surface for meta mode; require M5A integration evidence before M5/`0.3` closeout | M5B composition passes; M5A remains pending |
+| M5B-AR-010 | A meta-only implementation cannot yet prove the shared M5A/M5B result/renderer promise | Blocking, closed | Implement both modes through the shared schema-v1 result family, public dispatch, semantic renderer, extraction, and composition contracts | combined M5 tests, oracle, and production gate |
 
 ## Independent review checklist
 
@@ -36,5 +36,5 @@ and isolated-wheel behavior.
 
 Joshua Myers independently reviewed the M5B implementation and evidence and
 accepted the technical candidate on 2026-09-14. No new M5B finding was reported.
-M5B-AR-010 is carried into the combined M5 gate and cannot close until M5A proves
-the shared result and renderer contract.
+M5B-AR-010 closed when M5A proved the shared result and renderer contract. Joshua
+Myers accepted the final combined M5/`0.3` candidate on 2026-09-14.

@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M0–M4 complete; M5B adapted technical core under verification
+- Status: M0–M5 complete; `0.3` product gate accepted
 
 Definitions:
 
@@ -21,7 +21,7 @@ Definitions:
 | `extract_subtitle` | `extract_subtitle` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `ggbarstats` | `ggbarstats` | 0.2 | Adapted; shared classical categorical analysis and normalized bars implemented |
 | `ggbetweenstats` | `ggbetweenstats` | 0.1 | Adapted; Welch parametric/Holm mode implemented |
-| `ggcoefstats` | `ggcoefstats` | 0.3 | Adapted M5B REML/Hartung–Knapp meta mode implemented; M5A and final verification pending |
+| `ggcoefstats` | `ggcoefstats` | 0.3 | Adapted M5A strict table/OLS and M5B REML/Hartung–Knapp modes implemented and accepted |
 | `ggcorrmat` | `ggcorrmat` | 0.1 | Adapted; Pearson/Holm mode implemented |
 | `ggdotplotstats` | `ggdotplotstats` | 0.1 | Adapted; labeled parametric mode implemented |
 | `gghistostats` | `gghistostats` | M0/0.1 | Adapted; one-sample parametric mode implemented |
@@ -123,6 +123,13 @@ schema-v1 result, REML weights and convergence record, modified
 Hartung–Knapp inference, prediction behavior, heterogeneity records, semantic
 forest renderer, extraction, and composition are now implemented.
 
+M5A implements four explicit table profiles and one exact fitted Statsmodels OLS
+adapter. It rejects broad model dispatch, WLS/GLS/GLM and raw result objects,
+uses explicit structured identities and intercept metadata, retains reported or
+model-derived inference provenance, and makes no multiplicity or model-validity
+claim. This is adapted rather than equivalent to upstream's broad R tidying
+dispatch.
+
 The approved MA1–MA4 specification retains upstream's REML between-study
 variance estimator but adapts its default normal pooled inference to a modified
 Hartung–Knapp t method. It requires explicit independent-study and common-scale
@@ -131,11 +138,12 @@ and forbids estimator fallback. The Python path is therefore classified as
 adapted rather than equivalent to upstream's default normal pooled inference.
 The pinned-R fixture retains the raw upstream object, independently solves the
 approved REML/modified-Hartung–Knapp path in base R, and verifies pinned
-metafor's normal and `adhoc` results at its iterative precision. Independent
-review remains pending.
+metafor's normal and `adhoc` results at its iterative precision. Joshua Myers
+independently reviewed and accepted both tracks and the combined M5/`0.3`
+candidate on 2026-09-14.
 
 Robust/Bayesian meta-analysis, Bayes-factor captions, automatic term creation,
 heuristic duplicate-term concatenation, arbitrary model dispatch, ANOVA effect
 sizes, exponentiated/transformed parameters, ellipsis forwarding, and dynamic R
-plotting objects are provisionally deferred. Final classifications require M5
+plotting objects are deferred beyond M5. These classifications passed M5
 implementation evidence and accountable review.

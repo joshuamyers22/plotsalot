@@ -781,6 +781,75 @@ utils::write.csv(
   na = "NA"
 )
 
+# M5A coefficient and fitted-model fixtures ---------------------------------
+
+coefficient_input <- utils::read.csv(file.path(input_dir, "m5a-coefficients.csv"))
+coefficient_tidy <- data.frame(
+  term = coefficient_input$term,
+  estimate = coefficient_input$estimate,
+  std.error = coefficient_input$standard_error,
+  statistic = coefficient_input$statistic,
+  p.value = coefficient_input$p_value,
+  conf.low = coefficient_input$conf_low,
+  conf.high = coefficient_input$conf_high,
+  stringsAsFactors = FALSE
+)
+coefficient_plot <- ggstatsplot::ggcoefstats(
+  coefficient_tidy,
+  conf.int = TRUE,
+  conf.level = 0.95,
+  stats.labels = FALSE
+)
+dput(
+  ggstatsplot::extract_stats(coefficient_plot),
+  file = file.path(output_dir, "m5a-coefficients-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+
+ols_input <- utils::read.csv(file.path(input_dir, "m5a-ols.csv"))
+ols_fit <- stats::lm(y ~ x, data = ols_input)
+ols_plot <- ggstatsplot::ggcoefstats(
+  ols_fit,
+  conf.int = TRUE,
+  conf.level = 0.95,
+  stats.labels = FALSE
+)
+dput(
+  ggstatsplot::extract_stats(ols_plot),
+  file = file.path(output_dir, "m5a-ols-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+ols_coefficients <- summary(ols_fit)$coefficients
+ols_intervals <- stats::confint(ols_fit, level = 0.95)
+utils::write.csv(
+  data.frame(
+    term = c("const", "x1"),
+    estimate = unname(ols_coefficients[, "Estimate"]),
+    standard_error = unname(ols_coefficients[, "Std. Error"]),
+    statistic = unname(ols_coefficients[, "t value"]),
+    df = stats::df.residual(ols_fit),
+    p_value = unname(ols_coefficients[, "Pr(>|t|)"]),
+    interval_low = unname(ols_intervals[, 1L]),
+    interval_high = unname(ols_intervals[, 2L]),
+    stringsAsFactors = FALSE
+  ),
+  file.path(output_dir, "m5a-ols-results.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+utils::write.csv(
+  data.frame(
+    nobs = stats::nobs(ols_fit),
+    df_model = length(stats::coef(ols_fit)) - 1L,
+    df_resid = stats::df.residual(ols_fit),
+    rank = ols_fit$rank,
+    stringsAsFactors = FALSE
+  ),
+  file.path(output_dir, "m5a-ols-summary.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+
 # M5B frequentist random-effects meta-analysis fixture -----------------------
 
 meta_input <- utils::read.csv(file.path(input_dir, "m5b-meta.csv"))

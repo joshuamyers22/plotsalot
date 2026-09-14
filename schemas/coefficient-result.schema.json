@@ -2,36 +2,150 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://plotsalot.dev/schemas/coefficient-result.schema.json",
   "title": "plotsalot coefficient and meta-analysis result schema v1",
-  "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "schema_version", "analysis", "source_kind", "inference_profile",
-    "term_column", "estimate_column", "standard_error_column", "input_rows",
-    "retained_rows", "source_order", "display_order", "terms", "meta_analysis",
-    "conf_level", "alpha", "stats_labels", "only_significant", "limits", "warnings"
+  "oneOf": [
+    {"$ref": "#/$defs/meta_result"},
+    {"$ref": "#/$defs/table_result"}
   ],
-  "properties": {
-    "schema_version": {"const": 1},
-    "analysis": {"const": "ggcoefstats_meta_analysis"},
-    "source_kind": {"const": "table"},
-    "inference_profile": {"const": "study_effect_standard_error"},
-    "term_column": {"const": "term"},
-    "estimate_column": {"const": "estimate"},
-    "standard_error_column": {"const": "standard_error"},
-    "input_rows": {"type": "integer", "minimum": 3},
-    "retained_rows": {"type": "integer", "minimum": 3},
-    "source_order": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}},
-    "display_order": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}},
-    "terms": {"type": "array", "minItems": 3, "items": {"$ref": "#/$defs/term"}},
-    "meta_analysis": {"$ref": "#/$defs/meta"},
-    "conf_level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
-    "alpha": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
-    "stats_labels": {"type": "boolean"},
-    "only_significant": {"type": "boolean"},
-    "limits": {"$ref": "#/$defs/limits"},
-    "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
-  },
   "$defs": {
+    "meta_result": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "analysis", "source_kind", "inference_profile",
+        "term_column", "estimate_column", "standard_error_column", "input_rows",
+        "retained_rows", "source_order", "display_order", "terms", "meta_analysis",
+        "conf_level", "alpha", "stats_labels", "only_significant", "limits", "warnings"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "analysis": {"const": "ggcoefstats_meta_analysis"},
+        "source_kind": {"const": "table"},
+        "inference_profile": {"const": "study_effect_standard_error"},
+        "term_column": {"const": "term"},
+        "estimate_column": {"const": "estimate"},
+        "standard_error_column": {"const": "standard_error"},
+        "input_rows": {"type": "integer", "minimum": 3},
+        "retained_rows": {"type": "integer", "minimum": 3},
+        "source_order": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}},
+        "display_order": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}},
+        "terms": {"type": "array", "minItems": 3, "items": {"$ref": "#/$defs/term"}},
+        "meta_analysis": {"$ref": "#/$defs/meta"},
+        "conf_level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "alpha": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "stats_labels": {"type": "boolean"},
+        "only_significant": {"type": "boolean"},
+        "limits": {"$ref": "#/$defs/limits"},
+        "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "table_result": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "analysis", "source_kind", "inference_profile",
+        "identity_columns", "input_rows", "retained_rows", "source_order",
+        "display_order", "terms", "excluded_intercepts", "model_summary",
+        "estimate_label", "effect_scale", "effect_direction", "effect_units",
+        "null_value", "conf_level", "alpha", "stats_labels", "only_significant",
+        "sort", "limits", "warnings"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "analysis": {"const": "ggcoefstats_coefficients"},
+        "source_kind": {"enum": ["table", "statsmodels_ols"]},
+        "inference_profile": {"enum": ["estimate_only", "interval", "full_t", "full_z"]},
+        "identity_columns": {"type": "array", "maxItems": 3, "items": {"enum": ["response", "component", "group"]}},
+        "input_rows": {"type": "integer", "minimum": 1},
+        "retained_rows": {"type": "integer", "minimum": 1},
+        "source_order": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/coefficient_identity"}},
+        "display_order": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/coefficient_identity"}},
+        "terms": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/coefficient_term"}},
+        "excluded_intercepts": {"type": "array", "items": {"$ref": "#/$defs/coefficient_identity"}},
+        "model_summary": {"oneOf": [{"$ref": "#/$defs/model_summary"}, {"type": "null"}]},
+        "estimate_label": {"type": "string", "minLength": 1},
+        "effect_scale": {"type": "string", "minLength": 1},
+        "effect_direction": {"type": "string", "minLength": 1},
+        "effect_units": {"type": "string", "minLength": 1},
+        "null_value": {"type": "number"},
+        "conf_level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "alpha": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "stats_labels": {"type": "boolean"},
+        "only_significant": {"type": "boolean"},
+        "sort": {"enum": ["none", "ascending", "descending"]},
+        "limits": {"$ref": "#/$defs/coefficient_limits"},
+        "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "coefficient_identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["response", "component", "group", "term"],
+      "properties": {
+        "response": {"type": ["string", "null"]},
+        "component": {"type": ["string", "null"]},
+        "group": {"type": ["string", "null"]},
+        "term": {"type": "string", "minLength": 1}
+      }
+    },
+    "reported_inference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "interval", "standard_error", "statistic_name", "statistic", "df", "p_value", "significant"],
+      "properties": {
+        "source": {"enum": ["reported", "statsmodels_ols"]},
+        "interval": {"oneOf": [{"$ref": "#/$defs/coefficient_interval"}, {"type": "null"}]},
+        "standard_error": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "statistic_name": {"enum": ["t", "z", null]},
+        "statistic": {"type": ["number", "null"]},
+        "df": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "p_value": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "significant": {"type": ["boolean", "null"]}
+      }
+    },
+    "coefficient_interval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"const": "coefficient"},
+        "method": {"enum": ["reported", "statsmodels_ols"]},
+        "level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "low": {"type": "number"}, "high": {"type": "number"}
+      }
+    },
+    "coefficient_term": {
+      "type": "object", "additionalProperties": false,
+      "required": ["identity", "is_intercept", "source_position", "display_position", "estimate", "inference"],
+      "properties": {
+        "identity": {"$ref": "#/$defs/coefficient_identity"},
+        "is_intercept": {"type": "boolean"},
+        "source_position": {"type": "integer", "minimum": 0},
+        "display_position": {"type": "integer", "minimum": 0},
+        "estimate": {"type": "number"},
+        "inference": {"oneOf": [{"$ref": "#/$defs/reported_inference"}, {"type": "null"}]}
+      }
+    },
+    "model_summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["model_class", "result_class", "statsmodels_version", "covariance_type", "use_t", "nobs", "df_model", "df_resid", "rank", "parameter_count", "aic", "bic"],
+      "properties": {
+        "model_class": {"const": "statsmodels.regression.linear_model.OLS"},
+        "result_class": {"const": "statsmodels.regression.linear_model.RegressionResultsWrapper"},
+        "statsmodels_version": {"type": "string", "minLength": 1},
+        "covariance_type": {"enum": ["nonrobust", "HC3"]},
+        "use_t": {"type": "boolean"},
+        "nobs": {"type": "integer", "minimum": 1},
+        "df_model": {"type": "number"}, "df_resid": {"type": "number", "exclusiveMinimum": 0},
+        "rank": {"type": "integer", "minimum": 1}, "parameter_count": {"type": "integer", "minimum": 1},
+        "aic": {"type": ["number", "null"]}, "bic": {"type": ["number", "null"]}
+      }
+    },
+    "coefficient_limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maximum_coefficients", "maximum_rendered_points", "maximum_labels", "maximum_identity_columns", "maximum_model_summary_fields"],
+      "properties": {
+        "maximum_coefficients": {"type": "integer", "minimum": 1},
+        "maximum_rendered_points": {"type": "integer", "minimum": 1},
+        "maximum_labels": {"type": "integer", "minimum": 1},
+        "maximum_identity_columns": {"type": "integer", "minimum": 1},
+        "maximum_model_summary_fields": {"type": "integer", "minimum": 1}
+      }
+    },
     "interval": {
       "type": "object", "additionalProperties": false,
       "required": ["target", "method", "level", "low", "high"],

@@ -1,0 +1,4 @@
+response,term,estimate,conf_low,conf_high,standard_error,statistic_kind,statistic,df,p_value,is_intercept
+outcome,constant,0.25,-0.15,0.65,0.20,t,1.25,12,0.235,true
+outcome,dose,-0.40,-0.75,-0.05,0.17,t,-2.35,12,0.036,false
+outcome,age,0.08,0.01,0.15,0.035,t,2.29,12,0.041,false

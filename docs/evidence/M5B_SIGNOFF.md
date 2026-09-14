@@ -12,11 +12,10 @@ Myers is the recorded statistical and product owner.
 | M5B technical release-candidate gates | Implementation owner | Codex | Verified, 2026-09-14 | Complete |
 | Independent adversarial review | Independent reviewer | Joshua Myers | Accepted, 2026-09-14 | Complete |
 | M5B technical candidate acceptance | Product/statistical owner | Joshua Myers | Accepted, 2026-09-14 | Complete |
-| Final M5 and `0.3` release acceptance | Product/statistical owner | Joshua Myers | Pending M5A and combined gate | Blocking |
+| Final M5 and `0.3` release acceptance | Product/statistical owner | Joshua Myers | Accepted, 2026-09-14 | Complete |
 
 The approved decisions are specified in `../M5_STATISTICAL_METHODS.md`.
 
 Joshua Myers approved MA1–MA4 without revision, independently reviewed the
-implemented evidence, and accepted the M5B technical candidate on 2026-09-14.
-This does not close M5 or `0.3`: M5A and the combined shared-contract gate remain
-required by the milestone contract.
+implemented evidence, accepted the M5B technical candidate, and accepted the
+final combined M5/`0.3` candidate on 2026-09-14.

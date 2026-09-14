@@ -5,7 +5,7 @@
   semantic renderer, extraction/composition, tests, benchmark, and package gates
 - Technical result: core implementation passes its Python and pinned-R gates
 - Track result: independently reviewed and accepted as the M5B technical
-  candidate; shared M5A integration and final M5/`0.3` acceptance remain open
+  candidate; shared M5A integration and final M5/`0.3` acceptance complete
 
 ## Statistical and sample evidence
 
@@ -64,8 +64,8 @@ approximately 34.6 MB across these ceiling cases.
 ## Python production gate
 
 - Ruff and strict Pyright pass.
-- 163 tests pass with 92% repository branch coverage. New M5B modules cover:
-  study data 100%, analysis 91%, result contracts 97%, and renderer 96%.
+- The final combined gate has 175 passing tests with 92% repository branch
+  coverage; every M5 domain module has at least 90% branch coverage.
 - OSV reports no known vulnerabilities or adverse project statuses; dependency
   license policy passes.
 - Source distribution and wheel build successfully. An offline clean temporary
@@ -73,18 +73,12 @@ approximately 34.6 MB across these ceiling cases.
   passed an M5B analysis/render smoke test.
 - The expanded pinned oracle and benchmark verifiers pass.
 - Oracle manifest SHA-256:
-  `3f38642d15097b4785ac5432e6359eaeff542add9b7f344ef18c0447b1981b5a`
+  `21b0d6daef8a2dbec4477d797dad14d986def2192b59f70c71b1792ecb97e7b0`
 - Wheel SHA-256:
-  `31e52616a9455218797d9d32a502fd73a280d7fc33048c4c40967c017a5a1298`
-
-## Open gates
-
-- Implement M5A and prove both modes consume the shared coefficient-result and
-  renderer contract.
-- Run the combined M5 production gate and obtain final M5/`0.3` approval.
+  `51dd12092b6f8347021a241cb51b8feb7ba1c6c88f5c084a19052cd1a4dcb2f7`
 
 ## Independent acceptance
 
 Joshua Myers independently reviewed this evidence, reported no new M5B finding,
-and accepted the M5B technical candidate on 2026-09-14. The acceptance does not
-waive the M5A/shared-contract or final M5/`0.3` gates.
+accepted the M5B technical candidate, and accepted the final combined M5/`0.3`
+candidate on 2026-09-14.
