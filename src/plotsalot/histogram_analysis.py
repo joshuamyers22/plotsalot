@@ -19,6 +19,10 @@ from plotsalot.result import (
 )
 
 Alternative = Literal["two-sided", "less", "greater"]
+OneSampleAnalysisIdentity = Literal[
+    "gghistostats_one_sample_parametric",
+    "ggdotplotstats_one_sample_parametric",
+]
 
 
 class _TtestResult(Protocol):
@@ -45,8 +49,8 @@ class _ScipyStats(Protocol):
 scipy_stats = cast(_ScipyStats, import_module("scipy.stats"))
 
 _PROTOTYPE_WARNING = (
-    "M0 prototype: effect-size uncertainty and nonparametric, robust, Bayesian, "
-    "and grouped modes are not implemented."
+    "Adapted method: effect-size uncertainty and nonparametric, robust, and "
+    "Bayesian modes are not implemented."
 )
 
 
@@ -74,6 +78,26 @@ def analyze_gghistostats(
 ) -> HistogramAnalysis:
     """Analyze the parametric one-sample histogram method without rendering."""
 
+    sample = select_numeric_sample(data, x, minimum_size=2, require_variation=True)
+    return analyze_one_sample_sample(
+        sample,
+        analysis="gghistostats_one_sample_parametric",
+        test_value=test_value,
+        alternative=alternative,
+        conf_level=conf_level,
+    )
+
+
+def analyze_one_sample_sample(
+    sample: NumericSample,
+    *,
+    analysis: OneSampleAnalysisIdentity,
+    test_value: float = 0.0,
+    alternative: Alternative = "two-sided",
+    conf_level: float = 0.95,
+) -> HistogramAnalysis:
+    """Apply the approved one-sample method to an already reconciled sample."""
+
     if not 0.0 < conf_level < 1.0:
         raise ValueError("conf_level must be strictly between 0 and 1")
     if alternative not in {"two-sided", "less", "greater"}:
@@ -81,7 +105,6 @@ def analyze_gghistostats(
     if not np.isfinite(test_value):
         raise ValueError("test_value must be finite")
 
-    sample = select_numeric_sample(data, x, minimum_size=2, require_variation=True)
     values = sample.values
     mean = float(np.mean(values))
     standard_deviation = float(np.std(values, ddof=1))
@@ -99,8 +122,8 @@ def analyze_gghistostats(
 
     result = AnalysisResult(
         schema_version=1,
-        analysis="gghistostats_one_sample_parametric",
-        column=x,
+        analysis=analysis,
+        column=sample.column,
         sample=sample.audit,
         estimate=EstimateResult(
             name="mean",

@@ -26,6 +26,7 @@ verify-oracle:
 	uv run python tools/verify_oracle.py
 benchmark:
 	uv run python benchmarks/benchmark_m0.py
+	uv run python benchmarks/benchmark_m2.py
 	uv run python tools/verify_benchmark.py
 verify-benchmark:
 	uv run python tools/verify_benchmark.py

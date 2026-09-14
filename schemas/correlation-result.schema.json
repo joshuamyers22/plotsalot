@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plotsalot.invalid/schemas/correlation-result-v1.json",
+  "title": "plotsalot Pearson correlation result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "analysis", "x", "y", "sample", "estimate", "test", "interval", "limits", "warnings"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "analysis": {"const": "ggscatterstats_pearson"},
+    "x": {"type": "string", "minLength": 1},
+    "y": {"type": "string", "minLength": 1},
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_rows", "analyzed_rows", "dropped_null_rows"],
+      "properties": {
+        "input_rows": {"type": "integer", "minimum": 0},
+        "analyzed_rows": {"type": "integer", "minimum": 4},
+        "dropped_null_rows": {"type": "integer", "minimum": 0}
+      }
+    },
+    "estimate": {"type": "number", "minimum": -1, "maximum": 1},
+    "test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "alternative", "statistic", "df", "p_value"],
+      "properties": {
+        "name": {"const": "pearson_correlation"},
+        "alternative": {"const": "two-sided"},
+        "statistic": {"type": ["number", "null"]},
+        "df": {"type": "integer", "minimum": 2},
+        "p_value": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"const": "population_pearson_r"},
+        "method": {"const": "fisher_z_two_sided"},
+        "level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "low": {"type": "number", "minimum": -1, "maximum": 1},
+        "high": {"type": "number", "minimum": -1, "maximum": 1}
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_rows", "maximum_groups", "maximum_variables", "maximum_labels"],
+      "properties": {
+        "maximum_rows": {"type": "integer", "minimum": 1},
+        "maximum_groups": {"type": "null"},
+        "maximum_variables": {"type": "null"},
+        "maximum_labels": {"type": "null"}
+      }
+    },
+    "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

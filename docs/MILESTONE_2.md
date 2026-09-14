@@ -1,6 +1,6 @@
 # Milestone M2: Frequentist Univariate and Correlation Core
 
-- Status: Planned
+- Status: Complete
 - Contract date: 2026-09-14
 - Target duration: 4–5 weeks
 - Product and statistical owner: Joshua Myers
@@ -46,18 +46,18 @@ contract amendment rather than a closeout-time deferral.
 
 | Deliverable | Acceptance evidence | Status |
 |---|---|---|
-| Approved method records | One reviewed specification per supported univariate and association mode | Planned |
-| Univariate analysis core | Shared analysis used by histogram and dot renderers; analytic, independent-reference, and oracle tests | Planned |
-| Association analysis core | Bivariate and matrix results with explicit sample and multiplicity semantics | Planned |
-| Grouped execution contract | Stable ordering, group identity, atomic failure behavior, and per-group sample audits | Planned |
-| Versioned result schemas | Frozen typed records, JSON-safe mappings, schemas, and migration notes where M1 contracts change | Planned |
-| Semantic renderers | Layer/annotation tests showing that every displayed statistic comes from the paired result | Planned |
-| Compatibility disposition | Supported and rejected methods/arguments recorded in `compatibility.md` | Planned |
-| Oracle and independent evidence | Frozen R fixtures plus analytic or independent Python references at predeclared tolerances | Planned |
-| Performance baseline | Scatter workloads at 10K/100K/1M rows and correlation matrices at 10/25/50 variables | Planned |
-| Public documentation | Examples, method limitations, extraction behavior, errors, and reproducibility metadata | Planned |
-| Production repository gate | Check, audit, build, isolated-wheel smoke, oracle verification, and benchmark verification pass | Planned |
-| Milestone review and sign-off | Verification loop, adversarial review, finding disposition, and statistical-owner approval | Planned |
+| Approved method records | One reviewed specification per supported univariate and association mode | Complete |
+| Univariate analysis core | Shared analysis used by histogram and dot renderers; analytic, independent-reference, and oracle tests | Complete |
+| Association analysis core | Bivariate and matrix results with explicit sample and multiplicity semantics | Complete |
+| Grouped execution contract | Stable ordering, group identity, atomic failure behavior, and per-group sample audits | Complete |
+| Versioned result schemas | Frozen typed records, JSON-safe mappings, schemas, and migration notes where M1 contracts change | Complete |
+| Semantic renderers | Layer/annotation tests showing that every displayed statistic comes from the paired result | Complete |
+| Compatibility disposition | Supported and rejected methods/arguments recorded in `compatibility.md` | Complete |
+| Oracle and independent evidence | Frozen R fixtures plus analytic or independent Python references at predeclared tolerances | Complete |
+| Performance baseline | Scatter workloads at 10K/100K/1M rows and correlation matrices at 10/25/50 variables | Complete |
+| Public documentation | Examples, method limitations, extraction behavior, errors, and reproducibility metadata | Complete |
+| Production repository gate | Check, audit, build, isolated-wheel smoke, oracle verification, and benchmark verification pass | Complete |
+| Milestone review and sign-off | Verification loop, adversarial review, finding disposition, and statistical-owner approval | Complete |
 
 ## Statistical specification checklist
 
@@ -178,6 +178,13 @@ error bounds.
 - `docs/evidence/M2_SIGNOFF.md`
 - updated `docs/compatibility.md`, `STATISTICAL_ANALYSIS_PLAN.md`, public API
   documentation, schemas, oracle manifest, and benchmark manifest
+
+The active proposal is `M2_STATISTICAL_METHODS.md`; accountable decisions are
+tracked in `evidence/M2_SIGNOFF.md`.
+
+Joshua Myers approved the completed M2 release candidate on 2026-09-14. Every
+exit-gate requirement is satisfied; later methods and arguments remain governed
+by their recorded compatibility dispositions.
 
 ## Exit gate
 

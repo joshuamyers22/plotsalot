@@ -130,6 +130,144 @@ utils::write.csv(
   na = "NA"
 )
 
+# M2 labeled-dot fixture -------------------------------------------------------
+
+dot_input <- utils::read.csv(
+  file.path(input_dir, "m2-dot.csv"),
+  na.strings = c("", "NA")
+)
+dot_plot <- ggstatsplot::ggdotplotstats(
+  data = dot_input,
+  x = value,
+  y = label,
+  type = "parametric",
+  test.value = 0,
+  alternative = "two.sided",
+  conf.level = 0.95,
+  bf.message = FALSE,
+  centrality.plotting = FALSE
+)
+dput(
+  ggstatsplot::extract_stats(dot_plot),
+  file = file.path(output_dir, "m2-dot-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+
+dot_complete <- dot_input[stats::complete.cases(dot_input), , drop = FALSE]
+dot_labels <- unique(dot_complete$label)
+dot_rows <- lapply(dot_labels, function(label) {
+  values <- dot_complete$value[dot_complete$label == label]
+  interval <- stats::t.test(values, conf.level = 0.95)$conf.int
+  data.frame(
+    record = "label",
+    label = label,
+    input_rows = sum(dot_input$label == label, na.rm = TRUE),
+    analyzed_rows = length(values),
+    dropped_null_rows = sum(dot_input$label == label & is.na(dot_input$value), na.rm = TRUE),
+    mean = mean(values),
+    standard_deviation = stats::sd(values),
+    statistic = NA_real_,
+    df = length(values) - 1L,
+    p_value = NA_real_,
+    interval_low = unname(interval[[1L]]),
+    interval_high = unname(interval[[2L]]),
+    stringsAsFactors = FALSE
+  )
+})
+dot_overall_test <- stats::t.test(dot_complete$value, mu = 0, conf.level = 0.95)
+dot_overall <- data.frame(
+  record = "overall",
+  label = NA_character_,
+  input_rows = nrow(dot_input),
+  analyzed_rows = nrow(dot_complete),
+  dropped_null_rows = nrow(dot_input) - nrow(dot_complete),
+  mean = mean(dot_complete$value),
+  standard_deviation = stats::sd(dot_complete$value),
+  statistic = unname(dot_overall_test$statistic),
+  df = unname(dot_overall_test$parameter),
+  p_value = dot_overall_test$p.value,
+  interval_low = unname(dot_overall_test$conf.int[[1L]]),
+  interval_high = unname(dot_overall_test$conf.int[[2L]]),
+  stringsAsFactors = FALSE
+)
+utils::write.csv(
+  do.call(rbind, c(list(dot_overall), dot_rows)),
+  file.path(output_dir, "m2-dot-results.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+
+# M2 Pearson scatter and matrix fixture ---------------------------------------
+
+correlation_input <- utils::read.csv(
+  file.path(input_dir, "m2-correlation.csv"),
+  na.strings = c("", "NA")
+)
+scatter_plot <- ggstatsplot::ggscatterstats(
+  data = correlation_input,
+  x = x,
+  y = y,
+  type = "parametric",
+  conf.level = 0.95,
+  bf.message = FALSE,
+  marginal = FALSE
+)
+dput(
+  ggstatsplot::extract_stats(scatter_plot),
+  file = file.path(output_dir, "m2-scatter-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+matrix_plot <- ggstatsplot::ggcorrmat(
+  data = correlation_input,
+  cor.vars = c(x, y, z),
+  type = "parametric",
+  conf.level = 0.95,
+  p.adjust.method = "holm"
+)
+dput(
+  ggstatsplot::extract_stats(matrix_plot),
+  file = file.path(output_dir, "m2-corrmat-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+
+correlation_columns <- c("x", "y", "z")
+pair_indices <- utils::combn(seq_along(correlation_columns), 2L)
+correlation_rows <- lapply(seq_len(ncol(pair_indices)), function(index) {
+  left <- correlation_columns[[pair_indices[1L, index]]]
+  right <- correlation_columns[[pair_indices[2L, index]]]
+  complete <- stats::complete.cases(correlation_input[, c(left, right)])
+  test <- stats::cor.test(
+    correlation_input[[left]][complete],
+    correlation_input[[right]][complete],
+    method = "pearson",
+    alternative = "two.sided",
+    conf.level = 0.95
+  )
+  data.frame(
+    x = left,
+    y = right,
+    n_obs = sum(complete),
+    estimate = unname(test$estimate),
+    statistic = unname(test$statistic),
+    df = unname(test$parameter),
+    p_value = test$p.value,
+    interval_low = unname(test$conf.int[[1L]]),
+    interval_high = unname(test$conf.int[[2L]]),
+    stringsAsFactors = FALSE
+  )
+})
+correlation_results <- do.call(rbind, correlation_rows)
+correlation_results$adjusted_p_value <- stats::p.adjust(
+  correlation_results$p_value,
+  method = "holm"
+)
+utils::write.csv(
+  correlation_results,
+  file.path(output_dir, "m2-correlation-results.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+
 installed <- as.data.frame(utils::installed.packages()[, c("Package", "Version")])
 installed <- installed[order(installed$Package), , drop = FALSE]
 utils::write.csv(

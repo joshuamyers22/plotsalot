@@ -24,5 +24,11 @@ fields and independent base-R reference calculations at `1e-12` absolute and
 relative tolerance. Non-finite and degenerate fixtures retain upstream's
 acceptance behavior while requiring the safer Python contract to reject them.
 
+M2 adds raw pinned-ggstatsplot objects plus normalized base-R fixtures for the
+labeled-dot overall/per-label means and intervals, Pearson coefficients and
+Fisher intervals, pairwise sample counts, and Holm-adjusted matrix p-values.
+`tools/verify_oracle.py` compares those retained values to the Python result
+contracts and checks every oracle artifact hash.
+
 Do not publish the oracle image. Its development-only dependency graph has
 licenses distinct from the eventual plotsalot distribution decision.

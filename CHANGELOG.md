@@ -16,3 +16,13 @@
   ggstatsplot in ADR-010.
 - Added the detailed M2 contract for frequentist univariate, correlation,
   grouped-result, oracle, benchmark, and production acceptance gates.
+- Recorded Joshua Myers's approval of the pinned-source M2 statistical methods.
+- Added labeled dot plots, Pearson scatter plots, pairwise-complete Pearson
+  correlation matrices with Holm adjustment, and atomic grouped variants with
+  typed JSON-safe results and semantic Matplotlib renderers.
+- Added M2 resource ceilings, preserved scalar group identities, result schemas,
+  analytic/independent checks, and focused contract/failure tests.
+- Added pinned-R M2 oracle fixtures and the retained scatter/matrix performance
+  grid with five separate analysis and render measurements per workload.
+- Completed M2 after the full production gate, adversarial finding disposition,
+  independent review, and Joshua Myers's final milestone approval.

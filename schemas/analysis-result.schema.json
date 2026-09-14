@@ -17,7 +17,12 @@
   ],
   "properties": {
     "schema_version": {"const": 1},
-    "analysis": {"type": "string", "minLength": 1},
+    "analysis": {
+      "enum": [
+        "gghistostats_one_sample_parametric",
+        "ggdotplotstats_one_sample_parametric"
+      ]
+    },
     "column": {"type": "string", "minLength": 1},
     "sample": {
       "type": "object",
@@ -77,6 +82,30 @@
     "warnings": {
       "type": "array",
       "items": {"type": "string"}
+    }
+  },
+  "$defs": {
+    "sampleAudit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_rows", "analyzed_rows", "dropped_null_rows"],
+      "properties": {
+        "input_rows": {"type": "integer", "minimum": 0},
+        "analyzed_rows": {"type": "integer", "minimum": 0},
+        "dropped_null_rows": {"type": "integer", "minimum": 0}
+      }
+    },
+    "meanInterval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"const": "population_mean"},
+        "method": {"const": "student_t_two_sided"},
+        "level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "low": {"type": "number"},
+        "high": {"type": "number"}
+      }
     }
   }
 }

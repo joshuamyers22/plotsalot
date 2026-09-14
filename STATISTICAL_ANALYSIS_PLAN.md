@@ -1,6 +1,6 @@
 # Statistical Analysis Plan: Cross-Language Parity Program
 
-- Status: M0 one-sample specification approved; future methods remain gated
+- Status: M0 and M2 classical specifications approved
 - Version: 0.1.0
 - Date: 2026-09-13
 - Statistical owner/reviewer: Joshua Myers; M0 approval recorded 2026-09-14
@@ -90,6 +90,14 @@
   mean, sample deviation, t statistic, df, p-value, and interval on well-scaled
   fixtures. Oracle tolerances may differ only through reviewed method records.
 
+## M2 classical frequentist proposal
+
+`docs/M2_STATISTICAL_METHODS.md` specifies the approved labeled-dot summaries,
+grouped test-family scope, Pearson correlation and Fisher interval, pairwise
+correlation-matrix missingness, Holm adjustment, grouped correction scopes, and
+resource limits. Joshua Myers approved U2, G1, C1, C2, and G2 without revision
+on 2026-09-14; the earlier U1 approval remains in force.
+
 ## Diagnostics and validation
 
 - Identification/rank/residual diagnostics: method-specific; not applicable to
@@ -119,5 +127,6 @@
 - Monitoring/rollback: run parity and numerical-drift suites on dependency
   updates. Yank and patch a defective release; never silently revise a result.
 - Approval: Joshua Myers approved the M0 one-sample specification and documented
-  upstream adaptations on 2026-09-14. Later method families require separate
+  upstream adaptations on 2026-09-14 and approved the M2 classical
+  specification on the same date. Later method families require separate
   approvals under this plan.

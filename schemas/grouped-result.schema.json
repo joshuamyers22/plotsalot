@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plotsalot.dev/schemas/grouped-result.schema.json",
+  "title": "plotsalot grouped result schema v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "analysis",
+    "group_column",
+    "sample",
+    "correction_scope",
+    "groups",
+    "limits",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "analysis": {
+      "enum": [
+        "grouped_gghistostats_one_sample_parametric",
+        "grouped_ggdotplotstats_one_sample_parametric",
+        "grouped_ggscatterstats_pearson",
+        "grouped_ggcorrmat_pearson"
+      ]
+    },
+    "group_column": { "type": "string", "minLength": 1 },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_rows",
+        "analyzed_rows",
+        "dropped_null_group_rows"
+      ],
+      "properties": {
+        "input_rows": { "type": "integer", "minimum": 0 },
+        "analyzed_rows": { "type": "integer", "minimum": 0 },
+        "dropped_null_group_rows": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "correction_scope": {
+      "enum": ["none_across_groups", "within_group_matrix"]
+    },
+    "groups": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["group", "result"],
+        "properties": {
+          "group": {
+            "anyOf": [
+              { "type": "string", "minLength": 1 },
+              { "type": "integer" },
+              { "type": "number" },
+              { "type": "boolean" }
+            ]
+          },
+          "result": {
+            "oneOf": [
+              { "$ref": "analysis-result.schema.json" },
+              { "$ref": "dotplot-result.schema.json" },
+              { "$ref": "correlation-result.schema.json" },
+              { "$ref": "correlation-matrix-result.schema.json" }
+            ]
+          }
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maximum_rows",
+        "maximum_groups",
+        "maximum_variables",
+        "maximum_labels"
+      ],
+      "properties": {
+        "maximum_rows": { "type": "integer", "minimum": 1 },
+        "maximum_groups": { "type": "integer", "minimum": 1 },
+        "maximum_variables": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "maximum_labels": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

@@ -12,7 +12,7 @@ from typing import Any
 
 import polars as pl
 
-from plotsalot import analyze_gghistostats
+from plotsalot import analyze_ggcorrmat, analyze_ggdotplotstats, analyze_gghistostats
 
 ROOT = Path(__file__).resolve().parents[1]
 ORACLE = ROOT / "oracle"
@@ -21,6 +21,12 @@ OUTPUT = ORACLE / "fixtures" / "r-output"
 MANIFEST = ORACLE / "fixtures" / "manifest.json"
 NORMAL_FIXTURES = ("normal", "null-containing", "small-sample")
 BOUNDARY_FIXTURES = ("non-finite", "degenerate")
+M2_INPUT_FIXTURES = ("m2-dot", "m2-correlation")
+M2_RAW_FIXTURES = (
+    "m2-dot-ggstatsplot.R",
+    "m2-scatter-ggstatsplot.R",
+    "m2-corrmat-ggstatsplot.R",
+)
 FLOAT_FIELDS = {
     "test_value": lambda result: result.test.null_value,
     "conf_level": lambda result: result.interval.level,
@@ -116,6 +122,98 @@ def _verify_results() -> None:
         raise AssertionError(f"Python unexpectedly accepted boundary fixture {name}")
 
 
+def _close(actual: float, expected: str, label: str) -> None:
+    reference = float(expected)
+    if not math.isclose(actual, reference, rel_tol=1e-12, abs_tol=1e-12):
+        raise AssertionError(f"{label}: Python={actual:.17g}, R={reference:.17g}")
+
+
+def _verify_m2_results() -> None:
+    for filename in M2_RAW_FIXTURES:
+        path = OUTPUT / filename
+        if not path.is_file() or path.stat().st_size == 0:
+            raise AssertionError(f"missing raw ggstatsplot M2 result: {path}")
+
+    dot_data = pl.read_csv(INPUT / "m2-dot.csv", null_values="NA")
+    dot_result = analyze_ggdotplotstats(dot_data, "value", "label").result
+    with (OUTPUT / "m2-dot-results.csv").open(newline="") as handle:
+        dot_rows = list(csv.DictReader(handle))
+    overall = next(row for row in dot_rows if row["record"] == "overall")
+    dot_integer_fields = {
+        "input_rows": dot_result.sample.input_rows,
+        "analyzed_rows": dot_result.sample.analyzed_rows,
+        "dropped_null_rows": dot_result.sample.dropped_null_rows,
+    }
+    for field, actual in dot_integer_fields.items():
+        if actual != int(overall[field]):
+            raise AssertionError(
+                f"m2-dot.overall.{field}: Python={actual}, R={overall[field]}"
+            )
+    one_sample = dot_result.one_sample
+    for field, actual in {
+        "mean": one_sample.estimate.value,
+        "standard_deviation": one_sample.estimate.standard_deviation,
+        "statistic": one_sample.test.statistic,
+        "df": one_sample.test.df,
+        "p_value": one_sample.test.p_value,
+        "interval_low": one_sample.interval.low,
+        "interval_high": one_sample.interval.high,
+    }.items():
+        _close(actual, overall[field], f"m2-dot.overall.{field}")
+
+    labels = {estimate.label: estimate for estimate in dot_result.estimates}
+    expected_labels = {
+        row["label"]: row for row in dot_rows if row["record"] == "label"
+    }
+    if set(labels) != set(expected_labels):
+        raise AssertionError("m2-dot label identities differ")
+    for label, estimate in labels.items():
+        expected = expected_labels[label]
+        if estimate.interval is None or estimate.standard_deviation is None:
+            raise AssertionError(f"m2-dot.{label}: expected an interval")
+        for field, actual in {
+            "mean": estimate.value,
+            "standard_deviation": estimate.standard_deviation,
+            "interval_low": estimate.interval.low,
+            "interval_high": estimate.interval.high,
+        }.items():
+            _close(actual, expected[field], f"m2-dot.{label}.{field}")
+
+    correlation_data = pl.read_csv(INPUT / "m2-correlation.csv", null_values="NA")
+    matrix_result = analyze_ggcorrmat(
+        correlation_data, ("x", "y", "z"), p_adjust="holm"
+    ).result
+    cells = {(cell.x, cell.y): cell for cell in matrix_result.cells}
+    with (OUTPUT / "m2-correlation-results.csv").open(newline="") as handle:
+        correlation_rows = list(csv.DictReader(handle))
+    for expected in correlation_rows:
+        identity = (expected["x"], expected["y"])
+        cell = cells[identity]
+        if cell.n_obs != int(expected["n_obs"]):
+            raise AssertionError(
+                f"m2-correlation.{identity}.n_obs: "
+                f"Python={cell.n_obs}, R={expected['n_obs']}"
+            )
+        numeric = {
+            "estimate": cell.estimate,
+            "df": cell.df,
+            "p_value": cell.p_value,
+            "interval_low": None if cell.interval is None else cell.interval.low,
+            "interval_high": None if cell.interval is None else cell.interval.high,
+            "adjusted_p_value": cell.adjusted_p_value,
+        }
+        if abs(cell.estimate) < 1.0:
+            numeric["statistic"] = cell.statistic
+        elif cell.statistic is not None:
+            raise AssertionError(
+                f"m2-correlation.{identity}: perfect result has a statistic"
+            )
+        for field, actual in numeric.items():
+            if actual is None:
+                raise AssertionError(f"m2-correlation.{identity}.{field} is absent")
+            _close(float(actual), expected[field], f"m2-correlation.{identity}.{field}")
+
+
 def _artifact_paths() -> list[Path]:
     paths = [ORACLE / "Dockerfile", ORACLE / "DESCRIPTION", ORACLE / "generate.R"]
     paths.extend(sorted(INPUT.glob("*.csv")))
@@ -139,6 +237,8 @@ def _manifest_payload() -> dict[str, Any]:
         "ggstatsplot_revision": "7a724cd0ab55668b9d0b2e84b12c711c5be68ac8",
         "normal_fixtures": list(NORMAL_FIXTURES),
         "boundary_fixtures": list(BOUNDARY_FIXTURES),
+        "m2_input_fixtures": list(M2_INPUT_FIXTURES),
+        "m2_raw_fixtures": list(M2_RAW_FIXTURES),
         "sha256": _hashes(),
     }
 
@@ -147,6 +247,7 @@ def verify_oracle() -> None:
     """Verify semantic parity and all retained oracle artifact hashes."""
 
     _verify_results()
+    _verify_m2_results()
     retained = json.loads(MANIFEST.read_text())
     if retained != _manifest_payload():
         raise AssertionError("oracle artifact hashes differ from manifest")
@@ -158,6 +259,7 @@ def main() -> None:
     args = parser.parse_args()
     if args.write_manifest:
         _verify_results()
+        _verify_m2_results()
         payload = _manifest_payload()
         MANIFEST.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     else:

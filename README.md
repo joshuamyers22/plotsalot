@@ -3,8 +3,9 @@
 `plotsalot` is a planned Python implementation of the statistical-visualization
 workflows in [`ggstatsplot`](https://github.com/IndrajeetPatil/ggstatsplot).
 
-M0 and M1 are complete. The project remains an early one-method prototype and
-is not ready for analytical or production use.
+M0, M1, and M2 are complete. The approved frequentist univariate and correlation
+surfaces have passed their technical and statistical gates. The project remains
+pre-release and is not yet ready for production analytical use.
 
 ## Development
 
@@ -32,7 +33,7 @@ boundaries, and returns structured results alongside Matplotlib figures. R is
 used only to create frozen development-time parity evidence; released artifacts
 will not require R or network access.
 
-## Current prototype
+## Current API
 
 ```python
 import polars as pl
@@ -59,7 +60,33 @@ plot = render_gghistostats(analysis, title="Observed values")
 plot.axes["main"].grid(axis="y", alpha=0.2)
 ```
 
-Only the parametric one-sample prototype is implemented. See
+M2 also provides labeled means, Pearson scatter/correlation matrices, and atomic
+grouped operations:
+
+```python
+from plotsalot import (
+    ggcorrmat,
+    ggdotplotstats,
+    ggscatterstats,
+    grouped_ggscatterstats,
+)
+
+dot = ggdotplotstats(data, "value", "label")
+scatter = ggscatterstats(data, "x", "y")
+matrix = ggcorrmat(data, ("x", "y", "z"))
+grouped = grouped_ggscatterstats(data, "x", "y", "cohort")
+
+print(scatter.result.estimate)
+print(matrix.result.to_dict())
+for group_plot in grouped.plots:
+    group_plot.figure.savefig(f"group-{group_plot.title}.svg")
+```
+
+Only the approved classical modes are supported: one-sample Student tests,
+per-label mean intervals, two-sided Pearson correlations with Fisher intervals,
+and per-matrix Holm adjustment. Inputs are limited by default to 1,000,000 rows,
+200 dot labels, 50 matrix variables, and 20 groups. Unsupported upstream
+arguments and nonparametric, robust, and Bayesian modes remain deferred. See
 [`docs/MILESTONE_0.md`](docs/MILESTONE_0.md),
 [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md),
 [`docs/MILESTONE_2.md`](docs/MILESTONE_2.md),
@@ -68,7 +95,12 @@ Only the parametric one-sample prototype is implemented. See
 [`STATISTICAL_ANALYSIS_PLAN.md`](STATISTICAL_ANALYSIS_PLAN.md) for scope and
 evidence gates.
 
-The prototype is intentionally adapted rather than statistically identical to
+Custom ceilings are explicit keyword arguments on the applicable M2 surfaces
+and are serialized in `result.limits`. Invalid data, unsupported methods, and
+an invalid member of a grouped operation raise an error; grouped calls never
+return a partial result.
+
+The implementation is intentionally adapted rather than statistically identical to
 upstream: it rejects non-finite and zero-variance samples and reports Cohen's d;
 the pinned ggstatsplot oracle accepts those boundary fixtures and reports
 Hedges' g. The retained fixtures make that distinction testable.
