@@ -62,6 +62,7 @@ plot.axes["main"].grid(axis="y", alpha=0.2)
 Only the parametric one-sample prototype is implemented. See
 [`docs/MILESTONE_0.md`](docs/MILESTONE_0.md),
 [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md),
+[`docs/MILESTONE_2.md`](docs/MILESTONE_2.md),
 [`docs/CONTRACTS.md`](docs/CONTRACTS.md),
 [`docs/compatibility.md`](docs/compatibility.md), and
 [`STATISTICAL_ANALYSIS_PLAN.md`](STATISTICAL_ANALYSIS_PLAN.md) for scope and

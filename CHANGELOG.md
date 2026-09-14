@@ -14,3 +14,5 @@
   peak-allocation distributions, with artifact checks in the unit gate.
 - Adopted the MIT license and limited the upstream compatibility scope to
   ggstatsplot in ADR-010.
+- Added the detailed M2 contract for frequentist univariate, correlation,
+  grouped-result, oracle, benchmark, and production acceptance gates.

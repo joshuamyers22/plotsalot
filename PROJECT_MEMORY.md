@@ -33,6 +33,7 @@ restricted material. Update stable keys in place and remove stale entries.
 | `shared-contracts` | Result/data/analysis modules are independent of Matplotlib; a retained histogram analysis owns an immutable numeric sample and feeds a validated, caller-customizable plot container. | `docs/CONTRACTS.md`; `tests/test_contracts.py`; `tests/test_data_boundary.py` | 2026-09-14 |
 | `m0-oracle-adaptations` | The pinned ggstatsplot oracle accepts non-finite/degenerate fixtures and reports Hedges' g; plotsalot deliberately rejects those samples and reports Cohen's d. Shared t-test fields match at 1e-12 tolerance. | `oracle/fixtures/manifest.json`; `tools/verify_oracle.py`; `STATISTICAL_ANALYSIS_PLAN.md` | 2026-09-14 |
 | `m0-performance-baseline` | Five-sample analysis/render timing and incremental Python allocation peaks are retained for 10K, 100K, and 1M rows on the M0 arm64 host. | `benchmarks/results/m0-baseline.json`; `tools/verify_benchmark.py` | 2026-09-14 |
+| `m2-contract` | M2 is a planned 4–5 week frequentist univariate/correlation milestone covering histogram, dot, scatter, matrix, grouped, and extraction surfaces; each method remains blocked on its own approved statistical specification. | `docs/MILESTONE_2.md` | 2026-09-14 |
 
 ## Verified traps and failed approaches
 
