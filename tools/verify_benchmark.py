@@ -11,6 +11,7 @@ RESULT = ROOT / "benchmarks" / "results" / "m0-baseline.json"
 M2_RESULT = ROOT / "benchmarks" / "results" / "m2-baseline.json"
 M3_RESULT = ROOT / "benchmarks" / "results" / "m3-baseline.json"
 M4_RESULT = ROOT / "benchmarks" / "results" / "m4-baseline.json"
+M5B_RESULT = ROOT / "benchmarks" / "results" / "m5b-baseline.json"
 
 
 def _positive_int(value: Any, label: str) -> int:
@@ -189,6 +190,37 @@ def verify_benchmark() -> None:
                 raise AssertionError(f"{grid_name}.{size}: invalid phase mapping")
             for phase in phases:
                 _verify_summary(values.get(phase), f"{grid_name}.{size}.{phase}")
+
+    m5b = json.loads(M5B_RESULT.read_text())
+    if m5b.get("schema_version") != 1:
+        raise AssertionError("unsupported M5B benchmark schema")
+    measurement = m5b.get("measurement", {})
+    if measurement.get("repeats") != 5:
+        raise AssertionError("M5B baseline must retain five samples")
+    if measurement.get("input_frame_allocation") != "outside measured phases":
+        raise AssertionError("M5B input allocation boundary must be explicit")
+    study_results = m5b.get("study_results")
+    if not isinstance(study_results, dict) or set(study_results) != {
+        "3",
+        "10",
+        "100",
+        "500",
+    }:
+        raise AssertionError("M5B study-count grid does not match its contract")
+    expected_cases = {
+        "equal_variance_zero_heterogeneity",
+        "equal_variance_positive_heterogeneity",
+        "unequal_variance_zero_heterogeneity",
+        "unequal_variance_positive_heterogeneity",
+    }
+    for studies, cases in study_results.items():
+        if not isinstance(cases, dict) or set(cases) != expected_cases:
+            raise AssertionError(f"M5B {studies}: workload cases are incomplete")
+        for case, phases in cases.items():
+            if not isinstance(phases, dict):
+                raise AssertionError(f"M5B {studies}.{case}: invalid phases")
+            for phase in ("selection", "analysis", "render"):
+                _verify_summary(phases.get(phase), f"M5B.{studies}.{case}.{phase}")
 
 
 def main() -> None:

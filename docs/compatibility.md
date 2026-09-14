@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M0–M4 complete; M5 detailed contract prepared
+- Status: M0–M4 complete; M5B adapted technical core under verification
 
 Definitions:
 
@@ -21,7 +21,7 @@ Definitions:
 | `extract_subtitle` | `extract_subtitle` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `ggbarstats` | `ggbarstats` | 0.2 | Adapted; shared classical categorical analysis and normalized bars implemented |
 | `ggbetweenstats` | `ggbetweenstats` | 0.1 | Adapted; Welch parametric/Holm mode implemented |
-| `ggcoefstats` | `ggcoefstats` | 0.3 | M5A and M5B methods approved; implementation pending |
+| `ggcoefstats` | `ggcoefstats` | 0.3 | Adapted M5B REML/Hartung–Knapp meta mode implemented; M5A and final verification pending |
 | `ggcorrmat` | `ggcorrmat` | 0.1 | Adapted; Pearson/Holm mode implemented |
 | `ggdotplotstats` | `ggdotplotstats` | 0.1 | Adapted; labeled parametric mode implemented |
 | `gghistostats` | `gghistostats` | M0/0.1 | Adapted; one-sample parametric mode implemented |
@@ -109,7 +109,7 @@ Failure never triggers an automatic exact or simulated replacement. Defaults
 limit inputs to one million rows, 20 levels per axis, 400 cells/labels, 190
 pairwise hypotheses, 20 groups, and weighted total 1,000,000,000.
 
-## M5 planned disposition
+## M5 disposition
 
 `MILESTONE_5.md` contracts `ggcoefstats` as a strict Polars coefficient-table
 and narrow fitted-Statsmodels adapter rather than universal R-style model
@@ -118,14 +118,21 @@ plus one approved frequentist random-effects meta-analysis over independent,
 comparable study estimates. Joshua Myers approved K1–K4 for strict
 estimate/interval/full-inference tables and an exact fitted-OLS adapter. M5A
 implementation is authorized. Joshua Myers also approved MA1–MA4, authorizing
-M5B implementation.
+M5B implementation. The explicit Polars study-effect path, owned arrays,
+schema-v1 result, REML weights and convergence record, modified
+Hartung–Knapp inference, prediction behavior, heterogeneity records, semantic
+forest renderer, extraction, and composition are now implemented.
 
 The approved MA1–MA4 specification retains upstream's REML between-study
 variance estimator but adapts its default normal pooled inference to a modified
 Hartung–Knapp t method. It requires explicit independent-study and common-scale
 declarations, computes a prediction interval only with at least five studies,
-and forbids estimator fallback. These methods are approved but remain
-unimplemented compatibility dispositions.
+and forbids estimator fallback. The Python path is therefore classified as
+adapted rather than equivalent to upstream's default normal pooled inference.
+The pinned-R fixture retains the raw upstream object, independently solves the
+approved REML/modified-Hartung–Knapp path in base R, and verifies pinned
+metafor's normal and `adhoc` results at its iterative precision. Independent
+review remains pending.
 
 Robust/Bayesian meta-analysis, Bayes-factor captions, automatic term creation,
 heuristic duplicate-term concatenation, arbitrary model dispatch, ANOVA effect

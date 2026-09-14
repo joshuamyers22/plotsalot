@@ -120,15 +120,22 @@ on 2026-09-14.
 `docs/MILESTONE_5.md` defines the planned strict coefficient-table protocol,
 narrow fitted-Statsmodels adapter, semantic coefficient renderer, and
 frequentist random-effects meta-analysis boundary.
-`docs/M5_STATISTICAL_METHODS.md` proposes K1–K4 for M5A: strict estimate-only,
+`docs/M5_STATISTICAL_METHODS.md` specifies the approved K1–K4 methods for M5A:
+strict estimate-only,
 interval, full-t, and full-z table profiles; an exact fitted-OLS adapter with
 nonrobust/HC3 covariance provenance; deterministic selection/render semantics;
 and explicit limits. Joshua Myers approved K1–K4 without revision on
-2026-09-14, authorizing M5A implementation. The same method file now proposes
-MA1–MA4 for M5B: strict independent study estimates, intercept-only REML,
+2026-09-14, authorizing M5A implementation. The same method file specifies the
+approved MA1–MA4 methods for M5B: strict independent study estimates,
+intercept-only REML,
 modified Hartung–Knapp pooled inference, bounded prediction behavior, and
 Cochran-Q/I-squared/tau heterogeneity records. Joshua Myers approved MA1–MA4
 without revision on 2026-09-14, authorizing M5B implementation.
+The M5B technical core now implements that approved study boundary, REML,
+modified Hartung–Knapp, prediction, and heterogeneity path. Its independent
+likelihood/analytic fixtures, pinned-R oracle, and Python production gates pass;
+Joshua Myers independently reviewed and accepted the M5B technical candidate on
+2026-09-14. Shared M5A integration and final M5/`0.3` acceptance remain open.
 
 ## Diagnostics and validation
 

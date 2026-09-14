@@ -38,5 +38,13 @@ noncentral chi-square intervals and computes exact binomial intervals; the
 verifier explicitly asserts upstream Fisher, McNemar, Pearson's-C, and stratum
 adjustment differences as adaptations.
 
+M5B adds a raw pinned-ggstatsplot meta-analysis object and normalized study and
+summary results. The oracle independently solves the approved intercept-only
+REML score in base R and derives modified Hartung–Knapp inference, prediction,
+and heterogeneity values. Pinned metafor 5.0-1 supplies separate normal and
+`adhoc` references; its iterative tau estimate is checked at `1e-6` relative
+and `1e-8` absolute tolerance, while the independently solved values use
+`1e-10` relative and `1e-12` absolute tolerance.
+
 Do not publish the oracle image. Its development-only dependency graph has
 licenses distinct from the eventual plotsalot distribution decision.

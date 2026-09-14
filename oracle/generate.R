@@ -781,6 +781,154 @@ utils::write.csv(
   na = "NA"
 )
 
+# M5B frequentist random-effects meta-analysis fixture -----------------------
+
+meta_input <- utils::read.csv(file.path(input_dir, "m5b-meta.csv"))
+meta_tidy <- data.frame(
+  term = meta_input$term,
+  estimate = meta_input$estimate,
+  std.error = meta_input$standard_error,
+  check.names = FALSE,
+  stringsAsFactors = FALSE
+)
+meta_plot <- ggstatsplot::ggcoefstats(
+  meta_tidy,
+  conf.int = FALSE,
+  meta.analytic.effect = TRUE,
+  meta.type = "parametric",
+  bf.message = FALSE,
+  stats.labels = FALSE
+)
+dput(
+  ggstatsplot::extract_stats(meta_plot),
+  file = file.path(output_dir, "m5b-meta-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+
+meta_fit <- metafor::rma(
+  yi = meta_tidy$estimate,
+  sei = meta_tidy$std.error,
+  method = "REML",
+  test = "z"
+)
+meta_fit_adhoc <- metafor::rma(
+  yi = meta_tidy$estimate,
+  sei = meta_tidy$std.error,
+  method = "REML",
+  test = "adhoc"
+)
+meta_variances <- meta_tidy$std.error^2
+meta_scale <- max(abs(meta_tidy$estimate), meta_tidy$std.error)
+meta_scaled_estimates <- meta_tidy$estimate / meta_scale
+meta_scaled_variances <- (meta_tidy$std.error / meta_scale)^2
+meta_reml_score <- function(tau_squared) {
+  weights <- 1 / (meta_scaled_variances + tau_squared)
+  total <- sum(weights)
+  pooled <- sum(weights * meta_scaled_estimates) / total
+  sum(weights^2 * (meta_scaled_estimates - pooled)^2) -
+    total + sum(weights^2) / total
+}
+meta_score_at_zero <- meta_reml_score(0)
+if (meta_score_at_zero <= 0) {
+  meta_tau_squared <- 0
+} else {
+  meta_upper <- max(1, stats::var(meta_scaled_estimates), meta_scaled_variances)
+  while (meta_reml_score(meta_upper) >= 0) meta_upper <- meta_upper * 2
+  meta_tau_squared <- stats::uniroot(
+    meta_reml_score,
+    interval = c(0, meta_upper),
+    tol = .Machine$double.eps,
+    maxiter = 1000L
+  )$root * meta_scale^2
+}
+meta_weights <- 1 / (meta_variances + meta_tau_squared)
+meta_normalized_weights <- meta_weights / sum(meta_weights)
+meta_pooled <- sum(meta_normalized_weights * meta_tidy$estimate)
+meta_df <- nrow(meta_tidy) - 1L
+meta_q_hk <- sum(meta_weights * (meta_tidy$estimate - meta_pooled)^2) / meta_df
+meta_q_star <- max(1, meta_q_hk)
+meta_adjusted_variance <- meta_q_star / sum(meta_weights)
+meta_adjusted_se <- sqrt(meta_adjusted_variance)
+meta_statistic <- meta_pooled / meta_adjusted_se
+meta_p_value <- 2 * stats::pt(abs(meta_statistic), meta_df, lower.tail = FALSE)
+meta_t_critical <- stats::qt(0.975, meta_df)
+meta_ci <- meta_pooled + c(-1, 1) * meta_t_critical * meta_adjusted_se
+meta_prediction <- meta_pooled + c(-1, 1) * meta_t_critical * sqrt(
+  meta_tau_squared + meta_adjusted_variance
+)
+meta_fixed_weights <- 1 / meta_variances
+meta_fixed_mean <- sum(meta_fixed_weights * meta_tidy$estimate) / sum(meta_fixed_weights)
+meta_q <- sum(meta_fixed_weights * (meta_tidy$estimate - meta_fixed_mean)^2)
+meta_i_squared <- if (meta_q > 0) max(0, (meta_q - meta_df) / meta_q) else 0
+
+meta_summary <- data.frame(
+  fixture = "m5b-meta",
+  studies = nrow(meta_tidy),
+  tau_squared = meta_tau_squared,
+  tau = sqrt(meta_tau_squared),
+  pooled_estimate = meta_pooled,
+  conventional_variance = 1 / sum(meta_weights),
+  q_hk = meta_q_hk,
+  q_star = meta_q_star,
+  adjusted_variance = meta_adjusted_variance,
+  pooled_standard_error = meta_adjusted_se,
+  pooled_statistic = meta_statistic,
+  pooled_df = meta_df,
+  pooled_p_value = meta_p_value,
+  pooled_interval_low = meta_ci[[1L]],
+  pooled_interval_high = meta_ci[[2L]],
+  prediction_interval_low = meta_prediction[[1L]],
+  prediction_interval_high = meta_prediction[[2L]],
+  q = meta_q,
+  q_df = meta_df,
+  q_p_value = stats::pchisq(meta_q, meta_df, lower.tail = FALSE),
+  q_reference_mean = meta_fixed_mean,
+  i_squared = meta_i_squared,
+  metafor_tau_squared = unname(meta_fit$tau2),
+  upstream_test = "z",
+  upstream_pooled_estimate = unname(meta_fit$b[[1L]]),
+  upstream_standard_error = unname(meta_fit$se[[1L]]),
+  upstream_p_value = unname(meta_fit$pval[[1L]]),
+  upstream_interval_low = unname(meta_fit$ci.lb[[1L]]),
+  upstream_interval_high = unname(meta_fit$ci.ub[[1L]]),
+  metafor_adhoc_estimate = unname(meta_fit_adhoc$b[[1L]]),
+  metafor_adhoc_standard_error = unname(meta_fit_adhoc$se[[1L]]),
+  metafor_adhoc_statistic = unname(meta_fit_adhoc$zval[[1L]]),
+  metafor_adhoc_df = unname(meta_fit_adhoc$ddf[[1L]]),
+  metafor_adhoc_p_value = unname(meta_fit_adhoc$pval[[1L]]),
+  metafor_adhoc_interval_low = unname(meta_fit_adhoc$ci.lb[[1L]]),
+  metafor_adhoc_interval_high = unname(meta_fit_adhoc$ci.ub[[1L]]),
+  stringsAsFactors = FALSE
+)
+utils::write.csv(
+  meta_summary,
+  file.path(output_dir, "m5b-meta-results.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+
+meta_z <- meta_tidy$estimate / meta_tidy$std.error
+meta_study_results <- data.frame(
+  term = meta_tidy$term,
+  estimate = meta_tidy$estimate,
+  standard_error = meta_tidy$std.error,
+  statistic = meta_z,
+  p_value = 2 * stats::pnorm(abs(meta_z), lower.tail = FALSE),
+  interval_low = meta_tidy$estimate - stats::qnorm(0.975) * meta_tidy$std.error,
+  interval_high = meta_tidy$estimate + stats::qnorm(0.975) * meta_tidy$std.error,
+  sampling_variance = meta_variances,
+  random_effects_weight = meta_weights,
+  normalized_weight = meta_normalized_weights,
+  weighted_contribution = meta_normalized_weights * meta_tidy$estimate,
+  stringsAsFactors = FALSE
+)
+utils::write.csv(
+  meta_study_results,
+  file.path(output_dir, "m5b-meta-study-results.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+
 installed <- as.data.frame(utils::installed.packages()[, c("Package", "Version")])
 installed <- installed[order(installed$Package), , drop = FALSE]
 utils::write.csv(

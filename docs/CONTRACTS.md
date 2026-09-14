@@ -2,7 +2,8 @@
 
 These contracts are the M1 foundation extended by the approved M2 univariate
 and correlation records, the approved M3 comparison, composition, and theme
-records, and the approved M4 categorical records.
+records, the approved M4 categorical records, and the implemented M5B
+meta-analysis core.
 
 ## Data boundary
 
@@ -42,6 +43,14 @@ counts, materializes zero cells over the complete level cross-product, and owns
 a read-only `int64` table. Physical rows and weighted totals have separate,
 reconciling audit fields.
 
+`select_study_effects` requires the exact participating `term`, `estimate`, and
+`standard_error` columns for 3–500 independent aggregate studies by default.
+It rejects nulls, duplicate/non-string identities, non-finite estimates,
+nonpositive or unrepresentable errors, and coefficient-inference fields that
+would make meta mode ambiguous. Additional nonparticipating columns are
+ignored. Estimates and errors cross into owned, read-only `float64` arrays in
+source order.
+
 ## Result boundary
 
 `StructuredResult` is the minimum interface accepted by `StatsPlot`: a schema
@@ -51,9 +60,10 @@ than forcing unrelated methods into a universal bag of optional fields.
 
 Concrete schema-v1 result families are `AnalysisResult`, `DotPlotResult`,
 `CorrelationResult`, `CorrelationMatrixResult`, `ComparisonResult`,
-`CategoricalResult`, `GroupedResult`, and `CompositionResult`. Their serialized
-shapes are governed by the checked-in files under `schemas/`. M2 through M4
-results retain their configured resource ceilings in `ResourceLimits`.
+`CategoricalResult`, `CoefficientResult`, `GroupedResult`, and
+`CompositionResult`. Their serialized shapes are governed by the checked-in
+files under `schemas/`. M2 through M4 results retain their configured resource
+ceilings in `ResourceLimits`.
 
 `ComparisonResult` contains the exact analyzed sample audit, ordered per-level
 descriptives, omnibus test, two-level estimate/interval when applicable, named
@@ -67,6 +77,15 @@ margins, ratio, omnibus test, effect interval, expected-count diagnostics,
 complete pairwise and stratum families with their exact subtables, display and
 correction policy, confidence level, limits, and adaptations. Its bar and pie
 renderers share the same `CategoricalAnalysis`; neither recomputes inference.
+
+The M5B `CoefficientResult` retains every study estimate, normal interval/test,
+sampling variance, raw/normalized random-effects weight and contribution;
+explicit estimand/scale/direction/units/null/independence declarations; the
+complete REML convergence record; modified Hartung–Knapp pooled inference;
+prediction or its absence reason; Q, I-squared, tau-squared, and tau; resource
+limits; and warnings. Its constructor rejects contradictory weights, positions,
+intervals, degrees of freedom, pooled values, prediction thresholds, and
+boundary states before serialization.
 
 ## Analysis and rendering boundary
 
@@ -92,6 +111,12 @@ The categorical family follows the same split through `analyze_categorical`,
 `render_ggbarstats`, and `render_ggpiestats`. Bars and pies derive geometry,
 labels, totals, colors, subtitles, and p-value annotations from the retained
 result. The convenience functions expose explicit allowlisted signatures.
+
+M5B follows the split through `analyze_ggcoefstats`, `render_ggcoefstats`, and
+`ggcoefstats`. Meta-analysis requires `meta_analytic_effect=True`; ordinary
+coefficient mode fails explicitly until M5A is implemented. The renderer reads
+study, pooled, prediction, heterogeneity, reference-line, label, and annotation
+values from the retained result and never reruns REML or inference.
 
 ## Plot boundary
 

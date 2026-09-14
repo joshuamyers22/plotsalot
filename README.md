@@ -156,6 +156,39 @@ print(analysis.result.omnibus)
 print(analysis.result.cells)
 ```
 
+M5B adds an explicit frequentist random-effects meta-analysis over independent
+aggregate study estimates:
+
+```python
+from plotsalot import ggcoefstats
+
+studies = pl.DataFrame(
+    {
+        "term": ["Study A", "Study B", "Study C", "Study D", "Study E"],
+        "estimate": [0.10, 0.32, 0.25, -0.05, 0.41],
+        "standard_error": [0.08, 0.12, 0.10, 0.15, 0.09],
+    }
+)
+forest = ggcoefstats(
+    studies,
+    meta_analytic_effect=True,
+    estimand="mean treatment effect",
+    effect_scale="mean difference",
+    effect_direction="positive favors treatment",
+    effect_units="points",
+)
+
+print(forest.result.meta_analysis.pooled)
+print(forest.result.meta_analysis.heterogeneity)
+```
+
+This path uses the approved intercept-only REML estimator and modified
+Hartung–Knapp inference. It requires explicit comparable-scale and independence
+declarations, never derives effects from raw outcomes, never switches to a
+fixed-effect or fallback estimator, and provides prediction intervals only for
+five or more studies. Ordinary coefficient-table and fitted-model mode remains
+pending M5A verification.
+
 One-way calls omit `y` and may supply an exact level-keyed `ratio`. Paired calls
 require the same two levels on `x` and `y`, `paired=True`, and
 `proportion_test=False`; they use the approved exact binomial test over

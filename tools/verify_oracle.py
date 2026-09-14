@@ -17,6 +17,7 @@ from plotsalot import (
     ComparisonResult,
     analyze_categorical,
     analyze_ggbetweenstats,
+    analyze_ggcoefstats,
     analyze_ggcorrmat,
     analyze_ggdotplotstats,
     analyze_gghistostats,
@@ -55,6 +56,8 @@ M4_RAW_FIXTURES = tuple(
     for fixture in ("m4-one-way", "m4-independent", "m4-paired", "m4-raw", "m4-grouped")
     for renderer in ("bar", "pie")
 )
+M5B_INPUT_FIXTURES = ("m5b-meta",)
+M5B_RAW_FIXTURES = ("m5b-meta-ggstatsplot.R",)
 FLOAT_FIELDS = {
     "test_value": lambda result: result.test.null_value,
     "conf_level": lambda result: result.interval.level,
@@ -454,6 +457,108 @@ def _verify_m4_results() -> None:
             )
 
 
+def _close_m5b(actual: float, expected: str, label: str) -> None:
+    reference = float(expected)
+    if not math.isclose(actual, reference, rel_tol=1e-10, abs_tol=1e-12):
+        raise AssertionError(f"{label}: Python={actual:.17g}, R={reference:.17g}")
+
+
+def _close_m5b_metafor(actual: float, expected: str, label: str) -> None:
+    """Compare with metafor at the accuracy of its iterative tau estimator."""
+    reference = float(expected)
+    if not math.isclose(actual, reference, rel_tol=1e-6, abs_tol=1e-8):
+        raise AssertionError(f"{label}: Python={actual:.17g}, R={reference:.17g}")
+
+
+def _verify_m5b_results() -> None:
+    for filename in M5B_RAW_FIXTURES:
+        path = OUTPUT / filename
+        if not path.is_file() or path.stat().st_size == 0:
+            raise AssertionError(f"missing raw ggstatsplot M5B result: {path}")
+
+    data = pl.read_csv(INPUT / "m5b-meta.csv")
+    result = analyze_ggcoefstats(
+        data,
+        meta_analytic_effect=True,
+        estimand="mean treatment effect",
+        effect_scale="mean difference",
+        effect_direction="positive favors treatment",
+        effect_units="points",
+    ).result
+    with (OUTPUT / "m5b-meta-results.csv").open(newline="") as handle:
+        expected = next(csv.DictReader(handle))
+    meta = result.meta_analysis
+    prediction = meta.prediction.interval
+    if prediction is None:
+        raise AssertionError("M5B oracle requires its five-study prediction interval")
+    if result.retained_rows != int(expected["studies"]):
+        raise AssertionError("M5B oracle study count differs")
+    summary_values = {
+        "tau_squared": meta.heterogeneity.tau_squared,
+        "tau": meta.heterogeneity.tau,
+        "pooled_estimate": meta.pooled.estimate,
+        "conventional_variance": meta.pooled.conventional_variance,
+        "q_hk": meta.pooled.q_hk,
+        "q_star": meta.pooled.q_star,
+        "adjusted_variance": meta.pooled.adjusted_variance,
+        "pooled_standard_error": meta.pooled.standard_error,
+        "pooled_statistic": meta.pooled.statistic,
+        "pooled_df": float(meta.pooled.df),
+        "pooled_p_value": meta.pooled.p_value,
+        "pooled_interval_low": meta.pooled.interval.low,
+        "pooled_interval_high": meta.pooled.interval.high,
+        "prediction_interval_low": prediction.low,
+        "prediction_interval_high": prediction.high,
+        "q": meta.heterogeneity.q,
+        "q_df": float(meta.heterogeneity.df),
+        "q_p_value": meta.heterogeneity.p_value,
+        "q_reference_mean": meta.heterogeneity.reference_mean,
+        "i_squared": meta.heterogeneity.i_squared,
+    }
+    for field, actual in summary_values.items():
+        _close_m5b(actual, expected[field], f"m5b-meta.{field}")
+    for approved, field in (
+        (meta.heterogeneity.tau_squared, "metafor_tau_squared"),
+        (meta.pooled.estimate, "metafor_adhoc_estimate"),
+        (meta.pooled.standard_error, "metafor_adhoc_standard_error"),
+        (meta.pooled.statistic, "metafor_adhoc_statistic"),
+        (float(meta.pooled.df), "metafor_adhoc_df"),
+        (meta.pooled.p_value, "metafor_adhoc_p_value"),
+        (meta.pooled.interval.low, "metafor_adhoc_interval_low"),
+        (meta.pooled.interval.high, "metafor_adhoc_interval_high"),
+    ):
+        _close_m5b_metafor(approved, expected[field], f"m5b-meta.{field}")
+
+    upstream_se = float(expected["upstream_standard_error"])
+    if math.isclose(
+        meta.pooled.standard_error, upstream_se, rel_tol=1e-10, abs_tol=1e-12
+    ):
+        raise AssertionError("M5B oracle lost the upstream normal/HK adaptation")
+    if expected["upstream_test"] != "z":
+        raise AssertionError("M5B upstream reference no longer uses normal inference")
+
+    with (OUTPUT / "m5b-meta-study-results.csv").open(newline="") as handle:
+        study_rows = list(csv.DictReader(handle))
+    if len(study_rows) != len(result.terms):
+        raise AssertionError("M5B oracle study family size differs")
+    for term, row in zip(result.terms, study_rows, strict=True):
+        if term.term != row["term"]:
+            raise AssertionError("M5B oracle study identity differs")
+        for field, actual in {
+            "estimate": term.estimate,
+            "standard_error": term.inference.standard_error,
+            "statistic": term.inference.statistic,
+            "p_value": term.inference.p_value,
+            "interval_low": term.inference.interval.low,
+            "interval_high": term.inference.interval.high,
+            "sampling_variance": term.sampling_variance,
+            "random_effects_weight": term.random_effects_weight,
+            "normalized_weight": term.normalized_weight,
+            "weighted_contribution": term.weighted_contribution,
+        }.items():
+            _close_m5b(actual, row[field], f"m5b-meta.{term.term}.{field}")
+
+
 def _artifact_paths() -> list[Path]:
     paths = [ORACLE / "Dockerfile", ORACLE / "DESCRIPTION", ORACLE / "generate.R"]
     paths.extend(sorted(INPUT.glob("*.csv")))
@@ -483,6 +588,8 @@ def _manifest_payload() -> dict[str, Any]:
         "m3_raw_fixtures": list(M3_RAW_FIXTURES),
         "m4_input_fixtures": list(M4_INPUT_FIXTURES),
         "m4_raw_fixtures": list(M4_RAW_FIXTURES),
+        "m5b_input_fixtures": list(M5B_INPUT_FIXTURES),
+        "m5b_raw_fixtures": list(M5B_RAW_FIXTURES),
         "sha256": _hashes(),
     }
 
@@ -494,6 +601,7 @@ def verify_oracle() -> None:
     _verify_m2_results()
     _verify_m3_results()
     _verify_m4_results()
+    _verify_m5b_results()
     retained = json.loads(MANIFEST.read_text())
     if retained != _manifest_payload():
         raise AssertionError("oracle artifact hashes differ from manifest")
@@ -508,6 +616,7 @@ def main() -> None:
         _verify_m2_results()
         _verify_m3_results()
         _verify_m4_results()
+        _verify_m5b_results()
         payload = _manifest_payload()
         MANIFEST.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     else:

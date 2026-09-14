@@ -1,11 +1,11 @@
 # Milestone M5: Coefficients and Frequentist Meta-analysis
 
-- Status: M5A and M5B methods approved; implementation pending
+- Status: M5B technical candidate accepted; M5A and combined `0.3` gate pending
 - Contract date: 2026-09-14
 - Target duration: 4–6 weeks
 - Product and statistical owner: Joshua Myers
 - Implementation and visualization owner: Codex
-- Independent-review owner: Unassigned
+- Independent-review owner: Joshua Myers (M5B); M5A unassigned
 
 ## Objective
 
@@ -104,16 +104,16 @@ contract amendment.
 | Coefficient data boundary | Typed table protocol, composite identity, stable order, complete-field profiles, immutable arrays, exclusions, and failure tests | M5A | Planned |
 | Statsmodels adapters | Exact class allowlist, public-field extraction, covariance/test provenance, no refit, and adversarial fake-object rejection | M5A | Planned |
 | Shared coefficient analysis | Display-only and inferential inputs produce one renderer-independent analysis/result contract | M5A | Planned |
-| Frequentist meta-analysis | Approved random-effects estimate, weights, interval/test, prediction, and heterogeneity with independent evidence | M5B | Planned |
-| Versioned result schema | JSON-safe coefficient, inference, model-summary, meta-analysis, audit, provenance, warning, and resource records | Both | Planned |
-| Semantic renderer | Layer and injection tests prove every displayed quantity comes from the typed result | Both | Planned |
-| Extraction and composition | Individual extraction and heterogeneous M2–M5 composition preserve result identity | Both | Planned |
-| Compatibility disposition | Every touched upstream model/method/argument classified in `compatibility.md` | Both | Planned |
-| Oracle and independent evidence | Frozen pinned-R objects plus analytic or independently implemented references at approved tolerances | Both | Planned |
-| Performance baseline | Five-sample adapter/selection/analysis/render grids through declared term and study ceilings | Both | Planned |
-| Public documentation | Coefficient protocol, supported models, scale/null semantics, meta assumptions, labels, errors, limits, and adaptations | Both | Planned |
-| Production repository gate | Check, audit, build, isolated-wheel smoke, oracle verification, and benchmark verification pass | Both | Planned |
-| Review and sign-off | Verification loop, adversarial review, finding disposition, independent review, and Joshua Myers approval | Both | Planned |
+| Frequentist meta-analysis | Approved random-effects estimate, weights, interval/test, prediction, and heterogeneity with independent evidence | M5B | Technical candidate accepted |
+| Versioned result schema | JSON-safe coefficient, inference, model-summary, meta-analysis, audit, provenance, warning, and resource records | Both | M5B extension implemented; M5A pending |
+| Semantic renderer | Layer and injection tests prove every displayed quantity comes from the typed result | Both | M5B renderer implemented; shared M5A proof pending |
+| Extraction and composition | Individual extraction and heterogeneous M2–M5 composition preserve result identity | Both | M5B individual/composition path implemented; broader M5 grid pending |
+| Compatibility disposition | Every touched upstream model/method/argument classified in `compatibility.md` | Both | M5B complete; M5A pending |
+| Oracle and independent evidence | Frozen pinned-R objects plus analytic or independently implemented references at approved tolerances | Both | M5B complete; M5A pending |
+| Performance baseline | Five-sample adapter/selection/analysis/render grids through declared term and study ceilings | Both | M5B grid retained; M5A pending |
+| Public documentation | Coefficient protocol, supported models, scale/null semantics, meta assumptions, labels, errors, limits, and adaptations | Both | M5B documented; M5A pending |
+| Production repository gate | Check, audit, build, isolated-wheel smoke, oracle verification, and benchmark verification pass | Both | M5B technical gates pass; combined M5 gate pending |
+| Review and sign-off | Verification loop, adversarial review, finding disposition, independent review, and Joshua Myers approval | Both | M5B candidate accepted; M5A/final M5 pending |
 
 ## Required statistical decision records
 

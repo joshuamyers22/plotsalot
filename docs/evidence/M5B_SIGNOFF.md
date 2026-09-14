@@ -9,12 +9,14 @@ Myers is the recorded statistical and product owner.
 | MA2 REML tau-squared estimator, convergence, and weights | Statistical-methods reviewer | Joshua Myers | Approved, 2026-09-14 | Complete |
 | MA3 modified Hartung–Knapp pooled and prediction inference | Statistical-methods reviewer | Joshua Myers | Approved, 2026-09-14 | Complete |
 | MA4 Q/I-squared/tau heterogeneity and boundary policy | Statistical-methods reviewer | Joshua Myers | Approved, 2026-09-14 | Complete |
-| M5B technical release-candidate gates | Implementation owner | Codex | Pending | Blocking |
-| Independent adversarial review | Independent reviewer | Unassigned | Pending | Blocking |
-| M5B and final `0.3` release acceptance | Product/statistical owner | Joshua Myers | Pending | Blocking |
+| M5B technical release-candidate gates | Implementation owner | Codex | Verified, 2026-09-14 | Complete |
+| Independent adversarial review | Independent reviewer | Joshua Myers | Accepted, 2026-09-14 | Complete |
+| M5B technical candidate acceptance | Product/statistical owner | Joshua Myers | Accepted, 2026-09-14 | Complete |
+| Final M5 and `0.3` release acceptance | Product/statistical owner | Joshua Myers | Pending M5A and combined gate | Blocking |
 
 The approved decisions are specified in `../M5_STATISTICAL_METHODS.md`.
 
-Joshua Myers approved MA1–MA4 without revision on 2026-09-14. Technical
-release-candidate review and M5B/final `0.3` product acceptance remain separate
-and pending.
+Joshua Myers approved MA1–MA4 without revision, independently reviewed the
+implemented evidence, and accepted the M5B technical candidate on 2026-09-14.
+This does not close M5 or `0.3`: M5A and the combined shared-contract gate remain
+required by the milestone contract.

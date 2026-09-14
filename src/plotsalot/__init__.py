@@ -22,6 +22,10 @@ from plotsalot.categorical_grouped import (
     render_grouped_ggpiestats,
 )
 from plotsalot.categorical_result import CategoricalResult, CategoricalSampleAudit
+from plotsalot.coefficient import ggcoefstats, render_ggcoefstats
+from plotsalot.coefficient_analysis import CoefficientAnalysis, analyze_ggcoefstats
+from plotsalot.coefficient_data import StudyEffectTable, select_study_effects
+from plotsalot.coefficient_result import CoefficientResult, MetaAnalysisResult
 from plotsalot.comparison import (
     ggbetweenstats,
     ggwithinstats,
@@ -114,6 +118,8 @@ __all__ = [
     "CategoricalResult",
     "CategoricalSampleAudit",
     "CategoricalTable",
+    "CoefficientAnalysis",
+    "CoefficientResult",
     "CorrelationAnalysis",
     "CorrelationMatrixAnalysis",
     "CorrelationMatrixResult",
@@ -130,6 +136,7 @@ __all__ = [
     "GroupedStatsPlot",
     "HistogramAnalysis",
     "NumericSample",
+    "MetaAnalysisResult",
     "PairedNumericSample",
     "PairwiseComparisonResult",
     "PlotAnnotations",
@@ -137,6 +144,7 @@ __all__ = [
     "RepeatedSample",
     "RepeatedSampleAudit",
     "StatsTheme",
+    "StudyEffectTable",
     "StatsPlot",
     "StructuredResult",
     "analyze_categorical",
@@ -149,6 +157,7 @@ __all__ = [
     "analyze_grouped_ggwithinstats",
     "analyze_grouped_ggpiestats",
     "analyze_ggbarstats",
+    "analyze_ggcoefstats",
     "analyze_ggbetweenstats",
     "analyze_ggcorrmat",
     "analyze_ggdotplotstats",
@@ -161,6 +170,7 @@ __all__ = [
     "extract_stats",
     "extract_subtitle",
     "ggbarstats",
+    "ggcoefstats",
     "ggcorrmat",
     "ggbetweenstats",
     "ggdotplotstats",
@@ -177,6 +187,7 @@ __all__ = [
     "grouped_ggwithinstats",
     "grouped_ggpiestats",
     "render_ggbarstats",
+    "render_ggcoefstats",
     "render_ggbetweenstats",
     "render_ggcorrmat",
     "render_ggdotplotstats",
@@ -193,6 +204,7 @@ __all__ = [
     "render_grouped_ggbarstats",
     "render_grouped_ggpiestats",
     "select_categorical_table",
+    "select_study_effects",
     "select_numeric_pair",
     "select_numeric_sample",
     "theme_ggstatsplot",

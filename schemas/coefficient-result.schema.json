@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plotsalot.dev/schemas/coefficient-result.schema.json",
+  "title": "plotsalot coefficient and meta-analysis result schema v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "analysis", "source_kind", "inference_profile",
+    "term_column", "estimate_column", "standard_error_column", "input_rows",
+    "retained_rows", "source_order", "display_order", "terms", "meta_analysis",
+    "conf_level", "alpha", "stats_labels", "only_significant", "limits", "warnings"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "analysis": {"const": "ggcoefstats_meta_analysis"},
+    "source_kind": {"const": "table"},
+    "inference_profile": {"const": "study_effect_standard_error"},
+    "term_column": {"const": "term"},
+    "estimate_column": {"const": "estimate"},
+    "standard_error_column": {"const": "standard_error"},
+    "input_rows": {"type": "integer", "minimum": 3},
+    "retained_rows": {"type": "integer", "minimum": 3},
+    "source_order": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}},
+    "display_order": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}},
+    "terms": {"type": "array", "minItems": 3, "items": {"$ref": "#/$defs/term"}},
+    "meta_analysis": {"$ref": "#/$defs/meta"},
+    "conf_level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+    "alpha": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+    "stats_labels": {"type": "boolean"},
+    "only_significant": {"type": "boolean"},
+    "limits": {"$ref": "#/$defs/limits"},
+    "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "interval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"enum": ["study_effect", "mean_of_true_effect_distribution", "true_effect_in_new_study"]},
+        "method": {"enum": ["normal_approximation_from_reported_standard_error", "modified_hartung_knapp_random_effects_mean", "modified_hartung_knapp_normal_random_effects_prediction_interval"]},
+        "level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "low": {"type": "number"},
+        "high": {"type": "number"}
+      }
+    },
+    "inference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "standard_error", "interval", "statistic_name", "statistic", "df", "p_value", "significant"],
+      "properties": {
+        "source": {"const": "study_normal_approximation_from_reported_standard_error"},
+        "standard_error": {"type": "number", "exclusiveMinimum": 0},
+        "interval": {"$ref": "#/$defs/interval"},
+        "statistic_name": {"const": "z"},
+        "statistic": {"type": "number"},
+        "df": {"type": "null"},
+        "p_value": {"type": "number", "minimum": 0, "maximum": 1},
+        "significant": {"type": "boolean"}
+      }
+    },
+    "term": {
+      "type": "object", "additionalProperties": false,
+      "required": ["term", "source_position", "display_position", "estimate", "inference", "sampling_variance", "random_effects_weight", "normalized_weight", "weighted_contribution"],
+      "properties": {
+        "term": {"type": "string", "minLength": 1},
+        "source_position": {"type": "integer", "minimum": 0},
+        "display_position": {"type": "integer", "minimum": 0},
+        "estimate": {"type": "number"},
+        "inference": {"$ref": "#/$defs/inference"},
+        "sampling_variance": {"type": "number", "exclusiveMinimum": 0},
+        "random_effects_weight": {"type": "number", "exclusiveMinimum": 0},
+        "normalized_weight": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "weighted_contribution": {"type": "number"}
+      }
+    },
+    "pooled": {
+      "type": "object", "additionalProperties": false,
+      "required": ["method", "estimate", "standard_error", "conventional_variance", "adjusted_variance", "q_hk", "q_star", "statistic_name", "statistic", "df", "p_value", "interval"],
+      "properties": {
+        "method": {"const": "modified_hartung_knapp_random_effects_mean"},
+        "estimate": {"type": "number"},
+        "standard_error": {"type": "number", "exclusiveMinimum": 0},
+        "conventional_variance": {"type": "number", "exclusiveMinimum": 0},
+        "adjusted_variance": {"type": "number", "exclusiveMinimum": 0},
+        "q_hk": {"type": "number", "minimum": 0},
+        "q_star": {"type": "number", "minimum": 1},
+        "statistic_name": {"const": "t"},
+        "statistic": {"type": "number"},
+        "df": {"type": "integer", "minimum": 2},
+        "p_value": {"type": "number", "minimum": 0, "maximum": 1},
+        "interval": {"$ref": "#/$defs/interval"}
+      }
+    },
+    "prediction": {
+      "type": "object", "additionalProperties": false,
+      "required": ["interval", "absence_reason"],
+      "properties": {
+        "interval": {"oneOf": [{"$ref": "#/$defs/interval"}, {"type": "null"}]},
+        "absence_reason": {"enum": ["fewer_than_five_studies", null]}
+      }
+    },
+    "heterogeneity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["q", "df", "p_value", "reference_mean", "i_squared", "tau_squared", "tau", "tau_squared_interval", "tau_squared_interval_absence_reason"],
+      "properties": {
+        "q": {"type": "number", "minimum": 0},
+        "df": {"type": "integer", "minimum": 2},
+        "p_value": {"type": "number", "minimum": 0, "maximum": 1},
+        "reference_mean": {"type": "number"},
+        "i_squared": {"type": "number", "minimum": 0, "maximum": 1},
+        "tau_squared": {"type": "number", "minimum": 0},
+        "tau": {"type": "number", "minimum": 0},
+        "tau_squared_interval": {"type": "null"},
+        "tau_squared_interval_absence_reason": {"const": "not_in_m5b"}
+      }
+    },
+    "convergence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["method", "converged", "boundary", "scale_factor", "score_at_zero", "score_at_solution", "bracket_low", "bracket_high", "bracket_expansions", "iterations", "score_tolerance", "absolute_tolerance", "relative_tolerance"],
+      "properties": {
+        "method": {"const": "reml_intercept_only"},
+        "converged": {"const": true},
+        "boundary": {"type": "boolean"},
+        "scale_factor": {"type": "number", "exclusiveMinimum": 0},
+        "score_at_zero": {"type": "number"},
+        "score_at_solution": {"type": "number"},
+        "bracket_low": {"type": "number", "minimum": 0},
+        "bracket_high": {"type": "number", "minimum": 0},
+        "bracket_expansions": {"type": "integer", "minimum": 0, "maximum": 60},
+        "iterations": {"type": "integer", "minimum": 0, "maximum": 100},
+        "score_tolerance": {"type": "number", "exclusiveMinimum": 0},
+        "absolute_tolerance": {"type": "number", "exclusiveMinimum": 0},
+        "relative_tolerance": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "meta": {
+      "type": "object", "additionalProperties": false,
+      "required": ["estimand", "effect_scale", "effect_direction", "effect_units", "dependence", "null_value", "sampling_model", "estimator", "pooled", "prediction", "heterogeneity", "convergence"],
+      "properties": {
+        "estimand": {"type": "string", "minLength": 1},
+        "effect_scale": {"type": "string", "minLength": 1},
+        "effect_direction": {"type": "string", "minLength": 1},
+        "effect_units": {"type": "string", "minLength": 1},
+        "dependence": {"const": "independent"},
+        "null_value": {"type": "number"},
+        "sampling_model": {"const": "normal_normal_random_effects"},
+        "estimator": {"const": "reml_intercept_only"},
+        "pooled": {"$ref": "#/$defs/pooled"},
+        "prediction": {"$ref": "#/$defs/prediction"},
+        "heterogeneity": {"$ref": "#/$defs/heterogeneity"},
+        "convergence": {"$ref": "#/$defs/convergence"}
+      }
+    },
+    "limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maximum_studies", "maximum_rendered_points", "maximum_labels"],
+      "properties": {
+        "maximum_studies": {"type": "integer", "minimum": 3},
+        "maximum_rendered_points": {"type": "integer", "minimum": 1},
+        "maximum_labels": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

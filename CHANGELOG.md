@@ -71,3 +71,14 @@
   inference, prediction intervals, and explicit no-fallback boundaries.
 - Recorded Joshua Myers's approval of the M5B meta-analysis methods without
   revision, authorizing implementation while release acceptance remains pending.
+- Added the M5B technical core: immutable study-effect input, deterministic
+  intercept-only REML, modified Hartung–Knapp pooled inference, prediction
+  intervals, Q/I-squared/tau heterogeneity, and schema-v1 coefficient results.
+- Added the explicit meta-analysis `ggcoefstats` forest renderer, extraction and
+  composition coverage, independent likelihood/analytic tests, resource and
+  failure guards, and a retained 3/10/100/500-study performance grid.
+- Added pinned-R M5B evidence: a raw ggstatsplot meta object, an independently
+  solved base-R REML/modified-Hartung–Knapp reference, and pinned metafor
+  normal/modified-Hartung–Knapp comparison values.
+- Recorded Joshua Myers's independent review and acceptance of the M5B technical
+  candidate; M5A and the combined M5/`0.3` gate remain open.

@@ -1,0 +1,6 @@
+term,estimate,standard_error
+study-1,0.1,0.1
+study-2,0.5,0.2
+study-3,1.2,0.25
+study-4,-0.2,0.15
+study-5,1.8,0.3
