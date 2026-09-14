@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-13T00:00:00-04:00",
+  "repositories": [
+    {
+      "name": "ggstatsplot",
+      "url": "https://github.com/IndrajeetPatil/ggstatsplot",
+      "revision": "7a724cd0ab55668b9d0b2e84b12c711c5be68ac8",
+      "revision_date": "2026-09-08T20:33:23+02:00",
+      "license": "MIT",
+      "inventory": {
+        "r_source_lines": 4055,
+        "exported_symbols": 22,
+        "test_that_blocks": 80,
+        "svg_snapshots": 107
+      },
+      "key_file_sha256": {
+        "DESCRIPTION": "027c30bfccbfa56cc52ce55937ef673d6cc4c8783ee82cd3ad14992b4ed1d279",
+        "NAMESPACE": "7fbedd22a3f16c0a64a2936c4ba44d33ce51088cd3c629b1fba6bbf1e7a9bef7",
+        "API": "d73f2f31acad7d4b6ba9f3e461097457c85aeae195849c778c19e8b89f328d23"
+      }
+    },
+    {
+      "name": "qqplotr",
+      "url": "https://github.com/aloy/qqplotr",
+      "revision": "eeaa2e2b972eec0f25d1557520fab74a1e71b59d",
+      "revision_date": "2026-06-25T19:30:02-05:00",
+      "license": "GPL-3",
+      "inventory": {
+        "r_source_lines": 2033,
+        "exported_symbols": 15,
+        "test_that_blocks": 43,
+        "feature_test_files": 7
+      },
+      "key_file_sha256": {
+        "DESCRIPTION": "ea28f2b336c344be10c7a709e198aa4b86801caf9cc568fe63bae8bb0a9e6782",
+        "NAMESPACE": "68576aeb1e13d6bac5d13e664fb580c8303f1e26cfd8cfe3c5fe1fe9111ef1b9",
+        "LICENSE": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2"
+      }
+    }
+  ]
+}

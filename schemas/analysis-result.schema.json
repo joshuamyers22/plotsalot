@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plotsalot.invalid/schemas/analysis-result-v1.json",
+  "title": "plotsalot analysis result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "analysis",
+    "column",
+    "sample",
+    "estimate",
+    "test",
+    "interval",
+    "effect_size",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "analysis": {"type": "string", "minLength": 1},
+    "column": {"type": "string", "minLength": 1},
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_rows", "analyzed_rows", "dropped_null_rows"],
+      "properties": {
+        "input_rows": {"type": "integer", "minimum": 0},
+        "analyzed_rows": {"type": "integer", "minimum": 0},
+        "dropped_null_rows": {"type": "integer", "minimum": 0}
+      }
+    },
+    "estimate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value", "standard_deviation"],
+      "properties": {
+        "name": {"const": "mean"},
+        "value": {"type": "number"},
+        "standard_deviation": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "null_value", "alternative", "statistic", "df", "p_value"],
+      "properties": {
+        "name": {"const": "one_sample_t"},
+        "null_value": {"type": "number"},
+        "alternative": {"enum": ["two-sided", "less", "greater"]},
+        "statistic": {"type": "number"},
+        "df": {"type": "number", "minimum": 1},
+        "p_value": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"const": "population_mean"},
+        "method": {"const": "student_t_two_sided"},
+        "level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "low": {"type": "number"},
+        "high": {"type": "number"}
+      }
+    },
+    "effect_size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value", "standardizer"],
+      "properties": {
+        "name": {"const": "cohen_d"},
+        "value": {"type": "number"},
+        "standardizer": {"const": "sample_standard_deviation_ddof_1"}
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
+}
