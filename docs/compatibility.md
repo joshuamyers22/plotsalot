@@ -21,7 +21,7 @@ Definitions:
 | `extract_subtitle` | `extract_subtitle` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `ggbarstats` | `ggbarstats` | 0.2 | Adapted; shared classical categorical analysis and normalized bars implemented |
 | `ggbetweenstats` | `ggbetweenstats` | 0.1 | Adapted; Welch parametric/Holm mode implemented |
-| `ggcoefstats` | `ggcoefstats` | 0.3 | Contracted; implementation blocked on M5 method approval |
+| `ggcoefstats` | `ggcoefstats` | 0.3 | M5A and M5B methods approved; implementation pending |
 | `ggcorrmat` | `ggcorrmat` | 0.1 | Adapted; Pearson/Holm mode implemented |
 | `ggdotplotstats` | `ggdotplotstats` | 0.1 | Adapted; labeled parametric mode implemented |
 | `gghistostats` | `gghistostats` | M0/0.1 | Adapted; one-sample parametric mode implemented |
@@ -117,7 +117,15 @@ tidying. M5 requires estimate-only and approved inferential coefficient modes,
 plus one approved frequentist random-effects meta-analysis over independent,
 comparable study estimates. Joshua Myers approved K1–K4 for strict
 estimate/interval/full-inference tables and an exact fitted-OLS adapter. M5A
-implementation is authorized; MA1–MA4 and M5B remain blocked pending approval.
+implementation is authorized. Joshua Myers also approved MA1–MA4, authorizing
+M5B implementation.
+
+The approved MA1–MA4 specification retains upstream's REML between-study
+variance estimator but adapts its default normal pooled inference to a modified
+Hartung–Knapp t method. It requires explicit independent-study and common-scale
+declarations, computes a prediction interval only with at least five studies,
+and forbids estimator fallback. These methods are approved but remain
+unimplemented compatibility dispositions.
 
 Robust/Bayesian meta-analysis, Bayes-factor captions, automatic term creation,
 heuristic duplicate-term concatenation, arbitrary model dispatch, ANOVA effect

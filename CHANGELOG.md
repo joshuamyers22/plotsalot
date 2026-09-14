@@ -66,3 +66,8 @@
   the required statistical-review gate.
 - Recorded Joshua Myers's approval of the M5A coefficient methods without
   revision, authorizing implementation while MA1–MA4 remain pending for M5B.
+- Added the approval-ready M5B MA1–MA4 proposal and pending accountable records
+  for strict study effects, REML heterogeneity, modified Hartung–Knapp pooled
+  inference, prediction intervals, and explicit no-fallback boundaries.
+- Recorded Joshua Myers's approval of the M5B meta-analysis methods without
+  revision, authorizing implementation while release acceptance remains pending.

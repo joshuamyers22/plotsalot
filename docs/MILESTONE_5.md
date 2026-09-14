@@ -1,6 +1,6 @@
 # Milestone M5: Coefficients and Frequentist Meta-analysis
 
-- Status: M5A methods approved; implementation ready; M5B methods pending
+- Status: M5A and M5B methods approved; implementation pending
 - Contract date: 2026-09-14
 - Target duration: 4–6 weeks
 - Product and statistical owner: Joshua Myers
@@ -100,11 +100,11 @@ contract amendment.
 | Deliverable | Acceptance evidence | Track | Status |
 |---|---|---|---|
 | Pinned-surface audit | Exact upstream signature, data/model behavior, plot layers, meta modes, and deliberate Python adaptations recorded | Both | Complete |
-| Approved method specification | Reviewed K1–K4 and MA1–MA4 records covering every retained inferential path | Both | K1–K4 complete; MA1–MA4 pending |
+| Approved method specification | Reviewed K1–K4 and MA1–MA4 records covering every retained inferential path | Both | Complete |
 | Coefficient data boundary | Typed table protocol, composite identity, stable order, complete-field profiles, immutable arrays, exclusions, and failure tests | M5A | Planned |
 | Statsmodels adapters | Exact class allowlist, public-field extraction, covariance/test provenance, no refit, and adversarial fake-object rejection | M5A | Planned |
 | Shared coefficient analysis | Display-only and inferential inputs produce one renderer-independent analysis/result contract | M5A | Planned |
-| Frequentist meta-analysis | Approved random-effects estimate, weights, interval/test, prediction, and heterogeneity with independent evidence | M5B | Blocked on method approval |
+| Frequentist meta-analysis | Approved random-effects estimate, weights, interval/test, prediction, and heterogeneity with independent evidence | M5B | Planned |
 | Versioned result schema | JSON-safe coefficient, inference, model-summary, meta-analysis, audit, provenance, warning, and resource records | Both | Planned |
 | Semantic renderer | Layer and injection tests prove every displayed quantity comes from the typed result | Both | Planned |
 | Extraction and composition | Individual extraction and heterogeneous M2–M5 composition preserve result identity | Both | Planned |
