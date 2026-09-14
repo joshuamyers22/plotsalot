@@ -4,7 +4,7 @@
 - Scope: approved C1–C5/G5 methods, raw/count tables, bar/pie rendering,
   grouping, schemas, oracle, benchmark, and package surfaces
 - Technical result: release-candidate gates pass
-- Milestone result: pending independent review and Joshua Myers's final M4/0.2 acceptance
+- Milestone result: complete; M4 and the `0.2` product gate accepted
 
 ## Statistical and sample evidence
 
@@ -60,9 +60,8 @@ regression above 20%.
 - Wheel SHA-256:
   `46dc60ba13d19aac0102ef8bdc46892113a936dc5f96a1ee58c73332ecf95bf6`
 
-## Remaining accountable gates
+## Accountable closeout
 
-The technical candidate is ready for independent review. An independent
-reviewer must record a decision and Joshua Myers must separately accept the
-finding dispositions and final M4/`0.2` candidate before the milestone can be
-marked complete.
+Joshua Myers independently reviewed and approved the release candidate and its
+finding dispositions, then accepted the final M4/`0.2` candidate on 2026-09-14.
+No accountable gate remains open.

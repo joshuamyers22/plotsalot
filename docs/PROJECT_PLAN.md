@@ -14,6 +14,9 @@ on 2026-09-13. This repository executes that plan through the following gates.
 | M6 | Robust and Bayesian methods | 8–13 weeks |
 | M7 | Compatibility closure, hardening, documentation, 1.0 | 4–6 weeks |
 
+M0 through M4 are complete, and the `0.2` product gate is accepted. M5 is the
+next planned milestone.
+
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months
 with two Python engineers and a part-time statistical-methods reviewer.
 

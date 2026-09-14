@@ -3,7 +3,7 @@
 - Date: 2026-09-14
 - Scope: approved C1–C5/G5 implementation and `0.2` categorical candidate
 - Pass budget: three evidence-changing passes after method approval
-- Result: technical gates pass; independent review and final owner acceptance remain
+- Result: complete; technical gates, independent review, and final acceptance pass
 
 ## Pass 1: shared boundary and complete method paths
 

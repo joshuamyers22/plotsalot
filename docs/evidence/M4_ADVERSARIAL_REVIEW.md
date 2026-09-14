@@ -3,8 +3,8 @@
 - Date prepared: 2026-09-14
 - Review target: M4 categorical release candidate
 - Preparation: implementation self-review
-- Independent reviewer: Unassigned
-- Status: Ready for independent review
+- Independent reviewer: Joshua Myers
+- Status: Approved
 
 ## Findings found and corrected or dispositioned
 
@@ -31,5 +31,5 @@ resource ceilings, benchmark distributions, and isolated package behavior.
 
 ## Independent reviewer decision
 
-Pending. Technical self-review cannot satisfy the independent-review or final
-Joshua Myers acceptance gates.
+Joshua Myers reviewed the release candidate, checklist, and dispositions above
+and approved the independent adversarial review without revision on 2026-09-14.

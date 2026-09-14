@@ -55,3 +55,6 @@
   explicit categorical resource ceilings.
 - Added pinned-R C1–C5 oracle fixtures, analytic and failure-path tests, M4
   compatibility documentation, and the categorical performance workload grid.
+- Completed M4 after the full production gate, adversarial finding disposition,
+  independent review, and Joshua Myers's final approval, closing the `0.2`
+  product gate.

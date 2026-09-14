@@ -3,8 +3,7 @@
 `plotsalot` is a planned Python implementation of the statistical-visualization
 workflows in [`ggstatsplot`](https://github.com/IndrajeetPatil/ggstatsplot).
 
-M0 through M3 are complete. The M4 categorical release candidate passes its
-technical gates and awaits independent review and final owner acceptance. The
+M0 through M4 are complete, including the accepted `0.2` product gate. The
 project remains pre-release and is not yet ready for production analytical use.
 
 ## Development

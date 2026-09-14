@@ -13,13 +13,10 @@ Myers is the recorded statistical and product owner.
 | G5 grouped categorical identity and correction scope | Statistical-methods reviewer | Joshua Myers | Approved, 2026-09-14 | Complete |
 | Count-weight, resource, tolerance, and deferral policy | Statistical-methods reviewer | Joshua Myers | Approved, 2026-09-14 | Complete |
 | M4 technical release-candidate gates | Implementation owner | Codex | Passed, 2026-09-14 | Complete |
-| Independent adversarial review | Independent reviewer | Unassigned | Pending | Blocking |
-| M4 and `0.2` release acceptance | Product/statistical owner | Joshua Myers | Pending | Blocking |
+| Independent adversarial review | Independent reviewer | Joshua Myers | Approved, 2026-09-14 | Complete |
+| M4 and `0.2` release acceptance | Product/statistical owner | Joshua Myers | Accepted, 2026-09-14 | Complete |
 
 The approved decisions are specified in `../M4_STATISTICAL_METHODS.md`.
-Technical work cannot convert a pending statistical or product decision into an
-approval.
-
 Joshua Myers approved C1–C5/G5 and the count, resource, tolerance, and deferral
-policy without revision on 2026-09-14. Release-candidate acceptance remains
-separate and pending.
+policy without revision, independently reviewed the release candidate and its
+finding dispositions, and accepted M4 and the `0.2` product gate on 2026-09-14.

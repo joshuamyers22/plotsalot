@@ -1,11 +1,11 @@
 # Milestone M4: Categorical Bar and Pie Families
 
-- Status: Release candidate ready; independent review and final acceptance pending
+- Status: Complete
 - Contract date: 2026-09-14
 - Target duration: 3–4 weeks
 - Product and statistical owner: Joshua Myers
 - Implementation and visualization owner: Codex
-- Independent-review owner: Unassigned
+- Independent reviewer: Joshua Myers
 
 ## Objective
 
@@ -94,19 +94,19 @@ arguments may be deferred only with an explicit compatibility disposition.
 | Deliverable | Acceptance evidence | Track | Status |
 |---|---|---|---|
 | Approved method specification | Reviewed C1–C5/G5 records covering all retained designs and follow-up families | Both | Complete |
-| Categorical data boundary | Raw/count-weighted selection, level order, null and zero handling, immutable table, and reconciling audit tests | M4A | Implemented; gate pending |
-| Shared categorical analysis | One-way, independent, paired, pairwise, and proportion-test paths use one typed analysis contract | M4A | Implemented; gate pending |
-| Versioned results and schemas | JSON-safe table, cell, test, effect, interval, family, audit, warning, and limit records | M4A | Implemented; gate pending |
-| Semantic bar renderer | Layer and injection tests prove every count, percentage, total, interval, and statistical label comes from the typed result | M4A | Implemented; gate pending |
-| Semantic pie renderer | Cross-renderer result identity plus wedge/facet/label/zero-category tests | M4B | Implemented; gate pending |
-| Atomic grouped variants | Stable identities/order, nested audits, independent inner correction scopes, and identified all-or-nothing failure | Both | Implemented; gate pending |
-| Extraction and composition | Individual/grouped extraction and heterogeneous composition retain categorical results by identity | Both | Implemented; gate pending |
+| Categorical data boundary | Raw/count-weighted selection, level order, null and zero handling, immutable table, and reconciling audit tests | M4A | Complete |
+| Shared categorical analysis | One-way, independent, paired, pairwise, and proportion-test paths use one typed analysis contract | M4A | Complete |
+| Versioned results and schemas | JSON-safe table, cell, test, effect, interval, family, audit, warning, and limit records | M4A | Complete |
+| Semantic bar renderer | Layer and injection tests prove every count, percentage, total, interval, and statistical label comes from the typed result | M4A | Complete |
+| Semantic pie renderer | Cross-renderer result identity plus wedge/facet/label/zero-category tests | M4B | Complete |
+| Atomic grouped variants | Stable identities/order, nested audits, independent inner correction scopes, and identified all-or-nothing failure | Both | Complete |
+| Extraction and composition | Individual/grouped extraction and heterogeneous composition retain categorical results by identity | Both | Complete |
 | Compatibility disposition | Every touched upstream method and argument classified in `compatibility.md` | Both | Complete |
 | Oracle and independent evidence | Frozen pinned-R objects plus analytic or independently implemented references | Both | Complete |
 | Performance baseline | Five-sample selection/analysis/bar-render/pie-render/grouped grids through declared ceilings | Both | Complete |
 | Public documentation | Examples, table orientation, expected ratios, paired/count inputs, sparse behavior, labels, errors, limits, and adaptations | Both | Complete |
 | Production repository gate | Check, audit, build, isolated-wheel smoke, oracle verification, and benchmark verification pass | Both | Complete |
-| Review and sign-off | Verification loop, adversarial review, finding disposition, independent review, and Joshua Myers approval | Both | Pending |
+| Review and sign-off | Verification loop, adversarial review, finding disposition, independent review, and Joshua Myers approval | Both | Complete |
 
 ## Required statistical decision records
 
@@ -406,3 +406,7 @@ coverage, documentation, audit, build, and isolated-wheel gates pass; every
 blocking finding is closed; an independent review is recorded; and Joshua Myers
 approves the M4 release candidate. At that point, and only while M3 remains
 complete, the `0.2` product gate is complete.
+
+Joshua Myers independently reviewed the release candidate and its finding
+dispositions, approved M4, and accepted the `0.2` product gate on 2026-09-14.
+All exit criteria are satisfied, and M4 is complete.
