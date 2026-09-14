@@ -1,0 +1,4 @@
+"fixture","input_rows","analyzed_rows","dropped_null_rows","test_value","conf_level","mean","standard_deviation","statistic","df","p_value","interval_low","interval_high","cohen_d","upstream_effect_name","upstream_effect_estimate","upstream_effect_interval_low","upstream_effect_interval_high","upstream_effect_interval_method"
+"normal",5,5,0,0,0.95,3,1.58113883008419,4.24264068711928,4,0.0132355995636827,1.03675683852244,4.96324316147756,1.89736659610103,"Hedges' g",1.5138795132121,0.265674435331757,2.7184482399236,"ncp"
+"null-containing",5,4,1,0,0.95,2.5,1.29099444873581,3.87298334620742,3,0.030466291662171,0.445739743239479,4.55426025676052,1.93649167310371,"Hedges' g",1.40124780409948,0.105491374806768,2.6568468715403,"ncp"
+"small-sample",2,2,0,0,0.95,2,1.4142135623731,2,1,0.295167235300866,-10.7062047361747,14.7062047361747,1.41421356237309,"Hedges' g",0,0,0,"ncp"

@@ -1,43 +1,43 @@
-# ADR-010: Combined upstream license posture
+# ADR-010: Distribution license and upstream posture
 
-- Status: Proposed; blocks `qqplotr` source implementation
-- Date: 2026-09-13
-- Owners: Product and release/legal owners unassigned
+- Status: Accepted
+- Date: 2026-09-14
+- Owner and product/legal approver: Joshua Myers
+- Decision: License plotsalot under MIT and limit upstream compatibility scope to
+  ggstatsplot
 
 ## Context and forces
 
-`ggstatsplot` is MIT licensed. `qqplotr` declares GPL-3. A direct translation or
-other derivative use of GPL-covered implementation code can create distribution
-obligations for the combined work. The generated repository currently uses the
-production template's proprietary license. Public repository visibility does not
-itself grant reuse rights or resolve the combined-work licensing question.
+Plotsalot needs a clear distribution license and provenance policy. Its retained
+behavioral baseline, ggstatsplot, is MIT licensed. The project must preserve
+applicable notices, remain independently branded, and avoid implying upstream
+endorsement.
 
-## Options considered
+## Decision
 
-1. License the combined derivative under GPL-3-compatible terms and comply with
-   all corresponding-source and notice obligations.
-2. Implement Q–Q/P–P behavior independently from public APIs and published
-   statistical methods, with separated provenance and qualified review.
-3. Keep `qqplotr` capability in a separately distributed GPL component.
-4. Defer `qqplotr` capability.
-
-## Proposed decision
-
-Do not copy or translate `qqplotr` or `qqconf` source while this ADR is proposed.
-Continue only with API inventory, published-method research, independent test
-design, and `ggstatsplot`-side work. Obtain qualified legal review before
-selecting an option or publishing a package containing `qqplotr`-derived work.
+Plotsalot is an independent MIT-licensed implementation. The compatibility
+program targets ggstatsplot's public statistical-visualization workflows. Any
+new upstream target requires an explicit scope decision, license review, pinned
+identity, compatibility inventory, and statistical-method review before code or
+fixtures are added.
 
 ## Consequences
 
-- Q–Q/P–P implementation is temporarily blocked.
-- Repository license metadata remains proprietary and must not be treated as the
-  final combined-work release decision.
-- Provenance records must distinguish behavioral specifications, published
-  methods, independently written code, and any copied material.
+- Repository and distribution metadata use the MIT license.
+- Applicable upstream notices and method citations are preserved.
+- Upstream repositories are behavioral references and are not vendored.
+- The released package has no R or network runtime dependency.
+- The project remains independent and must not imply upstream endorsement.
 
 ## Verification
 
-No source module, test fixture, or documentation excerpt derived from GPL source
-may be added before this ADR becomes accepted. Release readiness remains blocked
-until the repository license and notices match the approved option.
+- `LICENSE` contains the MIT license and package metadata declares `MIT`.
+- Dependency license policy remains enforced by `make audit`.
+- `docs/upstream/manifest.json` lists only approved upstream targets.
+- The compatibility matrix contains only exports within approved product scope.
+
+## Approval
+
+Joshua Myers approved the MIT distribution license and removal of the former
+secondary upstream target on 2026-09-14 through explicit project-owner
+direction.

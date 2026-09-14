@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Statistical visualizations and distribution diagnostics for Python"
 readme = "README.md"
 requires-python = ">=3.11"
-license = "LicenseRef-Proprietary"
+license = "MIT"
 dependencies = [
     "matplotlib>=3.10,<4",
     "numpy>=2,<3",
@@ -12,6 +12,11 @@ dependencies = [
     "scipy>=1.16,<2",
     "statsmodels>=0.15,<0.16",
 ]
+
+[project.urls]
+Repository = "https://github.com/joshuamyers22/plotsalot"
+Issues = "https://github.com/joshuamyers22/plotsalot/issues"
+Changelog = "https://github.com/joshuamyers22/plotsalot/blob/main/CHANGELOG.md"
 
 [project.scripts]
 "plotsalot" = "plotsalot.cli:main"
@@ -24,7 +29,7 @@ requires = ["hatchling==1.32.0"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = ["pyright==1.1.411", "ruff==0.16.5"]
+dev = ["coverage==7.16.1", "pyright==1.1.411", "ruff==0.16.5"]
 
 [tool.ruff]
 target-version = "py311"
@@ -37,3 +42,11 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 pythonVersion = "3.11"
 typeCheckingMode = "strict"
 include = ["src", "tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["plotsalot"]
+
+[tool.coverage.report]
+fail_under = 75
+show_missing = true

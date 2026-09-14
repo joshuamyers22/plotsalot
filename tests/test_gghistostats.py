@@ -3,11 +3,21 @@ from __future__ import annotations
 import json
 import math
 import unittest
+from typing import cast
+from unittest.mock import patch
 
 import numpy as np
 import polars as pl
 
-from plotsalot import extract_caption, extract_stats, extract_subtitle, gghistostats
+from plotsalot import (
+    analyze_gghistostats,
+    extract_caption,
+    extract_stats,
+    extract_subtitle,
+    gghistostats,
+    render_gghistostats,
+)
+from plotsalot.histogram_analysis import Alternative
 
 
 class GgHistoStatsTests(unittest.TestCase):
@@ -67,6 +77,23 @@ class GgHistoStatsTests(unittest.TestCase):
 
         self.assertTrue(data.equals(before))
 
+    def test_analysis_and_rendering_are_separate_and_reusable(self) -> None:
+        data = pl.DataFrame({"value": [1.0, 2.0, 5.0]})
+
+        with patch("matplotlib.figure.Figure", side_effect=AssertionError):
+            analysis = analyze_gghistostats(data, "value")
+
+        first_plot = render_gghistostats(analysis, title="First")
+        second_plot = render_gghistostats(analysis, binwidth=1.0, title="Second")
+        self.addCleanup(first_plot.figure.clear)
+        self.addCleanup(second_plot.figure.clear)
+
+        self.assertIs(first_plot.result, analysis.result)
+        self.assertIs(second_plot.result, analysis.result)
+        self.assertEqual(first_plot.title, "First")
+        self.assertEqual(second_plot.title, "Second")
+        self.assertIsNot(first_plot.figure, second_plot.figure)
+
     def test_rejects_invalid_inputs(self) -> None:
         valid = pl.DataFrame({"value": [1.0, 2.0, 3.0]})
         cases = (
@@ -76,6 +103,13 @@ class GgHistoStatsTests(unittest.TestCase):
                 TypeError,
             ),
             (lambda: gghistostats(valid, "value", conf_level=1.0), ValueError),
+            (
+                lambda: gghistostats(
+                    valid, "value", alternative=cast(Alternative, "invalid")
+                ),
+                ValueError,
+            ),
+            (lambda: gghistostats(valid, "value", test_value=np.nan), ValueError),
             (lambda: gghistostats(valid, "value", binwidth=0.0), ValueError),
             (
                 lambda: gghistostats(pl.DataFrame({"value": [1.0, np.inf]}), "value"),

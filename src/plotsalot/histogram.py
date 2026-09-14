@@ -1,48 +1,21 @@
-"""M0 walking skeleton for a histogram with one-sample statistics."""
+"""Matplotlib rendering and composition for the histogram analysis."""
 
 from __future__ import annotations
 
-from importlib import import_module
-from typing import Literal, Protocol, cast
+from typing import Protocol, cast
 
 import numpy as np
 import polars as pl
 from matplotlib.figure import Figure
-from numpy.typing import NDArray
 
-from plotsalot.core import (
-    AnalysisResult,
-    EffectSizeResult,
-    EstimateResult,
-    IntervalResult,
-    SampleAudit,
-    StatsPlot,
-    TestResult,
+from plotsalot.data import FloatArray
+from plotsalot.histogram_analysis import (
+    Alternative,
+    HistogramAnalysis,
+    analyze_gghistostats,
 )
-
-Alternative = Literal["two-sided", "less", "greater"]
-FloatArray = NDArray[np.float64]
-
-
-class _TtestResult(Protocol):
-    statistic: float
-    pvalue: float
-
-
-class _TDistribution(Protocol):
-    def ppf(self, probability: float, df: float) -> float: ...
-
-
-class _ScipyStats(Protocol):
-    t: _TDistribution
-
-    def ttest_1samp(
-        self,
-        values: FloatArray,
-        *,
-        popmean: float,
-        alternative: Alternative,
-    ) -> _TtestResult: ...
+from plotsalot.plot import PlotAnnotations, StatsPlot
+from plotsalot.result import AnalysisResult
 
 
 class _AxesRenderer(Protocol):
@@ -95,121 +68,32 @@ class _FigureRenderer(Protocol):
     ) -> object: ...
 
 
-scipy_stats = cast(_ScipyStats, import_module("scipy.stats"))
-
-_PROTOTYPE_WARNING = (
-    "M0 prototype: effect-size uncertainty and nonparametric, robust, Bayesian, "
-    "and grouped modes are not implemented."
-)
-
-
-def _numeric_sample(data: object, column: str) -> tuple[FloatArray, SampleAudit]:
-    if not isinstance(data, pl.DataFrame):
-        raise TypeError("data must be a polars.DataFrame")
-    if column not in data.columns:
-        raise ValueError(f"column not found: {column!r}")
-
-    series = data.get_column(column)
-    if not series.dtype.is_numeric():
-        raise TypeError(f"column {column!r} must have a numeric dtype")
-
-    dropped_null_rows = series.null_count()
-    values: FloatArray = series.drop_nulls().to_numpy().astype(np.float64, copy=True)
-    if values.ndim != 1:
-        raise ValueError("selected column must convert to a one-dimensional array")
-    if values.size < 2:
-        raise ValueError("one-sample t-test requires at least two non-null values")
-    if not bool(np.isfinite(values).all()):
-        raise ValueError("selected column contains NaN or infinite values")
-
-    standard_deviation = float(np.std(values, ddof=1))
-    if standard_deviation <= 0.0:
-        raise ValueError("one-sample t-test requires nonzero sample variation")
-
-    return values, SampleAudit(
-        input_rows=data.height,
-        analyzed_rows=int(values.size),
-        dropped_null_rows=dropped_null_rows,
-    )
-
-
 def _p_value_text(p_value: float) -> str:
     return "p < 0.001" if p_value < 0.001 else f"p = {p_value:.3f}"
 
 
-def gghistostats(
-    data: pl.DataFrame,
-    x: str,
+def render_gghistostats(
+    analysis: HistogramAnalysis,
     *,
-    test_value: float = 0.0,
-    alternative: Alternative = "two-sided",
-    conf_level: float = 0.95,
     binwidth: float | None = None,
     title: str | None = None,
-) -> StatsPlot:
-    """Create the M0 parametric histogram prototype.
+) -> StatsPlot[AnalysisResult]:
+    """Render a previously computed histogram analysis with Matplotlib."""
 
-    The complete upstream-compatible function is not implemented yet. This
-    slice proves validated Polars input, an explicit NumPy/SciPy boundary,
-    structured results, traceable annotations, and Matplotlib rendering.
-    """
-
-    if not 0.0 < conf_level < 1.0:
-        raise ValueError("conf_level must be strictly between 0 and 1")
-    if alternative not in {"two-sided", "less", "greater"}:
-        raise ValueError("alternative must be 'two-sided', 'less', or 'greater'")
-    if not np.isfinite(test_value):
-        raise ValueError("test_value must be finite")
     if binwidth is not None and (not np.isfinite(binwidth) or binwidth <= 0.0):
         raise ValueError("binwidth must be finite and greater than zero")
 
-    values, sample = _numeric_sample(data, x)
-    mean = float(np.mean(values))
-    standard_deviation = float(np.std(values, ddof=1))
-    test = scipy_stats.ttest_1samp(
-        values, popmean=float(test_value), alternative=alternative
-    )
-    statistic = float(test.statistic)
-    p_value = float(test.pvalue)
-    df = float(values.size - 1)
-
-    standard_error = standard_deviation / float(np.sqrt(values.size))
-    critical = float(scipy_stats.t.ppf(0.5 + (conf_level / 2.0), df))
-    margin = critical * standard_error
-    effect_size = (mean - test_value) / standard_deviation
-
-    result = AnalysisResult(
-        schema_version=1,
-        analysis="gghistostats_one_sample_parametric",
-        column=x,
-        sample=sample,
-        estimate=EstimateResult(
-            name="mean",
-            value=mean,
-            standard_deviation=standard_deviation,
-        ),
-        test=TestResult(
-            name="one_sample_t",
-            null_value=float(test_value),
-            alternative=alternative,
-            statistic=statistic,
-            df=df,
-            p_value=p_value,
-        ),
-        interval=IntervalResult(
-            target="population_mean",
-            method="student_t_two_sided",
-            level=conf_level,
-            low=mean - margin,
-            high=mean + margin,
-        ),
-        effect_size=EffectSizeResult(
-            name="cohen_d",
-            value=effect_size,
-            standardizer="sample_standard_deviation_ddof_1",
-        ),
-        warnings=(_PROTOTYPE_WARNING,),
-    )
+    values = analysis.sample.values
+    result = analysis.result
+    sample = result.sample
+    x = analysis.sample.column
+    test_value = result.test.null_value
+    conf_level = result.interval.level
+    mean = result.estimate.value
+    statistic = result.test.statistic
+    p_value = result.test.p_value
+    df = result.test.df
+    effect_size = result.effect_size.value
 
     if binwidth is None:
         bins: str | int = "auto"
@@ -225,7 +109,8 @@ def gghistostats(
     renderer.axvline(mean, color="#1f77b4", linestyle="--", label="sample mean")
     renderer.set_xlabel(x)
     renderer.set_ylabel("Count")
-    renderer.set_title(title if title is not None else f"Distribution of {x}")
+    rendered_title = title if title is not None else f"Distribution of {x}"
+    renderer.set_title(rendered_title)
     renderer.legend()
 
     subtitle = (
@@ -253,24 +138,31 @@ def gghistostats(
         figure=figure,
         axes={"main": axes},
         result=result,
-        subtitle=subtitle,
-        caption=caption,
+        annotations=PlotAnnotations(
+            title=rendered_title,
+            subtitle=subtitle,
+            caption=caption,
+        ),
     )
 
 
-def extract_stats(plot: StatsPlot) -> AnalysisResult:
-    """Return the structured result attached to a plot."""
+def gghistostats(
+    data: pl.DataFrame,
+    x: str,
+    *,
+    test_value: float = 0.0,
+    alternative: Alternative = "two-sided",
+    conf_level: float = 0.95,
+    binwidth: float | None = None,
+    title: str | None = None,
+) -> StatsPlot[AnalysisResult]:
+    """Analyze and render the parametric one-sample histogram prototype."""
 
-    return plot.result
-
-
-def extract_subtitle(plot: StatsPlot) -> str:
-    """Return the rendered statistical subtitle source."""
-
-    return plot.subtitle
-
-
-def extract_caption(plot: StatsPlot) -> str:
-    """Return the rendered caption source."""
-
-    return plot.caption
+    analysis = analyze_gghistostats(
+        data,
+        x,
+        test_value=test_value,
+        alternative=alternative,
+        conf_level=conf_level,
+    )
+    return render_gghistostats(analysis, binwidth=binwidth, title=title)

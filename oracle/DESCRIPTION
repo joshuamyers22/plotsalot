@@ -1,0 +1,9 @@
+Package: plotsalotOracle
+Type: Project
+Title: Development-Only Plotsalot R Oracle
+Version: 0.0.0.9000
+Description: Locks the development-only ggstatsplot parity oracle.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Imports:
+    ggstatsplot

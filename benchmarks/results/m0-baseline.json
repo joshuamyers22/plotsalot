@@ -1,0 +1,233 @@
+{
+  "host": {
+    "machine": "arm64",
+    "platform": "macOS-15.1-arm64-arm-64bit",
+    "python": "3.12.14"
+  },
+  "measurement": {
+    "clock": "time.perf_counter_ns",
+    "memory": "tracemalloc incremental Python allocation peak",
+    "repeats": 5,
+    "seed_rule": "20260914 + row_count"
+  },
+  "results": {
+    "10000": {
+      "analysis": {
+        "elapsed_ns": {
+          "max": 2029875,
+          "median": 1956625,
+          "min": 1908417
+        },
+        "python_peak_bytes": {
+          "max": 247519,
+          "median": 247519,
+          "min": 247468
+        },
+        "samples": [
+          {
+            "elapsed_ns": 1956625,
+            "python_peak_bytes": 247519
+          },
+          {
+            "elapsed_ns": 1908417,
+            "python_peak_bytes": 247519
+          },
+          {
+            "elapsed_ns": 1923500,
+            "python_peak_bytes": 247468
+          },
+          {
+            "elapsed_ns": 2029875,
+            "python_peak_bytes": 247468
+          },
+          {
+            "elapsed_ns": 1988792,
+            "python_peak_bytes": 247519
+          }
+        ]
+      },
+      "render": {
+        "elapsed_ns": {
+          "max": 65646000,
+          "median": 61212584,
+          "min": 61170250
+        },
+        "python_peak_bytes": {
+          "max": 937239,
+          "median": 935184,
+          "min": 931496
+        },
+        "samples": [
+          {
+            "elapsed_ns": 61170250,
+            "python_peak_bytes": 937239
+          },
+          {
+            "elapsed_ns": 61210833,
+            "python_peak_bytes": 935214
+          },
+          {
+            "elapsed_ns": 61447500,
+            "python_peak_bytes": 935184
+          },
+          {
+            "elapsed_ns": 65646000,
+            "python_peak_bytes": 932424
+          },
+          {
+            "elapsed_ns": 61212584,
+            "python_peak_bytes": 931496
+          }
+        ]
+      }
+    },
+    "100000": {
+      "analysis": {
+        "elapsed_ns": {
+          "max": 2811500,
+          "median": 2653625,
+          "min": 2592416
+        },
+        "python_peak_bytes": {
+          "max": 2407519,
+          "median": 2407473,
+          "min": 2407381
+        },
+        "samples": [
+          {
+            "elapsed_ns": 2811500,
+            "python_peak_bytes": 2407473
+          },
+          {
+            "elapsed_ns": 2755542,
+            "python_peak_bytes": 2407381
+          },
+          {
+            "elapsed_ns": 2592416,
+            "python_peak_bytes": 2407473
+          },
+          {
+            "elapsed_ns": 2617584,
+            "python_peak_bytes": 2407519
+          },
+          {
+            "elapsed_ns": 2653625,
+            "python_peak_bytes": 2407473
+          }
+        ]
+      },
+      "render": {
+        "elapsed_ns": {
+          "max": 139468666,
+          "median": 137607083,
+          "min": 135544250
+        },
+        "python_peak_bytes": {
+          "max": 2507640,
+          "median": 2507074,
+          "min": 2505631
+        },
+        "samples": [
+          {
+            "elapsed_ns": 136104500,
+            "python_peak_bytes": 2507640
+          },
+          {
+            "elapsed_ns": 135544250,
+            "python_peak_bytes": 2506672
+          },
+          {
+            "elapsed_ns": 139468666,
+            "python_peak_bytes": 2507091
+          },
+          {
+            "elapsed_ns": 137607083,
+            "python_peak_bytes": 2505631
+          },
+          {
+            "elapsed_ns": 137790250,
+            "python_peak_bytes": 2507074
+          }
+        ]
+      }
+    },
+    "1000000": {
+      "analysis": {
+        "elapsed_ns": {
+          "max": 13265042,
+          "median": 11853458,
+          "min": 11664417
+        },
+        "python_peak_bytes": {
+          "max": 24007519,
+          "median": 24007519,
+          "min": 24007468
+        },
+        "samples": [
+          {
+            "elapsed_ns": 11829042,
+            "python_peak_bytes": 24007519
+          },
+          {
+            "elapsed_ns": 11664417,
+            "python_peak_bytes": 24007468
+          },
+          {
+            "elapsed_ns": 11984125,
+            "python_peak_bytes": 24007473
+          },
+          {
+            "elapsed_ns": 13265042,
+            "python_peak_bytes": 24007519
+          },
+          {
+            "elapsed_ns": 11853458,
+            "python_peak_bytes": 24007519
+          }
+        ]
+      },
+      "render": {
+        "elapsed_ns": {
+          "max": 324792333,
+          "median": 323871625,
+          "min": 323018375
+        },
+        "python_peak_bytes": {
+          "max": 9280104,
+          "median": 9279178,
+          "min": 9277918
+        },
+        "samples": [
+          {
+            "elapsed_ns": 323520292,
+            "python_peak_bytes": 9280104
+          },
+          {
+            "elapsed_ns": 323871625,
+            "python_peak_bytes": 9279596
+          },
+          {
+            "elapsed_ns": 324493250,
+            "python_peak_bytes": 9277918
+          },
+          {
+            "elapsed_ns": 324792333,
+            "python_peak_bytes": 9279085
+          },
+          {
+            "elapsed_ns": 323018375,
+            "python_peak_bytes": 9279178
+          }
+        ]
+      }
+    }
+  },
+  "schema_version": 1,
+  "scope": "gghistostats_one_sample_parametric",
+  "versions": {
+    "matplotlib": "3.11.2",
+    "numpy": "2.5.3",
+    "polars": "1.44.2",
+    "scipy": "1.18.1"
+  }
+}

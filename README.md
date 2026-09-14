@@ -1,12 +1,10 @@
 # plotsalot
 
 `plotsalot` is a planned Python implementation of the statistical-visualization
-workflows in [`ggstatsplot`](https://github.com/IndrajeetPatil/ggstatsplot) and
-the Q–Q/P–P diagnostics in [`qqplotr`](https://github.com/aloy/qqplotr).
+workflows in [`ggstatsplot`](https://github.com/IndrajeetPatil/ggstatsplot).
 
-The project is in milestone M0: source baselining, compatibility design,
-statistical specification, licensing review, and a small `gghistostats` walking
-skeleton. It is not ready for analytical or production use.
+M0 and M1 are complete. The project remains an early one-method prototype and
+is not ready for analytical or production use.
 
 ## Development
 
@@ -15,6 +13,19 @@ make setup
 make check
 make build
 ```
+
+The development-only R oracle and retained performance baseline are reproduced
+separately:
+
+```sh
+make oracle
+make benchmark
+```
+
+`make oracle` requires Docker and rebuilds the exact R 4.5.1/ggstatsplot
+environment from `oracle/renv.lock`. Neither R nor Docker is a package runtime
+dependency. `make check` verifies the checked-in oracle hashes and benchmark
+shape without invoking Docker, R, or the network.
 
 The package is Polars-first at tabular boundaries, uses explicit NumPy numerical
 boundaries, and returns structured results alongside Matplotlib figures. R is
@@ -37,19 +48,32 @@ plot.figure.savefig("histogram.svg")
 print(plot.result.to_dict())
 ```
 
+Analysis and rendering can also be separated so visual changes do not recompute
+statistics:
+
+```python
+from plotsalot import analyze_gghistostats, render_gghistostats
+
+analysis = analyze_gghistostats(data, "value", test_value=0.0)
+plot = render_gghistostats(analysis, title="Observed values")
+plot.axes["main"].grid(axis="y", alpha=0.2)
+```
+
 Only the parametric one-sample prototype is implemented. See
 [`docs/MILESTONE_0.md`](docs/MILESTONE_0.md),
+[`docs/MILESTONE_1.md`](docs/MILESTONE_1.md),
+[`docs/CONTRACTS.md`](docs/CONTRACTS.md),
 [`docs/compatibility.md`](docs/compatibility.md), and
 [`STATISTICAL_ANALYSIS_PLAN.md`](STATISTICAL_ANALYSIS_PLAN.md) for scope and
 evidence gates.
 
-## Licensing boundary
+The prototype is intentionally adapted rather than statistically identical to
+upstream: it rejects non-finite and zero-variance samples and reports Cohen's d;
+the pinned ggstatsplot oracle accepts those boundary fixtures and reports
+Hedges' g. The retained fixtures make that distinction testable.
 
-`ggstatsplot` is MIT licensed and `qqplotr` is GPL-3. No `qqplotr` source may be
-copied or translated into this repository until ADR-010 is resolved through
-qualified review. Current Q–Q/P–P planning is based on public API behavior and
-published statistical methods only.
+## License
 
-Public repository visibility does not itself grant an open-source license to
-Plotsalot. See [ADR-010](docs/adr/ADR-010-license-posture.md) for the licensing
-decision that must be resolved before `qqplotr`-derived work begins.
+Plotsalot is MIT licensed. See
+[ADR-010](docs/adr/ADR-010-license-posture.md) for the accepted distribution and
+upstream-notice rules.

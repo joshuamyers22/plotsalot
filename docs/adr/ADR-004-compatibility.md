@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-09-13
-- Owners: Product owner; statistical owner unassigned
+- Owners: Joshua Myers, product and M0 statistical approver
 
 ## Context and forces
 

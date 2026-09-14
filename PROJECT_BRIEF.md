@@ -1,7 +1,7 @@
 # Project Brief
 
-- Status: Draft; M0 decisions requiring accountable owners remain open
-- Last updated: 2026-09-13
+- Status: Accepted M0 baseline
+- Last updated: 2026-09-14
 
 ## Outcome
 
@@ -9,8 +9,8 @@
   report authors must currently coordinate plotting, statistical tests, effect
   sizes, uncertainty, corrections, and distribution diagnostics across multiple
   libraries. `plotsalot` will provide cohesive, inspectable plot-plus-result
-  workflows derived from the public behavior of `ggstatsplot` and `qqplotr`.
-- Measurable success criteria: Every one of the 37 combined upstream exports is
+  workflows derived from the public behavior of `ggstatsplot`.
+- Measurable success criteria: Every one of the 22 upstream exports is
   classified as equivalent, adapted, experimental, or deferred; each supported
   statistic maps to a versioned result field and specification; deterministic
   methods pass R-oracle and independent-reference fixtures at method-specific
@@ -22,16 +22,16 @@
   application; any claim of upstream endorsement.
 - Critical user journeys: create one statistical plot from a Polars dataframe;
   extract structured results and annotations; create grouped panels; modify and
-  save the Matplotlib result; pass supported Statsmodels/tidy coefficients;
-  compose Q–Q/P–P points, reference lines, detrending, and approved bands.
+  save the Matplotlib result; pass supported Statsmodels/tidy coefficients.
 
 ## Constraints and risk
 
 - Runtime/deployment environment: Python 3.11+ library for Linux and macOS,
   notebooks, scripts, and headless CI; wheels and sdist; no service or database.
-- Expected load and growth: benchmark 10K, 100K, and 1M-row univariate,
-  scatter, and Q–Q workloads plus 10-, 25-, and 50-variable correlation
-  matrices during M0.
+- Expected load and growth: benchmark 10K, 100K, and 1M-row univariate and
+  scatter workloads plus 10-, 25-, and 50-variable correlation matrices. M0
+  establishes the implemented univariate baseline; each remaining
+  family joins the retained grid at its implementation milestone.
 - Data classification and retention: caller-owned in-process data; no implicit
   persistence, logging of rows, or remote telemetry; figures and evidence are
   saved only by explicit user action.
@@ -46,20 +46,19 @@
   finite defaults and explicit override/budget behavior.
 - Recovery point/time objectives: not applicable. Published package artifacts
   must be reproducible and traceable; defective releases are yanked and patched.
-- Legal/compliance constraints: preserve MIT notices for `ggstatsplot`-derived
-  material; `qqplotr` is GPL-3 and creates a blocking license decision before
-  source copying or translation; credit both upstream projects and publications;
-  do not imply official status without approval.
-- Budget and delivery deadline: initial estimate 46–64 engineer-weeks and 6–9
+- Legal/compliance constraints: preserve applicable MIT notices for
+  `ggstatsplot`-derived material; credit upstream projects and publications; do
+  not imply official status.
+- Budget and delivery deadline: initial estimate 42–58 engineer-weeks and 6–8
   calendar months with two engineers plus a part-time statistical reviewer;
   recalibrate after M0. No committed deadline or financial budget is assigned.
-- Owners and on-call expectations: product, technical, statistical,
-  visualization, and release/security owners are unassigned. No on-call duty is
-  required before a supported public release.
+- Owners and on-call expectations: Joshua Myers is the product, M0 statistical,
+  and license approver. Technical, visualization, and release/security roles
+  remain unassigned. No on-call duty is required before a supported release.
 - Top failure or abuse scenarios: mislabeled estimator or interval; lost pairing;
   inconsistent plotted/tested samples; invalid stochastic output presented as
-  precise; wrong Q–Q/P–P band coverage semantics; R/SciPy parameterization drift;
-  resource exhaustion; license contamination; implied upstream endorsement.
+  precise; R/SciPy parameterization drift; resource exhaustion; license
+  contamination; implied upstream endorsement.
 
 ## System outline
 
@@ -74,8 +73,8 @@
   R oracle environment; package build and publication pipeline.
 - Core domain invariants: the displayed and tested samples reconcile; pairing is
   explicit; every rendered number comes from a typed result field; correction,
-  interval, distribution, quantile, detrending, and randomness metadata are
-  retained; imports have no I/O or global plotting/random-state side effects.
+  interval, distribution, and randomness metadata are retained; imports have no
+  I/O or global plotting/random-state side effects.
 - Consistency and concurrency needs: result objects are immutable value records;
   random generators are caller-owned or locally constructed; no shared mutable
   analysis state.
@@ -94,19 +93,18 @@
 | Requirement | Verification | Owner | Status |
 |---|---|---|---|
 | Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for M0 |
-| Both upstreams are pinned | `docs/upstream/manifest.json` and hashes | Technical lead | Passing |
+| Upstream is pinned | `docs/upstream/manifest.json` and hashes | Technical lead | Passing |
 | Public API inventory is complete | `docs/compatibility.md` versus namespaces | Product owner | Baseline complete |
 | No R runtime dependency | Python-only isolated wheel smoke test | Technical lead | Passing for prototype |
-| Statistical correctness | Method specs, analytic cases, R oracle, independent review | Statistical owner | Blocked on owner |
-| GPL/MIT posture | ADR-010 and qualified review | Product/release owners | Blocking |
+| Statistical correctness | Method specs, analytic cases, R oracle, independent review | Joshua Myers | M0 specification approved |
+| MIT license posture | ADR-010 and qualified review | Joshua Myers | Approved |
 | Initial walking skeleton | Focused tests and saved headless figure | Technical lead | Passing |
 
 ## Open decisions
 
 | Question | Decision deadline | Owner | ADR |
 |---|---|---|---|
-| Is `plotsalot` an official port and what license will it use? | End of M0 | Product owner | ADR-001, ADR-010 |
+| Is `plotsalot` an official port and what license will it use? | Decided: independent MIT project | Joshua Myers | ADR-001, ADR-010 |
 | Which renderer and dataframe contracts are stable? | End of M0 | Technical/visualization owners | ADR-002, ADR-003 |
 | Which behaviors define compatibility? | End of M0 | Product/statistical owners | ADR-004 |
-| Which Bayesian, robust, and diagnostic-band methods ship? | Before their implementation | Statistical owner | ADR-005, ADR-006, ADR-011 |
-| How are distributions and R quantile types mapped? | Before Q–Q/P–P code | Statistical owner | ADR-012 |
+| Which Bayesian and robust methods ship? | Before their implementation | Statistical owner | ADR-005, ADR-006 |

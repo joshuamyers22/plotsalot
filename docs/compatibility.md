@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M0 inventory; classifications may narrow after statistical review
+- Status: M0 approved inventory; classifications may narrow during later method reviews
 
 Definitions:
 
@@ -37,26 +37,6 @@ Definitions:
 | `grouped_ggscatterstats` | same name | 0.1 | Planned |
 | `grouped_ggwithinstats` | same name | 0.2 | Planned |
 | `theme_ggstatsplot` | `theme_ggstatsplot` | 0.1 | Planned |
-
-## qqplotr
-
-| Export | Python surface | Target | Status |
-|---|---|---:|---|
-| `stat_qq_point` | `stat_qq_point` / `qq_points` | 0.1 | Blocked by ADR-010 and method spec |
-| `stat_qq_line` | `stat_qq_line` / `qq_line` | 0.1 | Blocked by ADR-010 and method spec |
-| `stat_qq_band` | `stat_qq_band` / `qq_band` | 0.1–0.4 | Blocked by ADR-010 and method spec |
-| `stat_pp_point` | `stat_pp_point` / `pp_points` | 0.1 | Blocked by ADR-010 and method spec |
-| `stat_pp_line` | `stat_pp_line` / `pp_line` | 0.1 | Blocked by ADR-010 and method spec |
-| `stat_pp_band` | `stat_pp_band` / `pp_band` | 0.1–0.4 | Blocked by ADR-010 and method spec |
-| `geom_qq_band` | `BandSpec` and renderer | 0.1 | Adapted; blocked by ADR-010 |
-| `GeomQqBand` | internal renderer protocol | 0.1 | Adapted; no `ggproto` emulation |
-| `StatQqPoint` | internal calculation protocol | 0.1 | Adapted; no `ggproto` emulation |
-| `StatQqLine` | internal calculation protocol | 0.1 | Adapted; no `ggproto` emulation |
-| `StatQqBand` | internal calculation protocol | 0.1–0.4 | Adapted; no `ggproto` emulation |
-| `StatPpPoint` | internal calculation protocol | 0.1 | Adapted; no `ggproto` emulation |
-| `StatPpLine` | internal calculation protocol | 0.1 | Adapted; no `ggproto` emulation |
-| `StatPpBand` | internal calculation protocol | 0.1–0.4 | Adapted; no `ggproto` emulation |
-| `runShinyExample` | notebook/widget gallery | Post-1.0 | Deferred |
 
 ## Known adaptation rules
 

@@ -1,0 +1,2 @@
+# Preserve verbatim R-generated oracle evidence, including formatter whitespace.
+oracle/fixtures/r-output/* whitespace=-blank-at-eof,-trailing-space

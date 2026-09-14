@@ -1,9 +1,9 @@
 # Statistical Analysis Plan: Cross-Language Parity Program
 
-- Status: Draft; the M0 one-sample prototype is specified below
+- Status: M0 one-sample specification approved; future methods remain gated
 - Version: 0.1.0
 - Date: 2026-09-13
-- Statistical owner/reviewer: Unassigned; approval required before production use
+- Statistical owner/reviewer: Joshua Myers; M0 approval recorded 2026-09-14
 
 ## Decision and estimand
 
@@ -63,6 +63,12 @@
 - Effect size: Cohen's one-sample `d = (mean - test_value) / s`, with the sample
   standard deviation. Effect-size uncertainty is not implemented in M0 and the
   result must carry an explicit prototype warning.
+- Upstream adaptation: pinned `ggstatsplot` reports Hedges' g with an ncp
+  interval and accepts the retained non-finite and zero-variance boundary
+  fixtures. The M0 Python contract instead reports Cohen's d without an interval
+  and rejects both boundary states. Oracle verification treats these as explicit
+  adaptations while requiring parity for the t statistic, degrees of freedom,
+  p-value, sample counts, mean interval, and independently computed Cohen's d.
 - Presentation: retain full precision in the result; round only the subtitle.
 - Randomness: none.
 - Missing features: Bayesian/nonparametric/robust modes, effect-size interval,
@@ -84,18 +90,6 @@
   mean, sample deviation, t statistic, df, p-value, and interval on well-scaled
   fixtures. Oracle tolerances may differ only through reviewed method records.
 
-## Q–Q/P–P specification gate
-
-Before code is written, specify probability points, each mapped R quantile type,
-continuous/discrete support, tie behavior, supplied versus fitted parameters,
-R-to-SciPy parameter names, identity/two-quantile lines, detrending transform,
-and point-reduction fidelity. Each band must record whether coverage is
-pointwise or simultaneous and specify its bootstrap, KS, tail-sensitive, or
-equal-local-level algorithm and calibration target.
-
-This gate is additionally blocked by ADR-010. Public behavior and published
-method research are allowed; copying or translating GPL source is not.
-
 ## Diagnostics and validation
 
 - Identification/rank/residual diagnostics: method-specific; not applicable to
@@ -105,11 +99,11 @@ method research are allowed; copying or translating GPL source is not.
 - Sensitivity: include location/scale transformations, row permutations where
   valid, category relabeling/order, ties, extreme but finite values, and method
   boundary cases.
-- Calibration: stochastic intervals/bands require repeated-simulation coverage
+- Calibration: stochastic intervals require repeated-simulation coverage
   studies with declared error bounds and retained aggregate evidence.
 - Failure thresholds: mismatched sample, method metadata, df, sidedness,
-  correction, interval target, band coverage type, or non-finite output is
-  blocking regardless of rounded visual similarity.
+  correction, interval target, or non-finite output is blocking regardless of
+  rounded visual similarity.
 - Development/selection/final boundary: tune tolerances and designs on
   development fixtures; lock them before evaluating held-out fixtures.
 
@@ -119,10 +113,11 @@ method research are allowed; copying or translating GPL source is not.
   `docs/upstream/manifest.json`, method specs, and hashed parity fixtures.
 - Evidence schema: `schemas/analysis-result.schema.json`, version 1.
 - Results: report estimates and uncertainty, never p-values alone.
-- Invalidating conditions: unsupported method/parameter combination, unresolved
-  license posture, unreviewed statistical spec, oracle drift, failed diagnostics,
-  or stale dependency lock.
+- Invalidating conditions: unsupported method/parameter combination, violation
+  of the accepted license posture, unreviewed statistical spec, oracle drift,
+  failed diagnostics, or stale dependency lock.
 - Monitoring/rollback: run parity and numerical-drift suites on dependency
   updates. Yank and patch a defective release; never silently revise a result.
-- Approvals: author TBD; independent statistical reviewer TBD; product/release
-  approvers TBD.
+- Approval: Joshua Myers approved the M0 one-sample specification and documented
+  upstream adaptations on 2026-09-14. Later method families require separate
+  approvals under this plan.

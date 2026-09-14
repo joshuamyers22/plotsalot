@@ -1,0 +1,31 @@
+{
+  "boundary_fixtures": [
+    "non-finite",
+    "degenerate"
+  ],
+  "ggstatsplot_revision": "7a724cd0ab55668b9d0b2e84b12c711c5be68ac8",
+  "normal_fixtures": [
+    "normal",
+    "null-containing",
+    "small-sample"
+  ],
+  "schema_version": 1,
+  "sha256": {
+    "oracle/DESCRIPTION": "e8da3b8c9965df21684a3e2d6c50150176c5ebbb53033842a6198d6de03ae797",
+    "oracle/Dockerfile": "7f7612da94d25c4a933a53ba6a180f5cf41573a099e41c3fdc19b0806a8f37ad",
+    "oracle/fixtures/input/degenerate.csv": "2687952049f35cb20dba9afee00e482347a5ebee6f79c1b3c88841cc490d8ba8",
+    "oracle/fixtures/input/non-finite.csv": "71ed24d8df1e292eb4594a82d529af7888f78f2f8dd8aa2495d5a5864f3cc89d",
+    "oracle/fixtures/input/normal.csv": "49a2bb5c9701a38d80ffef0e137313225d42dd385248eef984ea2d0f9cef6772",
+    "oracle/fixtures/input/null-containing.csv": "c8720e565328654fefe825c85b502ed744c721336be7ce10cf64fb2cf83c6c89",
+    "oracle/fixtures/input/small-sample.csv": "3bb60d321ea829f8adef22734c295a2bc0889162448056cfc4045d6f9da4e740",
+    "oracle/fixtures/r-output/boundary-results.csv": "cf5d0759b27f6bb7f1557dd5821a74222548e5a555e5d6f992df8952944075a9",
+    "oracle/fixtures/r-output/installed-packages.csv": "08bf172819e7615de1faedd4759aa1881d961a902c3b1fc11f347d139eb32bb9",
+    "oracle/fixtures/r-output/normal-ggstatsplot.R": "3e8db78ec38d05c372731e375ec3fabe67151050e6b80f9772f3ec7ced868119",
+    "oracle/fixtures/r-output/normalized-results.csv": "456b0661f9d5a563d9727df6ca3061ecf10474eee3ab7d60e4738a6a8b9e019b",
+    "oracle/fixtures/r-output/null-containing-ggstatsplot.R": "b55c612d2bd3586f84b79c0d35a2dfb0591311318ec03becb761d2afc25c16be",
+    "oracle/fixtures/r-output/session-info.txt": "96cd7807f99cd4bb57b8fbe4f39350ab408b7073964e1a4879adb7c86094448d",
+    "oracle/fixtures/r-output/small-sample-ggstatsplot.R": "c265d30ba4f5628f8505d0b2f5e95e250cb90e657cc87ee7db823ad0b2f783ab",
+    "oracle/generate.R": "8aa183c77d6748a7d25a4fa7fd6169600a5ec15cc40624f95e6053247d5e3006",
+    "oracle/renv.lock": "79ee4cadc12458298ed7d8213ec4a9678907f88574655f42c696c4f7ecee76f9"
+  }
+}
