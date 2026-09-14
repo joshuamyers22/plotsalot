@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M3 complete; M4 categorical release candidate implemented
+- Status: M0–M4 complete; M5 detailed contract prepared
 
 Definitions:
 
@@ -21,7 +21,7 @@ Definitions:
 | `extract_subtitle` | `extract_subtitle` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `ggbarstats` | `ggbarstats` | 0.2 | Adapted; shared classical categorical analysis and normalized bars implemented |
 | `ggbetweenstats` | `ggbetweenstats` | 0.1 | Adapted; Welch parametric/Holm mode implemented |
-| `ggcoefstats` | `ggcoefstats` | 0.3 | Planned |
+| `ggcoefstats` | `ggcoefstats` | 0.3 | Contracted; implementation blocked on M5 method approval |
 | `ggcorrmat` | `ggcorrmat` | 0.1 | Adapted; Pearson/Holm mode implemented |
 | `ggdotplotstats` | `ggdotplotstats` | 0.1 | Adapted; labeled parametric mode implemented |
 | `gghistostats` | `gghistostats` | M0/0.1 | Adapted; one-sample parametric mode implemented |
@@ -108,3 +108,18 @@ tables, all at least five; other tables require at least 80% at five or more.
 Failure never triggers an automatic exact or simulated replacement. Defaults
 limit inputs to one million rows, 20 levels per axis, 400 cells/labels, 190
 pairwise hypotheses, 20 groups, and weighted total 1,000,000,000.
+
+## M5 planned disposition
+
+`MILESTONE_5.md` contracts `ggcoefstats` as a strict Polars coefficient-table
+and narrow fitted-Statsmodels adapter rather than universal R-style model
+tidying. M5 requires estimate-only and approved inferential coefficient modes,
+plus one approved frequentist random-effects meta-analysis over independent,
+comparable study estimates. Exact K1–K4/MA1–MA4 method decisions remain blocked
+pending Joshua Myers's approval.
+
+Robust/Bayesian meta-analysis, Bayes-factor captions, automatic term creation,
+heuristic duplicate-term concatenation, arbitrary model dispatch, ANOVA effect
+sizes, exponentiated/transformed parameters, ellipsis forwarding, and dynamic R
+plotting objects are provisionally deferred. Final classifications require M5
+implementation evidence and accountable review.

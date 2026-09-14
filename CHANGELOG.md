@@ -58,3 +58,6 @@
 - Completed M4 after the full production gate, adversarial finding disposition,
   independent review, and Joshua Myers's final approval, closing the `0.2`
   product gate.
+- Added the detailed M5 contract for strict coefficient tables, approved fitted-
+  Statsmodels adapters, semantic dot-and-whisker rendering, frequentist random-
+  effects meta-analysis, explicit method gates, and `0.3` acceptance.

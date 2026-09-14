@@ -115,6 +115,14 @@ strict sparse-table failure, and grouped correction scope. C1–C5/G5 and the
 count/resource/tolerance policy were approved by Joshua Myers without revision
 on 2026-09-14.
 
+## M5 coefficient and meta-analysis contract
+
+`docs/MILESTONE_5.md` defines the planned strict coefficient-table protocol,
+narrow fitted-Statsmodels adapter, semantic coefficient renderer, and
+frequentist random-effects meta-analysis boundary. K1–K4 and MA1–MA4 remain
+unapproved; inferential implementation and acceptance fixtures must stop until
+Joshua Myers approves the separate M5 statistical method specification.
+
 ## Diagnostics and validation
 
 - Identification/rank/residual diagnostics: method-specific; not applicable to
