@@ -90,6 +90,7 @@ arguments and nonparametric, robust, and Bayesian modes remain deferred. See
 [`docs/MILESTONE_0.md`](docs/MILESTONE_0.md),
 [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md),
 [`docs/MILESTONE_2.md`](docs/MILESTONE_2.md),
+[`docs/MILESTONE_3.md`](docs/MILESTONE_3.md),
 [`docs/CONTRACTS.md`](docs/CONTRACTS.md),
 [`docs/compatibility.md`](docs/compatibility.md), and
 [`STATISTICAL_ANALYSIS_PLAN.md`](STATISTICAL_ANALYSIS_PLAN.md) for scope and

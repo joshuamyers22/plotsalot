@@ -26,3 +26,7 @@
   grid with five separate analysis and render measurements per workload.
 - Completed M2 after the full production gate, adversarial finding disposition,
   independent review, and Joshua Myers's final milestone approval.
+- Added the detailed M3 contract, separating the M3A independent-group and
+  `0.1` composition/theme gate from the M3B repeated-measures and `0.2` gate,
+  with explicit method-approval, pairing, multiplicity, evidence, resource, and
+  sign-off requirements.
