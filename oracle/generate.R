@@ -268,6 +268,185 @@ utils::write.csv(
   na = "NA"
 )
 
+# M3 independent comparison fixture ------------------------------------------
+
+between_input <- utils::read.csv(file.path(input_dir, "m3-between.csv"))
+between_input$group <- factor(between_input$group, levels = sort(unique(between_input$group)))
+between_plot <- ggstatsplot::ggbetweenstats(
+  data = between_input,
+  x = group,
+  y = value,
+  type = "parametric",
+  pairwise.display = "all",
+  p.adjust.method = "holm",
+  bf.message = FALSE,
+  centrality.plotting = FALSE
+)
+dput(
+  ggstatsplot::extract_stats(between_plot),
+  file = file.path(output_dir, "m3-between-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+
+between_omnibus <- stats::oneway.test(
+  value ~ group,
+  data = between_input,
+  var.equal = FALSE
+)
+between_pairs <- utils::combn(levels(between_input$group), 2L, simplify = FALSE)
+between_pair_rows <- lapply(between_pairs, function(pair) {
+  left <- between_input$value[between_input$group == pair[[1L]]]
+  right <- between_input$value[between_input$group == pair[[2L]]]
+  test <- stats::t.test(left, right, var.equal = FALSE, conf.level = 0.95)
+  data.frame(
+    record = "pairwise",
+    left = pair[[1L]],
+    right = pair[[2L]],
+    statistic = unname(test$statistic),
+    df1 = NA_real_,
+    df2 = unname(test$parameter),
+    p_value = test$p.value,
+    estimate = mean(left) - mean(right),
+    interval_low = unname(test$conf.int[[1L]]),
+    interval_high = unname(test$conf.int[[2L]]),
+    stringsAsFactors = FALSE
+  )
+})
+between_pairs_df <- do.call(rbind, between_pair_rows)
+between_pairs_df$adjusted_p_value <- stats::p.adjust(
+  between_pairs_df$p_value,
+  method = "holm"
+)
+between_omnibus_row <- data.frame(
+  record = "omnibus",
+  left = NA_character_,
+  right = NA_character_,
+  statistic = unname(between_omnibus$statistic),
+  df1 = unname(between_omnibus$parameter[[1L]]),
+  df2 = unname(between_omnibus$parameter[[2L]]),
+  p_value = between_omnibus$p.value,
+  estimate = NA_real_,
+  interval_low = NA_real_,
+  interval_high = NA_real_,
+  adjusted_p_value = NA_real_,
+  stringsAsFactors = FALSE
+)
+utils::write.csv(
+  rbind(between_omnibus_row, between_pairs_df),
+  file.path(output_dir, "m3-between-results.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+
+# M3 repeated comparison fixture ---------------------------------------------
+
+within_input <- utils::read.csv(file.path(input_dir, "m3-within.csv"))
+within_input$condition <- factor(
+  within_input$condition,
+  levels = sort(unique(within_input$condition))
+)
+within_plot <- ggstatsplot::ggwithinstats(
+  data = within_input,
+  x = condition,
+  y = value,
+  subject.id = subject,
+  type = "parametric",
+  pairwise.display = "all",
+  p.adjust.method = "holm",
+  bf.message = FALSE,
+  centrality.plotting = FALSE
+)
+dput(
+  ggstatsplot::extract_stats(within_plot),
+  file = file.path(output_dir, "m3-within-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+
+within_wide <- stats::reshape(
+  within_input,
+  idvar = "subject",
+  timevar = "condition",
+  direction = "wide"
+)
+within_matrix <- as.matrix(
+  within_wide[, paste0("value.", levels(within_input$condition)), drop = FALSE]
+)
+n_subjects <- nrow(within_matrix)
+n_conditions <- ncol(within_matrix)
+grand_mean <- mean(within_matrix)
+ss_condition <- n_subjects * sum((colMeans(within_matrix) - grand_mean)^2)
+ss_subject <- n_conditions * sum((rowMeans(within_matrix) - grand_mean)^2)
+ss_total <- sum((within_matrix - grand_mean)^2)
+ss_error <- ss_total - ss_condition - ss_subject
+within_df1 <- n_conditions - 1L
+within_df2 <- (n_subjects - 1L) * (n_conditions - 1L)
+within_f <- (ss_condition / within_df1) / (ss_error / within_df2)
+within_covariance <- stats::cov(within_matrix)
+centering <- diag(n_conditions) - matrix(1 / n_conditions, n_conditions, n_conditions)
+projected <- centering %*% within_covariance %*% centering
+epsilon <- sum(diag(projected))^2 / (
+  (n_conditions - 1L) * sum(diag(projected %*% projected))
+)
+epsilon <- min(1, max(1 / (n_conditions - 1L), epsilon))
+within_uncorrected_p <- stats::pf(within_f, within_df1, within_df2, lower.tail = FALSE)
+within_corrected_df1 <- epsilon * within_df1
+within_corrected_df2 <- epsilon * within_df2
+within_corrected_p <- stats::pf(
+  within_f,
+  within_corrected_df1,
+  within_corrected_df2,
+  lower.tail = FALSE
+)
+within_pairs <- utils::combn(levels(within_input$condition), 2L, simplify = FALSE)
+within_pair_rows <- lapply(within_pairs, function(pair) {
+  left <- within_matrix[, paste0("value.", pair[[1L]])]
+  right <- within_matrix[, paste0("value.", pair[[2L]])]
+  test <- stats::t.test(left, right, paired = TRUE, conf.level = 0.95)
+  data.frame(
+    record = "pairwise",
+    left = pair[[1L]],
+    right = pair[[2L]],
+    statistic = unname(test$statistic),
+    df1 = NA_real_,
+    df2 = unname(test$parameter),
+    p_value = test$p.value,
+    estimate = mean(left - right),
+    interval_low = unname(test$conf.int[[1L]]),
+    interval_high = unname(test$conf.int[[2L]]),
+    epsilon = NA_real_,
+    uncorrected_p_value = NA_real_,
+    adjusted_p_value = NA_real_,
+    stringsAsFactors = FALSE
+  )
+})
+within_pairs_df <- do.call(rbind, within_pair_rows)
+within_pairs_df$adjusted_p_value <- stats::p.adjust(
+  within_pairs_df$p_value,
+  method = "holm"
+)
+within_omnibus_row <- data.frame(
+  record = "omnibus",
+  left = NA_character_,
+  right = NA_character_,
+  statistic = within_f,
+  df1 = within_corrected_df1,
+  df2 = within_corrected_df2,
+  p_value = within_corrected_p,
+  estimate = NA_real_,
+  interval_low = NA_real_,
+  interval_high = NA_real_,
+  epsilon = epsilon,
+  uncorrected_p_value = within_uncorrected_p,
+  adjusted_p_value = NA_real_,
+  stringsAsFactors = FALSE
+)
+utils::write.csv(
+  rbind(within_omnibus_row, within_pairs_df),
+  file.path(output_dir, "m3-within-results.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+
 installed <- as.data.frame(utils::installed.packages()[, c("Package", "Version")])
 installed <- installed[order(installed$Package), , drop = FALSE]
 utils::write.csv(

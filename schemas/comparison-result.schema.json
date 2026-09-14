@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plotsalot.dev/schemas/comparison-result.schema.json",
+  "title": "plotsalot comparison result schema v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "analysis",
+    "design",
+    "x",
+    "y",
+    "subject_id",
+    "sample",
+    "levels",
+    "omnibus",
+    "estimate",
+    "interval",
+    "effect_size",
+    "pairwise",
+    "p_adjust",
+    "pairwise_alpha",
+    "pairwise_display",
+    "correction",
+    "limits",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "analysis": {
+      "enum": ["ggbetweenstats_welch", "ggwithinstats_parametric"]
+    },
+    "design": { "enum": ["between", "within"] },
+    "x": { "type": "string", "minLength": 1 },
+    "y": { "type": "string", "minLength": 1 },
+    "subject_id": { "type": ["string", "null"] },
+    "sample": {
+      "oneOf": [
+        { "$ref": "#/$defs/sampleAudit" },
+        { "$ref": "#/$defs/repeatedSampleAudit" }
+      ]
+    },
+    "levels": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/level" }
+    },
+    "omnibus": { "$ref": "#/$defs/test" },
+    "estimate": { "type": ["number", "null"] },
+    "interval": {
+      "oneOf": [
+        { "$ref": "#/$defs/interval" },
+        { "type": "null" }
+      ]
+    },
+    "effect_size": { "$ref": "#/$defs/effect" },
+    "pairwise": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/pairwise" }
+    },
+    "p_adjust": { "enum": ["holm", "none"] },
+    "pairwise_alpha": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "pairwise_display": {
+      "enum": ["significant", "non-significant", "all", "none"]
+    },
+    "correction": {
+      "oneOf": [
+        { "$ref": "#/$defs/correction" },
+        { "type": "null" }
+      ]
+    },
+    "limits": { "$ref": "#/$defs/limits" },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "identity": {
+      "anyOf": [
+        { "type": "string", "minLength": 1 },
+        { "type": "integer" },
+        { "type": "number" },
+        { "type": "boolean" }
+      ]
+    },
+    "sampleAudit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_rows", "analyzed_rows", "dropped_null_rows"],
+      "properties": {
+        "input_rows": { "type": "integer", "minimum": 0 },
+        "analyzed_rows": { "type": "integer", "minimum": 0 },
+        "dropped_null_rows": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "repeatedSampleAudit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_rows",
+        "analyzed_rows",
+        "analyzed_subjects",
+        "dropped_null_identity_rows",
+        "dropped_null_value_rows",
+        "excluded_incomplete_rows",
+        "excluded_incomplete_subjects"
+      ],
+      "properties": {
+        "input_rows": { "type": "integer", "minimum": 0 },
+        "analyzed_rows": { "type": "integer", "minimum": 0 },
+        "analyzed_subjects": { "type": "integer", "minimum": 1 },
+        "dropped_null_identity_rows": { "type": "integer", "minimum": 0 },
+        "dropped_null_value_rows": { "type": "integer", "minimum": 0 },
+        "excluded_incomplete_rows": { "type": "integer", "minimum": 0 },
+        "excluded_incomplete_subjects": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {
+          "enum": ["population_mean", "population_mean_difference"]
+        },
+        "method": {
+          "enum": [
+            "student_t_two_sided",
+            "welch_satterthwaite_two_sided",
+            "paired_student_t_two_sided"
+          ]
+        },
+        "level": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "low": { "type": "number" },
+        "high": { "type": "number" }
+      }
+    },
+    "level": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "n_obs",
+        "mean",
+        "standard_deviation",
+        "interval"
+      ],
+      "properties": {
+        "level": { "$ref": "#/$defs/identity" },
+        "n_obs": { "type": "integer", "minimum": 2 },
+        "mean": { "type": "number" },
+        "standard_deviation": { "type": "number", "minimum": 0 },
+        "interval": { "$ref": "#/$defs/interval" }
+      }
+    },
+    "test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "statistic", "df1", "df2", "p_value"],
+      "properties": {
+        "name": {
+          "enum": [
+            "welch_t",
+            "welch_anova",
+            "paired_t",
+            "repeated_measures_anova"
+          ]
+        },
+        "statistic": { "type": "number" },
+        "df1": { "type": ["number", "null"] },
+        "df2": { "type": "number", "exclusiveMinimum": 0 },
+        "p_value": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value", "standardizer"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "value": { "type": "number" },
+        "standardizer": { "type": "string", "minLength": 1 }
+      }
+    },
+    "pairwise": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "left",
+        "right",
+        "estimate",
+        "standard_error",
+        "test",
+        "interval",
+        "effect_size",
+        "adjusted_p_value",
+        "significant"
+      ],
+      "properties": {
+        "left": { "$ref": "#/$defs/identity" },
+        "right": { "$ref": "#/$defs/identity" },
+        "estimate": { "type": "number" },
+        "standard_error": { "type": "number", "exclusiveMinimum": 0 },
+        "test": { "$ref": "#/$defs/test" },
+        "interval": { "$ref": "#/$defs/interval" },
+        "effect_size": { "$ref": "#/$defs/effect" },
+        "adjusted_p_value": { "type": "number", "minimum": 0, "maximum": 1 },
+        "significant": { "type": "boolean" }
+      }
+    },
+    "correction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "epsilon",
+        "uncorrected_df1",
+        "uncorrected_df2",
+        "uncorrected_p_value",
+        "corrected_df1",
+        "corrected_df2",
+        "corrected_p_value"
+      ],
+      "properties": {
+        "name": { "const": "greenhouse_geisser" },
+        "epsilon": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "uncorrected_df1": { "type": "number", "exclusiveMinimum": 0 },
+        "uncorrected_df2": { "type": "number", "exclusiveMinimum": 0 },
+        "uncorrected_p_value": { "type": "number", "minimum": 0, "maximum": 1 },
+        "corrected_df1": { "type": "number", "exclusiveMinimum": 0 },
+        "corrected_df2": { "type": "number", "exclusiveMinimum": 0 },
+        "corrected_p_value": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maximum_rows",
+        "maximum_groups",
+        "maximum_variables",
+        "maximum_labels",
+        "maximum_levels",
+        "maximum_pairwise_hypotheses",
+        "maximum_rendered_observations",
+        "maximum_subject_paths",
+        "maximum_panels"
+      ],
+      "properties": {
+        "maximum_rows": { "type": "integer", "minimum": 1 },
+        "maximum_groups": { "type": "null" },
+        "maximum_variables": { "type": "null" },
+        "maximum_labels": { "type": "null" },
+        "maximum_levels": { "type": "integer", "minimum": 2, "maximum": 20 },
+        "maximum_pairwise_hypotheses": { "type": "integer", "minimum": 1 },
+        "maximum_rendered_observations": { "type": "integer", "minimum": 1 },
+        "maximum_subject_paths": { "type": ["integer", "null"], "minimum": 1 },
+        "maximum_panels": { "type": "null" }
+      }
+    }
+  }
+}

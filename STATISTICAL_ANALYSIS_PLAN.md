@@ -1,6 +1,6 @@
 # Statistical Analysis Plan: Cross-Language Parity Program
 
-- Status: M0 and M2 classical specifications approved
+- Status: M0, M2, and M3 classical specifications approved
 - Version: 0.1.0
 - Date: 2026-09-13
 - Statistical owner/reviewer: Joshua Myers; M0 approval recorded 2026-09-14
@@ -98,6 +98,14 @@ correlation-matrix missingness, Holm adjustment, grouped correction scopes, and
 resource limits. Joshua Myers approved U2, G1, C1, C2, and G2 without revision
 on 2026-09-14; the earlier U1 approval remains in force.
 
+## M3 classical comparison proposal
+
+`docs/M3_STATISTICAL_METHODS.md` specifies Welch independent comparisons,
+Holm-adjusted pairwise Welch contrasts, explicit-subject paired comparisons,
+Greenhouse–Geisser-corrected repeated-measures ANOVA, complete-block repeated
+pairwise tests, grouped correction scopes, and resource limits. Joshua Myers
+approved B1–B3/G3 and W1–W3/G4 without revision on 2026-09-14.
+
 ## Diagnostics and validation
 
 - Identification/rank/residual diagnostics: method-specific; not applicable to
@@ -128,5 +136,6 @@ on 2026-09-14; the earlier U1 approval remains in force.
   updates. Yank and patch a defective release; never silently revise a result.
 - Approval: Joshua Myers approved the M0 one-sample specification and documented
   upstream adaptations on 2026-09-14 and approved the M2 classical
-  specification on the same date. Later method families require separate
-  approvals under this plan.
+  specification on the same date. Joshua Myers approved the M3 classical
+  comparison specification on 2026-09-14. Later method families require
+  separate approvals under this plan.

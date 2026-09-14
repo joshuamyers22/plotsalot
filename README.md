@@ -3,9 +3,10 @@
 `plotsalot` is a planned Python implementation of the statistical-visualization
 workflows in [`ggstatsplot`](https://github.com/IndrajeetPatil/ggstatsplot).
 
-M0, M1, and M2 are complete. The approved frequentist univariate and correlation
-surfaces have passed their technical and statistical gates. The project remains
-pre-release and is not yet ready for production analytical use.
+M0 through M3 are complete. The approved frequentist univariate, correlation,
+independent-group, and repeated-measures surfaces have passed their technical,
+statistical, and accountable gates. The project remains pre-release and is not
+yet ready for production analytical use.
 
 ## Development
 
@@ -82,10 +83,49 @@ for group_plot in grouped.plots:
     group_plot.figure.savefig(f"group-{group_plot.title}.svg")
 ```
 
+M3 adds Welch independent-group comparisons, explicit-subject repeated
+comparisons, grouped variants, local theming, and result-preserving composition:
+
+```python
+from plotsalot import (
+    combine_plots,
+    ggbetweenstats,
+    ggwithinstats,
+    grouped_ggbetweenstats,
+    theme_ggstatsplot,
+)
+
+between = ggbetweenstats(data, "treatment", "score")
+within = ggwithinstats(
+    repeated_data,
+    "condition",
+    "score",
+    subject_id="participant",
+    pairwise_display="all",
+)
+by_site = grouped_ggbetweenstats(data, "treatment", "score", "site")
+combined = combine_plots(
+    [between, within, by_site],
+    columns=2,
+    title="Comparison summary",
+    panel_tags="A",
+)
+
+print(between.result.omnibus)
+print(within.result.correction)
+print(combined.result.panels[0].result is between.result)
+
+custom_theme = theme_ggstatsplot()
+```
+
 Only the approved classical modes are supported: one-sample Student tests,
 per-label mean intervals, two-sided Pearson correlations with Fisher intervals,
-and per-matrix Holm adjustment. Inputs are limited by default to 1,000,000 rows,
-200 dot labels, 50 matrix variables, and 20 groups. Unsupported upstream
+Welch independent comparisons, paired tests, and Greenhouse–Geisser-corrected
+repeated-measures ANOVA. Holm is the default pairwise/matrix adjustment. M3
+requires an explicit subject identifier and analyzes/renders complete repeated
+blocks only. Inputs are limited by default to 1,000,000 rows, 200 dot labels,
+50 matrix variables, 20 groups or comparison levels, 1,000,000 rendered
+observations, 10,000 subject paths, and 20 composed panels. Unsupported upstream
 arguments and nonparametric, robust, and Bayesian modes remain deferred. See
 [`docs/MILESTONE_0.md`](docs/MILESTONE_0.md),
 [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md),
@@ -96,7 +136,7 @@ arguments and nonparametric, robust, and Bayesian modes remain deferred. See
 [`STATISTICAL_ANALYSIS_PLAN.md`](STATISTICAL_ANALYSIS_PLAN.md) for scope and
 evidence gates.
 
-Custom ceilings are explicit keyword arguments on the applicable M2 surfaces
+Custom ceilings are explicit keyword arguments on the applicable M2/M3 surfaces
 and are serialized in `result.limits`. Invalid data, unsupported methods, and
 an invalid member of a grouped operation raise an error; grouped calls never
 return a partial result.

@@ -1,10 +1,11 @@
 # Milestone M3: Between- and Within-Group Comparisons
 
-- Status: Planned; statistical-method approval pending
+- Status: Complete
 - Contract date: 2026-09-14
 - Target duration: 5–7 weeks
 - Product and statistical owner: Joshua Myers
-- Implementation, visualization, and independent-review owners: Unassigned
+- Implementation and visualization owner: Codex
+- Independent reviewer: Joshua Myers
 
 ## Objective
 
@@ -14,8 +15,9 @@ analysis/plot samples, and semantic Matplotlib figures. M3 also closes the
 composition and theme utilities promised for the `0.1` product gate.
 
 This contract fixes the product boundary, evidence requirements, and stopping
-rules. It does not approve a statistical method. Each implemented mode remains
-blocked until Joshua Myers approves its method record.
+rules. Joshua Myers approved every retained M3 method on 2026-09-14; those
+approvals do not substitute for independent release-candidate review or final
+product acceptance.
 
 ## Entry gate
 
@@ -68,22 +70,22 @@ surface or delivery track requires a product-owner-approved contract amendment.
 
 | Deliverable | Acceptance evidence | Track | Status |
 |---|---|---|---|
-| Approved method records | Reviewed specification for every supported independent or repeated-measures mode | Both | Pending |
-| Independent-group data contract | Typed level identities, retained observations, per-level counts, exclusions, and stable order | M3A | Planned |
-| Independent-group analysis | Approved two-level and three-or-more-level analysis paths with analytic, independent-reference, and oracle tests | M3A | Planned |
-| Repeated-measures data contract | Explicit subject/condition mapping, duplicate detection, completeness audit, and stable condition order | M3B | Planned |
-| Repeated-measures analysis | Approved two-condition and three-or-more-condition paths with analytic, independent-reference, and oracle tests | M3B | Planned |
-| Pairwise comparison core | Typed hypotheses, estimates, raw and adjusted probabilities, interval/effect metadata, and display disposition | Both | Planned |
-| Versioned result schemas | Frozen JSON-safe schemas for omnibus, pairwise, sample-audit, assumption, grouped, and composition records | Both | Planned |
-| Semantic renderers | Layer and annotation tests proving that displayed statistics originate in the paired typed result | Both | Planned |
-| Grouped execution | Stable order and identity, nested sample audits, declared correction scope, and atomic failure | Both | Planned |
-| Composition and theme utilities | Public API tests, result-preservation tests, local-style tests, and explicit incompatibility errors | M3A | Planned |
-| Compatibility disposition | Every touched upstream method and argument classified in `compatibility.md` | Both | Planned |
-| Oracle and independent evidence | Frozen pinned-R fixtures plus analytic or independent Python references at predeclared tolerances | Both | Planned |
-| Performance baseline | Retained analysis/render measurements across row, level, pairwise, subject, condition, and composition grids | Both | Planned |
-| Public documentation | Examples, method limitations, sample rules, assumptions, errors, extraction, and reproducibility metadata | Both | Planned |
-| Production repository gate | Check, audit, build, isolated-wheel smoke, oracle verification, and benchmark verification pass | Both | Planned |
-| Review and sign-off | Verification loop, adversarial review, finding disposition, independent review, and Joshua Myers approval | Both | Pending |
+| Approved method records | Reviewed specification for every supported independent or repeated-measures mode | Both | Complete |
+| Independent-group data contract | Typed level identities, retained observations, per-level counts, exclusions, and stable order | M3A | Complete |
+| Independent-group analysis | Approved two-level and three-or-more-level analysis paths with analytic, independent-reference, and oracle tests | M3A | Complete |
+| Repeated-measures data contract | Explicit subject/condition mapping, duplicate detection, completeness audit, and stable condition order | M3B | Complete |
+| Repeated-measures analysis | Approved two-condition and three-or-more-condition paths with analytic, independent-reference, and oracle tests | M3B | Complete |
+| Pairwise comparison core | Typed hypotheses, estimates, raw and adjusted probabilities, interval/effect metadata, and display disposition | Both | Complete |
+| Versioned result schemas | Frozen JSON-safe schemas for omnibus, pairwise, sample-audit, assumption, grouped, and composition records | Both | Complete |
+| Semantic renderers | Layer and annotation tests proving that displayed statistics originate in the paired typed result | Both | Complete |
+| Grouped execution | Stable order and identity, nested sample audits, declared correction scope, and atomic failure | Both | Complete |
+| Composition and theme utilities | Public API tests, result-preservation tests, local-style tests, and explicit incompatibility errors | M3A | Complete |
+| Compatibility disposition | Every touched upstream method and argument classified in `compatibility.md` | Both | Complete |
+| Oracle and independent evidence | Frozen pinned-R fixtures plus analytic or independent Python references at predeclared tolerances | Both | Complete |
+| Performance baseline | Retained analysis/render measurements across row, level, pairwise, subject, condition, and composition grids | Both | Complete |
+| Public documentation | Examples, method limitations, sample rules, assumptions, errors, extraction, and reproducibility metadata | Both | Complete |
+| Production repository gate | Check, audit, build, isolated-wheel smoke, oracle verification, and benchmark verification pass | Both | Complete |
+| Review and sign-off | Verification loop, adversarial review, finding disposition, independent review, and Joshua Myers approval | Both | Complete |
 
 ## Statistical method approval checklist
 
@@ -313,3 +315,11 @@ candidate.
 M3 is complete only when both M3A and M3B are complete, every remaining touched
 method and argument has an explicit compatibility disposition, and the combined
 release candidate passes the production gate from a clean source tree.
+
+## Closeout
+
+M3A and M3B passed their statistical, sample, multiplicity, renderer, grouped,
+composition/theme, schema, compatibility, oracle, benchmark, coverage, audit,
+build, isolated-wheel, and documentation gates. Joshua Myers independently
+reviewed the release candidate, accepted every recorded finding disposition,
+and approved both tracks on 2026-09-14. M3 is complete.

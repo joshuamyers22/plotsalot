@@ -99,7 +99,7 @@ def _group_identity(value: object) -> GroupIdentity:
     )
 
 
-def _split_groups(
+def split_groups(
     data: object,
     group: str,
     *,
@@ -146,7 +146,7 @@ def _split_groups(
     )
 
 
-def _grouped_result(
+def grouped_result(
     *,
     analysis: str,
     group_column: str,
@@ -167,7 +167,7 @@ def _grouped_result(
     )
 
 
-def _group_error(group: GroupIdentity, error: Exception) -> ValueError:
+def group_error(group: GroupIdentity, error: Exception) -> ValueError:
     return ValueError(f"group {group!r} failed: {error}")
 
 
@@ -184,7 +184,7 @@ def analyze_grouped_gghistostats(
 ) -> GroupedAnalysis[HistogramAnalysis]:
     """Apply the approved histogram analysis atomically by group."""
 
-    partitions, sample = _split_groups(
+    partitions, sample = split_groups(
         data,
         group,
         maximum_rows=maximum_rows,
@@ -209,12 +209,12 @@ def analyze_grouped_gghistostats(
                 conf_level=conf_level,
             )
         except (TypeError, ValueError) as error:
-            raise _group_error(partition.group, error) from error
+            raise group_error(partition.group, error) from error
         groups.append(GroupAnalysisItem(partition.group, item_analysis))
         results.append(GroupResultItem(partition.group, item_analysis.result))
     return GroupedAnalysis(
         groups=tuple(groups),
-        result=_grouped_result(
+        result=grouped_result(
             analysis="grouped_gghistostats_one_sample_parametric",
             group_column=group,
             sample=sample,
@@ -243,7 +243,7 @@ def analyze_grouped_ggdotplotstats(
 ) -> GroupedAnalysis[DotPlotAnalysis]:
     """Apply the approved labeled dot-plot analysis atomically by group."""
 
-    partitions, sample = _split_groups(
+    partitions, sample = split_groups(
         data,
         group,
         maximum_rows=maximum_rows,
@@ -264,12 +264,12 @@ def analyze_grouped_ggdotplotstats(
                 maximum_labels=maximum_labels,
             )
         except (TypeError, ValueError) as error:
-            raise _group_error(partition.group, error) from error
+            raise group_error(partition.group, error) from error
         groups.append(GroupAnalysisItem(partition.group, item_analysis))
         results.append(GroupResultItem(partition.group, item_analysis.result))
     return GroupedAnalysis(
         groups=tuple(groups),
-        result=_grouped_result(
+        result=grouped_result(
             analysis="grouped_ggdotplotstats_one_sample_parametric",
             group_column=group,
             sample=sample,
@@ -296,7 +296,7 @@ def analyze_grouped_ggscatterstats(
 ) -> GroupedAnalysis[CorrelationAnalysis]:
     """Apply the approved Pearson scatter analysis atomically by group."""
 
-    partitions, sample = _split_groups(
+    partitions, sample = split_groups(
         data,
         group,
         maximum_rows=maximum_rows,
@@ -314,12 +314,12 @@ def analyze_grouped_ggscatterstats(
                 maximum_rows=maximum_rows,
             )
         except (TypeError, ValueError) as error:
-            raise _group_error(partition.group, error) from error
+            raise group_error(partition.group, error) from error
         groups.append(GroupAnalysisItem(partition.group, item_analysis))
         results.append(GroupResultItem(partition.group, item_analysis.result))
     return GroupedAnalysis(
         groups=tuple(groups),
-        result=_grouped_result(
+        result=grouped_result(
             analysis="grouped_ggscatterstats_pearson",
             group_column=group,
             sample=sample,
@@ -346,7 +346,7 @@ def analyze_grouped_ggcorrmat(
 ) -> GroupedAnalysis[CorrelationMatrixAnalysis]:
     """Apply the approved Pearson matrix analysis atomically by group."""
 
-    partitions, sample = _split_groups(
+    partitions, sample = split_groups(
         data,
         group,
         maximum_rows=maximum_rows,
@@ -365,12 +365,12 @@ def analyze_grouped_ggcorrmat(
                 maximum_rows=maximum_rows,
             )
         except (TypeError, ValueError) as error:
-            raise _group_error(partition.group, error) from error
+            raise group_error(partition.group, error) from error
         groups.append(GroupAnalysisItem(partition.group, item_analysis))
         results.append(GroupResultItem(partition.group, item_analysis.result))
     return GroupedAnalysis(
         groups=tuple(groups),
-        result=_grouped_result(
+        result=grouped_result(
             analysis="grouped_ggcorrmat_pearson",
             group_column=group,
             sample=sample,
@@ -385,7 +385,7 @@ def analyze_grouped_ggcorrmat(
     )
 
 
-def _group_annotations(result: GroupedResult, title: str) -> PlotAnnotations:
+def group_annotations(result: GroupedResult, title: str) -> PlotAnnotations:
     return PlotAnnotations(
         title=title,
         subtitle=f"{len(result.groups)} group(s); {result.correction_scope}",
@@ -413,7 +413,7 @@ def render_grouped_gghistostats(
     return GroupedStatsPlot(
         plots=plots,
         result=analysis.result,
-        annotations=_group_annotations(analysis.result, rendered_title),
+        annotations=group_annotations(analysis.result, rendered_title),
     )
 
 
@@ -437,7 +437,7 @@ def render_grouped_ggdotplotstats(
     return GroupedStatsPlot(
         plots=plots,
         result=analysis.result,
-        annotations=_group_annotations(analysis.result, rendered_title),
+        annotations=group_annotations(analysis.result, rendered_title),
     )
 
 
@@ -459,7 +459,7 @@ def render_grouped_ggscatterstats(
     return GroupedStatsPlot(
         plots=plots,
         result=analysis.result,
-        annotations=_group_annotations(analysis.result, rendered_title),
+        annotations=group_annotations(analysis.result, rendered_title),
     )
 
 
@@ -483,7 +483,7 @@ def render_grouped_ggcorrmat(
     return GroupedStatsPlot(
         plots=plots,
         result=analysis.result,
-        annotations=_group_annotations(analysis.result, rendered_title),
+        annotations=group_annotations(analysis.result, rendered_title),
     )
 
 

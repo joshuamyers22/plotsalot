@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plotsalot.dev/schemas/composition-result.schema.json",
+  "title": "plotsalot composition result schema v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "analysis",
+    "rows",
+    "columns",
+    "guides",
+    "x_label",
+    "y_label",
+    "panel_tags",
+    "panels",
+    "limits",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "analysis": { "const": "combine_plots" },
+    "rows": { "type": "integer", "minimum": 1 },
+    "columns": { "type": "integer", "minimum": 1 },
+    "guides": { "const": "keep" },
+    "x_label": { "type": ["string", "null"], "minLength": 1 },
+    "y_label": { "type": ["string", "null"], "minLength": 1 },
+    "panel_tags": { "enum": [null, "A", "a", "1"] },
+    "panels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["panel", "source_index", "group", "title", "tag", "result"],
+        "properties": {
+          "panel": { "type": "string", "pattern": "^panel_[1-9][0-9]*$" },
+          "source_index": { "type": "integer", "minimum": 0 },
+          "group": {
+            "anyOf": [
+              { "type": "string", "minLength": 1 },
+              { "type": "integer" },
+              { "type": "number" },
+              { "type": "boolean" },
+              { "type": "null" }
+            ]
+          },
+          "title": { "type": "string", "minLength": 1 },
+          "tag": { "type": ["string", "null"], "minLength": 1 },
+          "result": { "type": "object" }
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maximum_rows",
+        "maximum_groups",
+        "maximum_variables",
+        "maximum_labels",
+        "maximum_levels",
+        "maximum_pairwise_hypotheses",
+        "maximum_rendered_observations",
+        "maximum_subject_paths",
+        "maximum_panels"
+      ],
+      "properties": {
+        "maximum_rows": { "const": 1 },
+        "maximum_groups": { "type": "null" },
+        "maximum_variables": { "type": "null" },
+        "maximum_labels": { "type": "null" },
+        "maximum_levels": { "type": "null" },
+        "maximum_pairwise_hypotheses": { "type": "null" },
+        "maximum_rendered_observations": { "type": "null" },
+        "maximum_subject_paths": { "type": "null" },
+        "maximum_panels": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

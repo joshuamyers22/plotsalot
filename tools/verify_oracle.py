@@ -12,7 +12,14 @@ from typing import Any
 
 import polars as pl
 
-from plotsalot import analyze_ggcorrmat, analyze_ggdotplotstats, analyze_gghistostats
+from plotsalot import (
+    ComparisonResult,
+    analyze_ggbetweenstats,
+    analyze_ggcorrmat,
+    analyze_ggdotplotstats,
+    analyze_gghistostats,
+    analyze_ggwithinstats,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 ORACLE = ROOT / "oracle"
@@ -27,6 +34,8 @@ M2_RAW_FIXTURES = (
     "m2-scatter-ggstatsplot.R",
     "m2-corrmat-ggstatsplot.R",
 )
+M3_INPUT_FIXTURES = ("m3-between", "m3-within")
+M3_RAW_FIXTURES = ("m3-between-ggstatsplot.R", "m3-within-ggstatsplot.R")
 FLOAT_FIELDS = {
     "test_value": lambda result: result.test.null_value,
     "conf_level": lambda result: result.interval.level,
@@ -214,6 +223,83 @@ def _verify_m2_results() -> None:
             _close(float(actual), expected[field], f"m2-correlation.{identity}.{field}")
 
 
+def _verify_pairwise_rows(
+    rows: list[dict[str, str]],
+    result: ComparisonResult,
+    fixture: str,
+) -> None:
+    pairwise = result.pairwise
+    expected_pairs = [row for row in rows if row["record"] == "pairwise"]
+    if len(pairwise) != len(expected_pairs):
+        raise AssertionError(f"{fixture}: pairwise family size differs")
+    for actual, expected in zip(pairwise, expected_pairs, strict=True):
+        if (actual.left, actual.right) != (expected["left"], expected["right"]):
+            raise AssertionError(f"{fixture}: pairwise identity differs")
+        for field, value in {
+            "statistic": actual.test.statistic,
+            "df2": actual.test.df2,
+            "p_value": actual.test.p_value,
+            "estimate": actual.estimate,
+            "interval_low": actual.interval.low,
+            "interval_high": actual.interval.high,
+            "adjusted_p_value": actual.adjusted_p_value,
+        }.items():
+            _close(
+                value,
+                expected[field],
+                f"{fixture}.{actual.left}.{actual.right}.{field}",
+            )
+
+
+def _verify_m3_results() -> None:
+    for filename in M3_RAW_FIXTURES:
+        path = OUTPUT / filename
+        if not path.is_file() or path.stat().st_size == 0:
+            raise AssertionError(f"missing raw ggstatsplot M3 result: {path}")
+
+    between_raw = (OUTPUT / "m3-between-ggstatsplot.R").read_text()
+    if "Games-Howell" not in between_raw:
+        raise AssertionError("M3 between oracle lost the upstream pairwise adaptation")
+    between_data = pl.read_csv(INPUT / "m3-between.csv")
+    between_result = analyze_ggbetweenstats(between_data, "group", "value").result
+    with (OUTPUT / "m3-between-results.csv").open(newline="") as handle:
+        between_rows = list(csv.DictReader(handle))
+    between_omnibus = next(row for row in between_rows if row["record"] == "omnibus")
+    for field, value in {
+        "statistic": between_result.omnibus.statistic,
+        "df1": between_result.omnibus.df1,
+        "df2": between_result.omnibus.df2,
+        "p_value": between_result.omnibus.p_value,
+    }.items():
+        if value is None:
+            raise AssertionError(f"m3-between.{field} is absent")
+        _close(float(value), between_omnibus[field], f"m3-between.{field}")
+    _verify_pairwise_rows(between_rows, between_result, "m3-between")
+
+    within_data = pl.read_csv(INPUT / "m3-within.csv")
+    within_result = analyze_ggwithinstats(
+        within_data, "condition", "value", subject_id="subject"
+    ).result
+    with (OUTPUT / "m3-within-results.csv").open(newline="") as handle:
+        within_rows = list(csv.DictReader(handle))
+    within_omnibus = next(row for row in within_rows if row["record"] == "omnibus")
+    correction = within_result.correction
+    if correction is None:
+        raise AssertionError("m3-within correction is absent")
+    for field, value in {
+        "statistic": within_result.omnibus.statistic,
+        "df1": within_result.omnibus.df1,
+        "df2": within_result.omnibus.df2,
+        "p_value": within_result.omnibus.p_value,
+        "epsilon": correction.epsilon,
+        "uncorrected_p_value": correction.uncorrected_p_value,
+    }.items():
+        if value is None:
+            raise AssertionError(f"m3-within.{field} is absent")
+        _close(float(value), within_omnibus[field], f"m3-within.{field}")
+    _verify_pairwise_rows(within_rows, within_result, "m3-within")
+
+
 def _artifact_paths() -> list[Path]:
     paths = [ORACLE / "Dockerfile", ORACLE / "DESCRIPTION", ORACLE / "generate.R"]
     paths.extend(sorted(INPUT.glob("*.csv")))
@@ -239,6 +325,8 @@ def _manifest_payload() -> dict[str, Any]:
         "boundary_fixtures": list(BOUNDARY_FIXTURES),
         "m2_input_fixtures": list(M2_INPUT_FIXTURES),
         "m2_raw_fixtures": list(M2_RAW_FIXTURES),
+        "m3_input_fixtures": list(M3_INPUT_FIXTURES),
+        "m3_raw_fixtures": list(M3_RAW_FIXTURES),
         "sha256": _hashes(),
     }
 
@@ -248,6 +336,7 @@ def verify_oracle() -> None:
 
     _verify_results()
     _verify_m2_results()
+    _verify_m3_results()
     retained = json.loads(MANIFEST.read_text())
     if retained != _manifest_payload():
         raise AssertionError("oracle artifact hashes differ from manifest")
@@ -260,6 +349,7 @@ def main() -> None:
     if args.write_manifest:
         _verify_results()
         _verify_m2_results()
+        _verify_m3_results()
         payload = _manifest_payload()
         MANIFEST.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     else:

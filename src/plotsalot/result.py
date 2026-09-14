@@ -30,6 +30,11 @@ class ResourceLimits:
     maximum_groups: int | None = None
     maximum_variables: int | None = None
     maximum_labels: int | None = None
+    maximum_levels: int | None = None
+    maximum_pairwise_hypotheses: int | None = None
+    maximum_rendered_observations: int | None = None
+    maximum_subject_paths: int | None = None
+    maximum_panels: int | None = None
 
     def __post_init__(self) -> None:
         values = (
@@ -37,6 +42,11 @@ class ResourceLimits:
             self.maximum_groups,
             self.maximum_variables,
             self.maximum_labels,
+            self.maximum_levels,
+            self.maximum_pairwise_hypotheses,
+            self.maximum_rendered_observations,
+            self.maximum_subject_paths,
+            self.maximum_panels,
         )
         if any(
             value is not None and (type(value) is not int or value < 1)
@@ -492,6 +502,8 @@ class GroupedResult:
             "grouped_ggdotplotstats_one_sample_parametric",
             "grouped_ggscatterstats_pearson",
             "grouped_ggcorrmat_pearson",
+            "grouped_ggbetweenstats_welch",
+            "grouped_ggwithinstats_parametric",
         }:
             raise ValueError("grouped analysis identity is unsupported")
         if not self.group_column or not self.groups:
@@ -502,6 +514,8 @@ class GroupedResult:
         if self.correction_scope not in {
             "none_across_groups",
             "within_group_matrix",
+            "within_each_comparison_result_none_across_outer_groups",
+            "within_each_repeated_result_none_across_outer_groups",
         }:
             raise ValueError("grouped correction scope is unsupported")
         if any(not warning for warning in self.warnings):

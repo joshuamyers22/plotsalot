@@ -30,3 +30,14 @@
   `0.1` composition/theme gate from the M3B repeated-measures and `0.2` gate,
   with explicit method-approval, pairing, multiplicity, evidence, resource, and
   sign-off requirements.
+- Added the approval-ready M3 classical method proposal and pending accountable
+  sign-off records for independent-group and repeated-measures tracks.
+- Recorded Joshua Myers's approval of the M3 classical comparison methods.
+- Added typed independent and explicit-subject repeated comparison samples,
+  Welch/paired/repeated analyses, full Holm families, Greenhouse–Geisser
+  metadata, semantic renderers, and atomic grouped variants.
+- Added result-preserving plot composition with shared labels and deterministic
+  tags, immutable local theming, M3 result schemas, pinned-R fixtures, and the
+  retained row/level/subject/condition/composition performance grid.
+- Completed M3A and M3B after the full production gate, adversarial finding
+  disposition, independent review, and Joshua Myers's final milestone approval.

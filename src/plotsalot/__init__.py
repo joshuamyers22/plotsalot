@@ -1,5 +1,35 @@
 """Statistical visualizations and extractable results for Python."""
 
+from plotsalot.comparison import (
+    ggbetweenstats,
+    ggwithinstats,
+    render_ggbetweenstats,
+    render_ggwithinstats,
+)
+from plotsalot.comparison_analysis import (
+    ComparisonAnalysis,
+    analyze_ggbetweenstats,
+    analyze_ggwithinstats,
+)
+from plotsalot.comparison_data import ComparisonSample, RepeatedSample
+from plotsalot.comparison_grouped import (
+    analyze_grouped_ggbetweenstats,
+    analyze_grouped_ggwithinstats,
+    grouped_ggbetweenstats,
+    grouped_ggwithinstats,
+    render_grouped_ggbetweenstats,
+    render_grouped_ggwithinstats,
+)
+from plotsalot.comparison_result import (
+    ComparisonResult,
+    PairwiseComparisonResult,
+    RepeatedSampleAudit,
+)
+from plotsalot.composition import (
+    ComposedStatsPlot,
+    CompositionResult,
+    combine_plots,
+)
 from plotsalot.correlation import (
     ggcorrmat,
     ggscatterstats,
@@ -54,6 +84,7 @@ from plotsalot.result import (
     ResourceLimits,
     StructuredResult,
 )
+from plotsalot.theme import StatsTheme, theme_ggstatsplot
 
 __all__ = [
     "AnalysisResult",
@@ -61,6 +92,11 @@ __all__ = [
     "CorrelationMatrixAnalysis",
     "CorrelationMatrixResult",
     "CorrelationResult",
+    "ComparisonAnalysis",
+    "ComparisonResult",
+    "ComparisonSample",
+    "ComposedStatsPlot",
+    "CompositionResult",
     "DotPlotAnalysis",
     "DotPlotResult",
     "GroupedAnalysis",
@@ -69,37 +105,55 @@ __all__ = [
     "HistogramAnalysis",
     "NumericSample",
     "PairedNumericSample",
+    "PairwiseComparisonResult",
     "PlotAnnotations",
     "ResourceLimits",
+    "RepeatedSample",
+    "RepeatedSampleAudit",
+    "StatsTheme",
     "StatsPlot",
     "StructuredResult",
     "analyze_grouped_ggcorrmat",
+    "analyze_grouped_ggbetweenstats",
     "analyze_grouped_ggdotplotstats",
     "analyze_grouped_gghistostats",
     "analyze_grouped_ggscatterstats",
+    "analyze_grouped_ggwithinstats",
+    "analyze_ggbetweenstats",
     "analyze_ggcorrmat",
     "analyze_ggdotplotstats",
     "analyze_gghistostats",
     "analyze_ggscatterstats",
+    "analyze_ggwithinstats",
+    "combine_plots",
     "extract_caption",
     "extract_stats",
     "extract_subtitle",
     "ggcorrmat",
+    "ggbetweenstats",
     "ggdotplotstats",
     "gghistostats",
     "ggscatterstats",
+    "ggwithinstats",
+    "grouped_ggbetweenstats",
     "grouped_ggcorrmat",
     "grouped_ggdotplotstats",
     "grouped_gghistostats",
     "grouped_ggscatterstats",
+    "grouped_ggwithinstats",
+    "render_ggbetweenstats",
     "render_ggcorrmat",
     "render_ggdotplotstats",
     "render_gghistostats",
     "render_ggscatterstats",
     "render_grouped_ggcorrmat",
+    "render_grouped_ggbetweenstats",
     "render_grouped_ggdotplotstats",
     "render_grouped_gghistostats",
     "render_grouped_ggscatterstats",
+    "render_grouped_ggwithinstats",
+    "render_ggwithinstats",
     "select_numeric_pair",
     "select_numeric_sample",
+    "theme_ggstatsplot",
 ]

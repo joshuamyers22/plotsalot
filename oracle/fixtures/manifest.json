@@ -13,6 +13,14 @@
     "m2-scatter-ggstatsplot.R",
     "m2-corrmat-ggstatsplot.R"
   ],
+  "m3_input_fixtures": [
+    "m3-between",
+    "m3-within"
+  ],
+  "m3_raw_fixtures": [
+    "m3-between-ggstatsplot.R",
+    "m3-within-ggstatsplot.R"
+  ],
   "normal_fixtures": [
     "normal",
     "null-containing",
@@ -25,6 +33,8 @@
     "oracle/fixtures/input/degenerate.csv": "2687952049f35cb20dba9afee00e482347a5ebee6f79c1b3c88841cc490d8ba8",
     "oracle/fixtures/input/m2-correlation.csv": "26e617a711a866c7d78de2f5384464337b967349a1cb018bfcb68819f6500e8a",
     "oracle/fixtures/input/m2-dot.csv": "9576967906d233979021f6ceea01f0c0c4ce33c3b7663f32a1628f900cfd47b4",
+    "oracle/fixtures/input/m3-between.csv": "09334b184a33015d085051b9d876f5fef2370cf69675bfd7b323382a1d56da34",
+    "oracle/fixtures/input/m3-within.csv": "ec5784d1782182638b7e41673f58f5c0019c27744a5f46fbbde399d1323099f7",
     "oracle/fixtures/input/non-finite.csv": "71ed24d8df1e292eb4594a82d529af7888f78f2f8dd8aa2495d5a5864f3cc89d",
     "oracle/fixtures/input/normal.csv": "49a2bb5c9701a38d80ffef0e137313225d42dd385248eef984ea2d0f9cef6772",
     "oracle/fixtures/input/null-containing.csv": "c8720e565328654fefe825c85b502ed744c721336be7ce10cf64fb2cf83c6c89",
@@ -36,12 +46,16 @@
     "oracle/fixtures/r-output/m2-dot-ggstatsplot.R": "e39dfaad94b78eee5531737e6ccd3bc68277860820d44c69b12996cd1a8c5b07",
     "oracle/fixtures/r-output/m2-dot-results.csv": "656fc58cf932f115d864f38680308bd4beb4da96373c494ce64d00eb06a9f0b9",
     "oracle/fixtures/r-output/m2-scatter-ggstatsplot.R": "e2ded169076d431f9ea4746cc89805a40ab522f6229a9b8364e14820f70a4da0",
+    "oracle/fixtures/r-output/m3-between-ggstatsplot.R": "678a45f6ecca5ceab8a6143f94b56e169621d5ed72a1340e8777492aca1a099c",
+    "oracle/fixtures/r-output/m3-between-results.csv": "cccf5eface9a38273cb135749b2944ab528e8357d0e5603746348c1bd39da6b5",
+    "oracle/fixtures/r-output/m3-within-ggstatsplot.R": "2f59499dd829144c3bb7e73506dffd98a0d967a7a2e0e5075bd721e997d93940",
+    "oracle/fixtures/r-output/m3-within-results.csv": "5d50d30bcb51be5d5ae9db87d37b1b06eec1d1634889111de192fafc4fa3dbf7",
     "oracle/fixtures/r-output/normal-ggstatsplot.R": "3e8db78ec38d05c372731e375ec3fabe67151050e6b80f9772f3ec7ced868119",
     "oracle/fixtures/r-output/normalized-results.csv": "456b0661f9d5a563d9727df6ca3061ecf10474eee3ab7d60e4738a6a8b9e019b",
     "oracle/fixtures/r-output/null-containing-ggstatsplot.R": "b55c612d2bd3586f84b79c0d35a2dfb0591311318ec03becb761d2afc25c16be",
-    "oracle/fixtures/r-output/session-info.txt": "43729c0c0c074accb3d087980da2495bfd334bbf091578f26aa5f4ed15fdb5ea",
+    "oracle/fixtures/r-output/session-info.txt": "90399239f1ece194c78923d50554f1bf99e4bbc7199262b30d2043cc14b7a3ea",
     "oracle/fixtures/r-output/small-sample-ggstatsplot.R": "c265d30ba4f5628f8505d0b2f5e95e250cb90e657cc87ee7db823ad0b2f783ab",
-    "oracle/generate.R": "cd128f8dfc9b8d6c996bd5d03cca59dcb8e9e43cf1ada479b1aafb23428be65a",
+    "oracle/generate.R": "d81f4215d62f90181abe91045b0485d3a7dc9a3ff7f569587a3d89f99995d1fa",
     "oracle/renv.lock": "79ee4cadc12458298ed7d8213ec4a9678907f88574655f42c696c4f7ecee76f9"
   }
 }

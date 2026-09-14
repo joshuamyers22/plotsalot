@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M2 implemented-surface disposition
+- Status: M3 release-candidate implemented-surface disposition
 
 Definitions:
 
@@ -15,28 +15,28 @@ Definitions:
 
 | Export | Python surface | Target | Status |
 |---|---|---:|---|
-| `combine_plots` | `combine_plots` | 0.1 | Planned |
+| `combine_plots` | `combine_plots` | 0.1 | Adapted; typed result-preserving raster composition implemented |
 | `extract_caption` | `extract_caption` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `extract_stats` | `extract_stats` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `extract_subtitle` | `extract_subtitle` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `ggbarstats` | `ggbarstats` | 0.2 | Planned |
-| `ggbetweenstats` | `ggbetweenstats` | 0.1 | Planned |
+| `ggbetweenstats` | `ggbetweenstats` | 0.1 | Adapted; Welch parametric/Holm mode implemented |
 | `ggcoefstats` | `ggcoefstats` | 0.3 | Planned |
 | `ggcorrmat` | `ggcorrmat` | 0.1 | Adapted; Pearson/Holm mode implemented |
 | `ggdotplotstats` | `ggdotplotstats` | 0.1 | Adapted; labeled parametric mode implemented |
 | `gghistostats` | `gghistostats` | M0/0.1 | Adapted; one-sample parametric mode implemented |
 | `ggpiestats` | `ggpiestats` | 0.2 | Planned |
 | `ggscatterstats` | `ggscatterstats` | 0.1 | Adapted; Pearson mode implemented |
-| `ggwithinstats` | `ggwithinstats` | 0.2 | Planned |
+| `ggwithinstats` | `ggwithinstats` | 0.2 | Adapted; explicit-subject complete-block parametric mode implemented |
 | `grouped_ggbarstats` | same name | 0.2 | Planned |
-| `grouped_ggbetweenstats` | same name | 0.1 | Planned |
+| `grouped_ggbetweenstats` | same name | 0.1 | Adapted; atomic per-group Welch container implemented |
 | `grouped_ggcorrmat` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
 | `grouped_ggdotplotstats` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
 | `grouped_gghistostats` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
 | `grouped_ggpiestats` | same name | 0.2 | Planned |
 | `grouped_ggscatterstats` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
-| `grouped_ggwithinstats` | same name | 0.2 | Planned |
-| `theme_ggstatsplot` | `theme_ggstatsplot` | 0.1 | Planned |
+| `grouped_ggwithinstats` | same name | 0.2 | Adapted; atomic per-group complete-block container implemented |
+| `theme_ggstatsplot` | `theme_ggstatsplot` | 0.1 | Adapted; immutable local Matplotlib theme implemented |
 
 ## Known adaptation rules
 
@@ -67,3 +67,26 @@ upstream arguments fail as unknown Python keyword arguments and are deferred.
 All M2 renderers use owned Matplotlib objects. Grouped functions return one
 validated `StatsPlot` per group inside `GroupedStatsPlot`; they do not claim
 equivalence to an upstream combined ggplot object.
+
+## M3 method and argument disposition
+
+The M3 public signatures are allowlists governed by
+`M3_STATISTICAL_METHODS.md`. Unsupported upstream parameters fail as unknown
+Python keyword arguments; accepted selector values are validated rather than
+ignored.
+
+| Surface | Supported method/arguments | Explicit M3 disposition |
+|---|---|---|
+| `ggbetweenstats` | two-sided parametric mode; Welch t for two levels; Welch ANOVA for 3–20 levels; Welch pairwise t; Holm or no adjustment; pointwise mean and contrast intervals; Hedges' g or partial omega squared | upstream Games–Howell post-hoc comparisons are adapted to the approved Welch-plus-Holm family; equal-variance, nonparametric, robust, Bayesian, effect-size intervals, arbitrary contrasts, and arbitrary layers are deferred |
+| `ggwithinstats` | explicit `subject_id`; complete pairs/blocks; paired t for two conditions; repeated-measures ANOVA for 3–20; always-primary Greenhouse–Geisser correction; paired post-hoc t tests; Holm or no adjustment | omitted/inferred subjects and upstream row-index fallback are rejected; incomplete subjects are excluded from both inference and rendering; the omnibus effect is the approved F-to-partial-omega conversion, not upstream sums-of-squares output; other missingness, sphericity-switch, correction, robust, and Bayesian modes are deferred |
+| grouped comparison surfaces | one explicit outer-group column, first-observed outer-group order, deterministic inner-level order, at most 20 outer groups, per-group correction families, atomic failure | no adjustment is pooled across outer groups; nested grouping, partial success, and inferred subject scope are rejected/deferred |
+| `combine_plots` | individual or grouped plotsalot containers, deterministic automatic or explicit rectangular layout, `guides="keep"`, shared labels, titles/subtitles/captions, optional alphabetic/numeric panel tags, at most 20 flattened panels | source typed result objects and grouped identities are retained, while source figures are rasterized; guide collection, shared-axis inference, patchwork expressions, and arbitrary Matplotlib figures are deferred |
+| `theme_ggstatsplot` | immutable `StatsTheme` with local figure, axes, grid, text, and accent settings | returns/applies an owned Matplotlib style and never mutates `rcParams`; ggplot theme objects and pixel-identical styling are deferred |
+
+For repeated designs, a duplicate subject-condition cell fails before null-value
+removal so ambiguity cannot be hidden by missingness. Condition/level order is
+categorical order when explicitly declared and otherwise deterministic scalar
+order. The R oracle is a compatibility reference: upstream and Python test
+statistics are compared where their approved methods coincide, while the
+pairwise and effect-size adaptations above are asserted separately by analytic
+and independent-reference tests.

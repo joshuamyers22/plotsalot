@@ -9,12 +9,26 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 RESULT = ROOT / "benchmarks" / "results" / "m0-baseline.json"
 M2_RESULT = ROOT / "benchmarks" / "results" / "m2-baseline.json"
+M3_RESULT = ROOT / "benchmarks" / "results" / "m3-baseline.json"
 
 
 def _positive_int(value: Any, label: str) -> int:
     if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
         raise AssertionError(f"{label} must be a positive integer")
     return value
+
+
+def _verify_summary(summary: object, label: str) -> None:
+    if not isinstance(summary, dict):
+        raise AssertionError(f"{label}: missing benchmark summary")
+    samples = summary.get("samples")
+    if not isinstance(samples, list) or len(samples) != 5:
+        raise AssertionError(f"{label}: expected five samples")
+    for index, sample in enumerate(samples):
+        if not isinstance(sample, dict):
+            raise AssertionError(f"{label}.{index}: invalid sample")
+        _positive_int(sample.get("elapsed_ns"), f"{label}.{index}.time")
+        _positive_int(sample.get("python_peak_bytes"), f"{label}.{index}.memory")
 
 
 def verify_benchmark() -> None:
@@ -84,6 +98,50 @@ def verify_benchmark() -> None:
                         sample.get("python_peak_bytes"),
                         f"{grid_name}.{size}.{phase}.{index}.memory",
                     )
+
+    m3 = json.loads(M3_RESULT.read_text())
+    if m3.get("schema_version") != 1:
+        raise AssertionError("unsupported M3 benchmark schema")
+    measurement = m3.get("measurement", {})
+    if measurement.get("repeats") != 5:
+        raise AssertionError("M3 baseline must retain five samples")
+    if measurement.get("input_frame_allocation") != "outside measured phases":
+        raise AssertionError("M3 input allocation boundary must be explicit")
+
+    comparison_grids = (
+        ("between_row_results", {"10000", "100000", "1000000"}),
+        ("between_level_results", {"2", "5", "10", "20"}),
+        ("within_subject_results", {"100", "1000", "10000"}),
+        ("within_condition_results", {"2", "5", "10"}),
+    )
+    for grid_name, expected_keys in comparison_grids:
+        grid = m3.get(grid_name)
+        if not isinstance(grid, dict) or set(grid) != expected_keys:
+            raise AssertionError(f"{grid_name}: workload grid does not match M3")
+        for size, phases in grid.items():
+            if not isinstance(phases, dict):
+                raise AssertionError(f"{grid_name}.{size}: invalid phase mapping")
+            for phase in ("selection", "analysis", "render"):
+                _verify_summary(phases.get(phase), f"{grid_name}.{size}.{phase}")
+
+    incomplete = m3.get("within_incomplete_result")
+    if not isinstance(incomplete, dict) or incomplete.get("incomplete_subjects") != 1:
+        raise AssertionError("M3 incomplete-block workload is missing")
+    for phase in ("selection", "analysis", "render"):
+        _verify_summary(incomplete.get(phase), f"within_incomplete_result.{phase}")
+
+    composition = m3.get("composition_results")
+    if not isinstance(composition, dict) or set(composition) != {
+        "1",
+        "4",
+        "10",
+        "20",
+    }:
+        raise AssertionError("composition_results: workload grid does not match M3")
+    for panels, phases in composition.items():
+        if not isinstance(phases, dict):
+            raise AssertionError(f"composition_results.{panels}: invalid mapping")
+        _verify_summary(phases.get("compose"), f"composition_results.{panels}.compose")
 
 
 def main() -> None:
