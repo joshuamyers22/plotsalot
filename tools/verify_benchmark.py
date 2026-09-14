@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RESULT = ROOT / "benchmarks" / "results" / "m0-baseline.json"
 M2_RESULT = ROOT / "benchmarks" / "results" / "m2-baseline.json"
 M3_RESULT = ROOT / "benchmarks" / "results" / "m3-baseline.json"
+M4_RESULT = ROOT / "benchmarks" / "results" / "m4-baseline.json"
 
 
 def _positive_int(value: Any, label: str) -> int:
@@ -142,6 +143,52 @@ def verify_benchmark() -> None:
         if not isinstance(phases, dict):
             raise AssertionError(f"composition_results.{panels}: invalid mapping")
         _verify_summary(phases.get("compose"), f"composition_results.{panels}.compose")
+
+    m4 = json.loads(M4_RESULT.read_text())
+    if m4.get("schema_version") != 1:
+        raise AssertionError("unsupported M4 benchmark schema")
+    measurement = m4.get("measurement", {})
+    if measurement.get("repeats") != 5:
+        raise AssertionError("M4 baseline must retain five samples")
+    if measurement.get("input_frame_allocation") != "outside measured phases":
+        raise AssertionError("M4 input allocation boundary must be explicit")
+
+    categorical_grids = (
+        (
+            "row_results",
+            {"10000", "100000", "1000000"},
+            ("selection", "analysis", "bar", "pie"),
+        ),
+        (
+            "level_results",
+            {"2", "5", "10", "20"},
+            ("selection", "analysis", "bar", "pie"),
+        ),
+        (
+            "cell_results",
+            {"4", "25", "100", "400"},
+            ("selection", "analysis", "bar", "pie"),
+        ),
+        (
+            "weighted_total_results",
+            {"20", "1000000", "1000000000"},
+            ("selection", "analysis", "bar", "pie"),
+        ),
+        ("grouped_results", {"1", "5", "20"}, ("analysis",)),
+        ("pie_facet_results", {"1", "5", "10", "20"}, ("value",)),
+    )
+    for grid_name, expected_keys, phases in categorical_grids:
+        grid = m4.get(grid_name)
+        if not isinstance(grid, dict) or set(grid) != expected_keys:
+            raise AssertionError(f"{grid_name}: workload grid does not match M4")
+        for size, values in grid.items():
+            if grid_name == "pie_facet_results":
+                _verify_summary(values, f"{grid_name}.{size}.pie")
+                continue
+            if not isinstance(values, dict):
+                raise AssertionError(f"{grid_name}.{size}: invalid phase mapping")
+            for phase in phases:
+                _verify_summary(values.get(phase), f"{grid_name}.{size}.{phase}")
 
 
 def main() -> None:

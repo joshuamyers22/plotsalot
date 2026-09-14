@@ -13,12 +13,19 @@ from typing import Any
 import polars as pl
 
 from plotsalot import (
+    CategoricalResult,
     ComparisonResult,
+    analyze_categorical,
     analyze_ggbetweenstats,
     analyze_ggcorrmat,
     analyze_ggdotplotstats,
     analyze_gghistostats,
     analyze_ggwithinstats,
+    analyze_grouped_ggbarstats,
+)
+from plotsalot.categorical_result import (
+    CategoricalEffectResult,
+    CategoricalTestResult,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +43,18 @@ M2_RAW_FIXTURES = (
 )
 M3_INPUT_FIXTURES = ("m3-between", "m3-within")
 M3_RAW_FIXTURES = ("m3-between-ggstatsplot.R", "m3-within-ggstatsplot.R")
+M4_INPUT_FIXTURES = (
+    "m4-one-way",
+    "m4-independent",
+    "m4-paired",
+    "m4-raw",
+    "m4-grouped",
+)
+M4_RAW_FIXTURES = tuple(
+    f"{fixture}-{renderer}-ggstatsplot.R"
+    for fixture in ("m4-one-way", "m4-independent", "m4-paired", "m4-raw", "m4-grouped")
+    for renderer in ("bar", "pie")
+)
 FLOAT_FIELDS = {
     "test_value": lambda result: result.test.null_value,
     "conf_level": lambda result: result.interval.level,
@@ -300,6 +319,141 @@ def _verify_m3_results() -> None:
     _verify_pairwise_rows(within_rows, within_result, "m3-within")
 
 
+def _verify_categorical_values(
+    test: CategoricalTestResult,
+    effect: CategoricalEffectResult,
+    adjusted_p_value: float | None,
+    expected: dict[str, str],
+    label: str,
+) -> None:
+    for field, value in {
+        "statistic": test.statistic,
+        "df": test.df,
+        "p_value": test.p_value,
+        "effect": effect.value,
+    }.items():
+        _close(float(value), expected[field], f"{label}.{field}")
+    for field, value in {
+        "interval_low": effect.interval.low,
+        "interval_high": effect.interval.high,
+    }.items():
+        reference = float(expected[field])
+        if not math.isclose(value, reference, rel_tol=1e-10, abs_tol=1e-12):
+            raise AssertionError(
+                f"{label}.{field}: Python={value:.17g}, R={reference:.17g}"
+            )
+    adjusted = expected["adjusted_p_value"]
+    if adjusted != "NA":
+        if adjusted_p_value is None:
+            raise AssertionError(f"{label}.adjusted_p_value is absent")
+        _close(
+            adjusted_p_value,
+            adjusted,
+            f"{label}.adjusted_p_value",
+        )
+
+
+def _verify_m4_results() -> None:
+    for filename in M4_RAW_FIXTURES:
+        path = OUTPUT / filename
+        if not path.is_file() or path.stat().st_size == 0:
+            raise AssertionError(f"missing raw ggstatsplot M4 result: {path}")
+    independent_raw = (OUTPUT / "m4-independent-bar-ggstatsplot.R").read_text()
+    paired_raw = (OUTPUT / "m4-paired-bar-ggstatsplot.R").read_text()
+    one_way_raw = (OUTPUT / "m4-one-way-bar-ggstatsplot.R").read_text()
+    if "Fisher's exact test" not in independent_raw:
+        raise AssertionError("M4 oracle lost the upstream pairwise adaptation")
+    if "McNemar's Chi-squared test" not in paired_raw:
+        raise AssertionError("M4 oracle lost the upstream paired adaptation")
+    if "Pearson's C" not in one_way_raw:
+        raise AssertionError("M4 oracle lost the upstream effect adaptation")
+
+    with (OUTPUT / "m4-categorical-results.csv").open(newline="") as handle:
+        rows = list(csv.DictReader(handle))
+
+    one_way = analyze_categorical(
+        pl.read_csv(INPUT / "m4-one-way.csv"), "x", counts="n"
+    ).result
+    independent = analyze_categorical(
+        pl.read_csv(INPUT / "m4-independent.csv"), "x", "y", counts="n"
+    ).result
+    paired = analyze_categorical(
+        pl.read_csv(INPUT / "m4-paired.csv"),
+        "x",
+        "y",
+        counts="n",
+        paired=True,
+        proportion_test=False,
+    ).result
+    results: dict[str, CategoricalResult] = {
+        "m4-one-way": one_way,
+        "m4-independent": independent,
+        "m4-paired": paired,
+    }
+    raw = pl.read_csv(INPUT / "m4-raw.csv")
+    raw_result = analyze_categorical(raw, "x", "y").result
+    aggregate_result = analyze_categorical(
+        pl.DataFrame(
+            {
+                "x": ["a", "a", "b", "b"],
+                "y": ["u", "v", "u", "v"],
+                "n": [10, 10, 10, 10],
+            }
+        ),
+        "x",
+        "y",
+        counts="n",
+    ).result
+    if (
+        raw_result.omnibus != aggregate_result.omnibus
+        or raw_result.effect != aggregate_result.effect
+        or raw_result.pairwise != aggregate_result.pairwise
+        or raw_result.strata != aggregate_result.strata
+    ):
+        raise AssertionError("M4 raw and aggregate oracle inputs are not equivalent")
+    grouped = analyze_grouped_ggbarstats(
+        pl.read_csv(INPUT / "m4-grouped.csv"),
+        "x",
+        "group",
+        "y",
+        counts="n",
+    )
+    if len(grouped.groups) != 2:
+        raise AssertionError("M4 grouped oracle fixture did not retain both groups")
+    for fixture, result in results.items():
+        expected = [row for row in rows if row["fixture"] == fixture]
+        omnibus = next(row for row in expected if row["family"] == "omnibus")
+        _verify_categorical_values(
+            result.omnibus, result.effect, None, omnibus, f"{fixture}.omnibus"
+        )
+        pairwise_rows = [row for row in expected if row["family"] == "pairwise"]
+        if len(pairwise_rows) != len(result.pairwise):
+            raise AssertionError(f"{fixture}: pairwise family size differs")
+        for actual, row in zip(result.pairwise, pairwise_rows, strict=True):
+            if (str(actual.left), str(actual.right)) != (row["left"], row["right"]):
+                raise AssertionError(f"{fixture}: pairwise identity differs")
+            _verify_categorical_values(
+                actual.test,
+                actual.effect,
+                actual.adjusted_p_value,
+                row,
+                f"{fixture}.pairwise.{actual.left}.{actual.right}",
+            )
+        stratum_rows = [row for row in expected if row["family"] == "stratum"]
+        if len(stratum_rows) != len(result.strata):
+            raise AssertionError(f"{fixture}: stratum family size differs")
+        for actual, row in zip(result.strata, stratum_rows, strict=True):
+            if str(actual.left) != row["left"]:
+                raise AssertionError(f"{fixture}: stratum identity differs")
+            _verify_categorical_values(
+                actual.test,
+                actual.effect,
+                actual.adjusted_p_value,
+                row,
+                f"{fixture}.stratum.{actual.left}",
+            )
+
+
 def _artifact_paths() -> list[Path]:
     paths = [ORACLE / "Dockerfile", ORACLE / "DESCRIPTION", ORACLE / "generate.R"]
     paths.extend(sorted(INPUT.glob("*.csv")))
@@ -327,6 +481,8 @@ def _manifest_payload() -> dict[str, Any]:
         "m2_raw_fixtures": list(M2_RAW_FIXTURES),
         "m3_input_fixtures": list(M3_INPUT_FIXTURES),
         "m3_raw_fixtures": list(M3_RAW_FIXTURES),
+        "m4_input_fixtures": list(M4_INPUT_FIXTURES),
+        "m4_raw_fixtures": list(M4_RAW_FIXTURES),
         "sha256": _hashes(),
     }
 
@@ -337,6 +493,7 @@ def verify_oracle() -> None:
     _verify_results()
     _verify_m2_results()
     _verify_m3_results()
+    _verify_m4_results()
     retained = json.loads(MANIFEST.read_text())
     if retained != _manifest_payload():
         raise AssertionError("oracle artifact hashes differ from manifest")
@@ -350,6 +507,7 @@ def main() -> None:
         _verify_results()
         _verify_m2_results()
         _verify_m3_results()
+        _verify_m4_results()
         payload = _manifest_payload()
         MANIFEST.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     else:

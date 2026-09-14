@@ -44,7 +44,7 @@
     "limits": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["maximum_rows", "maximum_groups", "maximum_variables", "maximum_labels", "maximum_levels", "maximum_pairwise_hypotheses", "maximum_rendered_observations", "maximum_subject_paths", "maximum_panels"],
+      "required": ["maximum_rows", "maximum_groups", "maximum_variables", "maximum_labels", "maximum_levels", "maximum_pairwise_hypotheses", "maximum_rendered_observations", "maximum_subject_paths", "maximum_panels", "maximum_cells", "maximum_total_count"],
       "properties": {
         "maximum_rows": {"type": "integer", "minimum": 1},
         "maximum_groups": {"type": "null"},
@@ -54,7 +54,9 @@
         "maximum_pairwise_hypotheses": {"type": "null"},
         "maximum_rendered_observations": {"type": "null"},
         "maximum_subject_paths": {"type": "null"},
-        "maximum_panels": {"type": "null"}
+        "maximum_panels": {"type": "null"},
+        "maximum_cells": {"type": "null"},
+        "maximum_total_count": {"type": "null"}
       }
     },
     "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}

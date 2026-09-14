@@ -3,10 +3,9 @@
 `plotsalot` is a planned Python implementation of the statistical-visualization
 workflows in [`ggstatsplot`](https://github.com/IndrajeetPatil/ggstatsplot).
 
-M0 through M3 are complete. The approved frequentist univariate, correlation,
-independent-group, and repeated-measures surfaces have passed their technical,
-statistical, and accountable gates. The project remains pre-release and is not
-yet ready for production analytical use.
+M0 through M3 are complete. The M4 categorical release candidate passes its
+technical gates and awaits independent review and final owner acceptance. The
+project remains pre-release and is not yet ready for production analytical use.
 
 ## Development
 
@@ -118,25 +117,76 @@ print(combined.result.panels[0].result is between.result)
 custom_theme = theme_ggstatsplot()
 ```
 
+M4 adds categorical bars and pies over one shared result contract. Inputs can be
+raw observations or aggregate integer frequencies; independent, paired binary,
+and grouped variants are explicit:
+
+```python
+from plotsalot import (
+    analyze_categorical,
+    ggbarstats,
+    ggpiestats,
+    grouped_ggbarstats,
+)
+
+frequencies = pl.DataFrame(
+    {
+        "response": ["no", "no", "yes", "yes"],
+        "cohort": ["control", "treated", "control", "treated"],
+        "count": [30, 10, 15, 25],
+    }
+)
+analysis = analyze_categorical(
+    frequencies,
+    "response",
+    "cohort",
+    counts="count",
+    pairwise_display="all",
+)
+bars = ggbarstats(frequencies, "response", "cohort", counts="count")
+pies = ggpiestats(frequencies, "response", "cohort", counts="count")
+site_data = pl.concat(
+    [
+        frequencies.with_columns(pl.lit("east").alias("site")),
+        frequencies.with_columns(pl.lit("west").alias("site")),
+    ]
+)
+by_site = grouped_ggbarstats(site_data, "response", "site", counts="count")
+
+print(analysis.result.omnibus)
+print(analysis.result.cells)
+```
+
+One-way calls omit `y` and may supply an exact level-keyed `ratio`. Paired calls
+require the same two levels on `x` and `y`, `paired=True`, and
+`proportion_test=False`; they use the approved exact binomial test over
+discordant counts. Pearson paths fail on inadequate expected counts rather than
+switching methods. Pairwise and per-`y` stratum Holm families are retained
+separately, and `pairwise_display` changes annotations only.
+
 Only the approved classical modes are supported: one-sample Student tests,
 per-label mean intervals, two-sided Pearson correlations with Fisher intervals,
 Welch independent comparisons, paired tests, and Greenhouse–Geisser-corrected
-repeated-measures ANOVA. Holm is the default pairwise/matrix adjustment. M3
+repeated-measures ANOVA, categorical Pearson tests, and exact binary paired
+inference. Holm is the default pairwise/matrix adjustment. M3
 requires an explicit subject identifier and analyzes/renders complete repeated
 blocks only. Inputs are limited by default to 1,000,000 rows, 200 dot labels,
 50 matrix variables, 20 groups or comparison levels, 1,000,000 rendered
-observations, 10,000 subject paths, and 20 composed panels. Unsupported upstream
+observations, 10,000 subject paths, 20 composed panels, 20 categorical levels
+per axis, 400 categorical cells/labels, 190 categorical pairwise hypotheses,
+and a weighted categorical total of 1,000,000,000. Unsupported upstream
 arguments and nonparametric, robust, and Bayesian modes remain deferred. See
 [`docs/MILESTONE_0.md`](docs/MILESTONE_0.md),
 [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md),
 [`docs/MILESTONE_2.md`](docs/MILESTONE_2.md),
 [`docs/MILESTONE_3.md`](docs/MILESTONE_3.md),
+[`docs/MILESTONE_4.md`](docs/MILESTONE_4.md),
 [`docs/CONTRACTS.md`](docs/CONTRACTS.md),
 [`docs/compatibility.md`](docs/compatibility.md), and
 [`STATISTICAL_ANALYSIS_PLAN.md`](STATISTICAL_ANALYSIS_PLAN.md) for scope and
 evidence gates.
 
-Custom ceilings are explicit keyword arguments on the applicable M2/M3 surfaces
+Custom ceilings are explicit keyword arguments on the applicable M2/M3/M4 surfaces
 and are serialized in `result.limits`. Invalid data, unsupported methods, and
 an invalid member of a grouped operation raise an error; grouped calls never
 return a partial result.

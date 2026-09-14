@@ -254,7 +254,9 @@
         "maximum_pairwise_hypotheses",
         "maximum_rendered_observations",
         "maximum_subject_paths",
-        "maximum_panels"
+        "maximum_panels",
+        "maximum_cells",
+        "maximum_total_count"
       ],
       "properties": {
         "maximum_rows": { "type": "integer", "minimum": 1 },
@@ -265,7 +267,9 @@
         "maximum_pairwise_hypotheses": { "type": "integer", "minimum": 1 },
         "maximum_rendered_observations": { "type": "integer", "minimum": 1 },
         "maximum_subject_paths": { "type": ["integer", "null"], "minimum": 1 },
-        "maximum_panels": { "type": "null" }
+        "maximum_panels": { "type": "null" },
+        "maximum_cells": { "type": "null" },
+        "maximum_total_count": { "type": "null" }
       }
     }
   }

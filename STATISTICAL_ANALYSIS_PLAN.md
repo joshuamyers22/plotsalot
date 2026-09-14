@@ -1,6 +1,6 @@
 # Statistical Analysis Plan: Cross-Language Parity Program
 
-- Status: M0, M2, and M3 classical specifications approved
+- Status: M0, M2, M3, and M4 classical specifications approved
 - Version: 0.1.0
 - Date: 2026-09-13
 - Statistical owner/reviewer: Joshua Myers; M0 approval recorded 2026-09-14
@@ -106,6 +106,15 @@ Greenhouse–Geisser-corrected repeated-measures ANOVA, complete-block repeated
 pairwise tests, grouped correction scopes, and resource limits. Joshua Myers
 approved B1–B3/G3 and W1–W3/G4 without revision on 2026-09-14.
 
+## M4 classical categorical proposal
+
+`docs/M4_STATISTICAL_METHODS.md` specifies approved raw/count-weighted one-way Pearson
+goodness-of-fit, independent Pearson association, exact two-category paired
+inference, pairwise and stratum Holm families, noncentral effect intervals,
+strict sparse-table failure, and grouped correction scope. C1–C5/G5 and the
+count/resource/tolerance policy were approved by Joshua Myers without revision
+on 2026-09-14.
+
 ## Diagnostics and validation
 
 - Identification/rank/residual diagnostics: method-specific; not applicable to
@@ -127,7 +136,8 @@ approved B1–B3/G3 and W1–W3/G4 without revision on 2026-09-14.
 
 - Commands and artifacts: `make check`, `uv build`, oracle generator command,
   `docs/upstream/manifest.json`, method specs, and hashed parity fixtures.
-- Evidence schema: `schemas/analysis-result.schema.json`, version 1.
+- Evidence schemas: checked-in schema-v1 files under `schemas/`, including
+  `categorical-result.schema.json`.
 - Results: report estimates and uncertainty, never p-values alone.
 - Invalidating conditions: unsupported method/parameter combination, violation
   of the accepted license posture, unreviewed statistical spec, oracle drift,
@@ -137,5 +147,5 @@ approved B1–B3/G3 and W1–W3/G4 without revision on 2026-09-14.
 - Approval: Joshua Myers approved the M0 one-sample specification and documented
   upstream adaptations on 2026-09-14 and approved the M2 classical
   specification on the same date. Joshua Myers approved the M3 classical
-  comparison specification on 2026-09-14. Later method families require
-  separate approvals under this plan.
+  comparison specification and the M4 classical categorical specification on
+  2026-09-14. Later method families require separate approvals under this plan.

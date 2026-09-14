@@ -447,6 +447,340 @@ utils::write.csv(
   na = "NA"
 )
 
+# M4 categorical fixtures ----------------------------------------------------
+
+categorical_names <- c("m4-one-way", "m4-independent", "m4-paired")
+for (fixture_name in categorical_names) {
+  categorical_input <- utils::read.csv(file.path(input_dir, paste0(fixture_name, ".csv")))
+  categorical_input$x <- factor(
+    categorical_input$x,
+    levels = sort(unique(categorical_input$x))
+  )
+  if ("y" %in% names(categorical_input)) {
+    categorical_input$y <- factor(
+      categorical_input$y,
+      levels = sort(unique(categorical_input$y))
+    )
+  }
+  paired_value <- identical(fixture_name, "m4-paired")
+  if ("y" %in% names(categorical_input)) {
+    bar_plot <- ggstatsplot::ggbarstats(
+      data = categorical_input,
+      x = x,
+      y = y,
+      counts = n,
+      type = "parametric",
+      paired = paired_value,
+      pairwise.display = "all",
+      p.adjust.method = "holm",
+      proportion.test = !paired_value,
+      bf.message = FALSE
+    )
+    pie_plot <- ggstatsplot::ggpiestats(
+      data = categorical_input,
+      x = x,
+      y = y,
+      counts = n,
+      type = "parametric",
+      paired = paired_value,
+      pairwise.display = "all",
+      p.adjust.method = "holm",
+      proportion.test = !paired_value,
+      bf.message = FALSE
+    )
+  } else {
+    bar_plot <- ggstatsplot::ggbarstats(
+      data = categorical_input,
+      x = x,
+      counts = n,
+      type = "parametric",
+      pairwise.display = "all",
+      p.adjust.method = "holm",
+      proportion.test = TRUE,
+      bf.message = FALSE
+    )
+    pie_plot <- ggstatsplot::ggpiestats(
+      data = categorical_input,
+      x = x,
+      counts = n,
+      type = "parametric",
+      pairwise.display = "all",
+      p.adjust.method = "holm",
+      proportion.test = TRUE,
+      bf.message = FALSE
+    )
+  }
+  dput(
+    ggstatsplot::extract_stats(bar_plot),
+    file = file.path(output_dir, paste0(fixture_name, "-bar-ggstatsplot.R")),
+    control = c("keepNA", "keepInteger", "niceNames")
+  )
+  dput(
+    ggstatsplot::extract_stats(pie_plot),
+    file = file.path(output_dir, paste0(fixture_name, "-pie-ggstatsplot.R")),
+    control = c("keepNA", "keepInteger", "niceNames")
+  )
+}
+
+categorical_raw <- utils::read.csv(file.path(input_dir, "m4-raw.csv"))
+categorical_raw$x <- factor(categorical_raw$x, levels = sort(unique(categorical_raw$x)))
+categorical_raw$y <- factor(categorical_raw$y, levels = sort(unique(categorical_raw$y)))
+raw_bar_plot <- ggstatsplot::ggbarstats(
+  data = categorical_raw,
+  x = x,
+  y = y,
+  type = "parametric",
+  pairwise.display = "all",
+  p.adjust.method = "holm",
+  proportion.test = TRUE,
+  bf.message = FALSE
+)
+raw_pie_plot <- ggstatsplot::ggpiestats(
+  data = categorical_raw,
+  x = x,
+  y = y,
+  type = "parametric",
+  pairwise.display = "all",
+  p.adjust.method = "holm",
+  proportion.test = TRUE,
+  bf.message = FALSE
+)
+dput(
+  ggstatsplot::extract_stats(raw_bar_plot),
+  file = file.path(output_dir, "m4-raw-bar-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+dput(
+  ggstatsplot::extract_stats(raw_pie_plot),
+  file = file.path(output_dir, "m4-raw-pie-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+
+categorical_grouped <- utils::read.csv(file.path(input_dir, "m4-grouped.csv"))
+categorical_grouped$x <- factor(
+  categorical_grouped$x,
+  levels = sort(unique(categorical_grouped$x))
+)
+categorical_grouped$y <- factor(
+  categorical_grouped$y,
+  levels = sort(unique(categorical_grouped$y))
+)
+grouped_bar_plot <- ggstatsplot::grouped_ggbarstats(
+  data = categorical_grouped,
+  x = x,
+  y = y,
+  counts = n,
+  grouping.var = group,
+  type = "parametric",
+  pairwise.display = "all",
+  p.adjust.method = "holm",
+  proportion.test = TRUE,
+  bf.message = FALSE
+)
+grouped_pie_plot <- ggstatsplot::grouped_ggpiestats(
+  data = categorical_grouped,
+  x = x,
+  y = y,
+  counts = n,
+  grouping.var = group,
+  type = "parametric",
+  pairwise.display = "all",
+  p.adjust.method = "holm",
+  proportion.test = TRUE,
+  bf.message = FALSE
+)
+dput(
+  ggstatsplot::extract_stats(grouped_bar_plot),
+  file = file.path(output_dir, "m4-grouped-bar-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+dput(
+  ggstatsplot::extract_stats(grouped_pie_plot),
+  file = file.path(output_dir, "m4-grouped-pie-ggstatsplot.R"),
+  control = c("keepNA", "keepInteger", "niceNames")
+)
+
+one_way_input <- utils::read.csv(file.path(input_dir, "m4-one-way.csv"))
+noncentral_effect_interval <- function(
+  statistic,
+  df,
+  n,
+  scale,
+  maximum,
+  conf_level = 0.95
+) {
+  alpha <- 1 - conf_level
+  solve_ncp <- function(target) {
+    upper <- max(1, statistic + df)
+    while (stats::pchisq(statistic, df, ncp = upper) > target) {
+      upper <- upper * 2
+      if (upper > 1e12) stop("noncentral interval root was not bracketed")
+    }
+    stats::uniroot(
+      function(value) stats::pchisq(statistic, df, ncp = value) - target,
+      interval = c(0, upper),
+      tol = 1e-14
+    )$root
+  }
+  cdf0 <- stats::pchisq(statistic, df)
+  lower_ncp <- if (cdf0 <= 1 - alpha / 2) 0 else solve_ncp(1 - alpha / 2)
+  lower <- min(maximum, sqrt(lower_ncp / (n * scale)))
+  upper <- if (cdf0 <= alpha / 2) {
+    maximum
+  } else {
+    min(maximum, sqrt(solve_ncp(alpha / 2) / (n * scale)))
+  }
+  c(lower, upper)
+}
+
+one_way_test <- stats::chisq.test(one_way_input$n, correct = FALSE)
+one_way_interval <- noncentral_effect_interval(
+  unname(one_way_test$statistic),
+  unname(one_way_test$parameter),
+  sum(one_way_input$n),
+  1,
+  sqrt(length(one_way_input$n) - 1)
+)
+one_way_row <- data.frame(
+  fixture = "m4-one-way",
+  family = "omnibus",
+  left = NA_character_,
+  right = NA_character_,
+  statistic = unname(one_way_test$statistic),
+  df = unname(one_way_test$parameter),
+  p_value = one_way_test$p.value,
+  adjusted_p_value = NA_real_,
+  effect = sqrt(unname(one_way_test$statistic) / sum(one_way_input$n)),
+  interval_low = one_way_interval[[1L]],
+  interval_high = one_way_interval[[2L]],
+  stringsAsFactors = FALSE
+)
+
+independent_input <- utils::read.csv(file.path(input_dir, "m4-independent.csv"))
+independent_input$x <- factor(independent_input$x, levels = sort(unique(independent_input$x)))
+independent_input$y <- factor(independent_input$y, levels = sort(unique(independent_input$y)))
+independent_table <- stats::xtabs(n ~ x + y, data = independent_input)
+independent_test <- stats::chisq.test(independent_table, correct = FALSE)
+independent_scale <- min(dim(independent_table) - 1L)
+independent_interval <- noncentral_effect_interval(
+  unname(independent_test$statistic),
+  unname(independent_test$parameter),
+  sum(independent_table),
+  independent_scale,
+  1
+)
+independent_row <- data.frame(
+  fixture = "m4-independent",
+  family = "omnibus",
+  left = NA_character_,
+  right = NA_character_,
+  statistic = unname(independent_test$statistic),
+  df = unname(independent_test$parameter),
+  p_value = independent_test$p.value,
+  adjusted_p_value = NA_real_,
+  effect = sqrt(
+    unname(independent_test$statistic) /
+      (sum(independent_table) * independent_scale)
+  ),
+  interval_low = independent_interval[[1L]],
+  interval_high = independent_interval[[2L]],
+  stringsAsFactors = FALSE
+)
+
+pair_indices <- utils::combn(rownames(independent_table), 2L, simplify = FALSE)
+pair_rows <- lapply(pair_indices, function(pair) {
+  pair_table <- independent_table[pair, , drop = FALSE]
+  pair_test <- stats::chisq.test(pair_table, correct = FALSE)
+  pair_interval <- noncentral_effect_interval(
+    unname(pair_test$statistic),
+    unname(pair_test$parameter),
+    sum(pair_table),
+    min(dim(pair_table) - 1L),
+    1
+  )
+  data.frame(
+    fixture = "m4-independent",
+    family = "pairwise",
+    left = pair[[1L]],
+    right = pair[[2L]],
+    statistic = unname(pair_test$statistic),
+    df = unname(pair_test$parameter),
+    p_value = pair_test$p.value,
+    adjusted_p_value = NA_real_,
+    effect = sqrt(
+      unname(pair_test$statistic) /
+        (sum(pair_table) * min(dim(pair_table) - 1L))
+    ),
+    interval_low = pair_interval[[1L]],
+    interval_high = pair_interval[[2L]],
+    stringsAsFactors = FALSE
+  )
+})
+pair_rows <- do.call(rbind, pair_rows)
+pair_rows$adjusted_p_value <- stats::p.adjust(pair_rows$p_value, method = "holm")
+
+stratum_rows <- lapply(colnames(independent_table), function(level) {
+  stratum_test <- stats::chisq.test(independent_table[, level], correct = FALSE)
+  stratum_interval <- noncentral_effect_interval(
+    unname(stratum_test$statistic),
+    unname(stratum_test$parameter),
+    sum(independent_table[, level]),
+    1,
+    sqrt(nrow(independent_table) - 1)
+  )
+  data.frame(
+    fixture = "m4-independent",
+    family = "stratum",
+    left = level,
+    right = NA_character_,
+    statistic = unname(stratum_test$statistic),
+    df = unname(stratum_test$parameter),
+    p_value = stratum_test$p.value,
+    adjusted_p_value = NA_real_,
+    effect = sqrt(unname(stratum_test$statistic) / sum(independent_table[, level])),
+    interval_low = stratum_interval[[1L]],
+    interval_high = stratum_interval[[2L]],
+    stringsAsFactors = FALSE
+  )
+})
+stratum_rows <- do.call(rbind, stratum_rows)
+stratum_rows$adjusted_p_value <- stats::p.adjust(
+  stratum_rows$p_value,
+  method = "holm"
+)
+
+paired_input <- utils::read.csv(file.path(input_dir, "m4-paired.csv"))
+paired_table <- stats::xtabs(n ~ x + y, data = paired_input)
+discordant <- paired_table[1L, 2L] + paired_table[2L, 1L]
+paired_test <- stats::binom.test(
+  paired_table[1L, 2L],
+  discordant,
+  p = 0.5,
+  alternative = "two.sided"
+)
+paired_interval <- unname(paired_test$conf.int) - 0.5
+paired_row <- data.frame(
+  fixture = "m4-paired",
+  family = "omnibus",
+  left = NA_character_,
+  right = NA_character_,
+  statistic = paired_table[1L, 2L],
+  df = 0,
+  p_value = paired_test$p.value,
+  adjusted_p_value = NA_real_,
+  effect = paired_table[1L, 2L] / discordant - 0.5,
+  interval_low = paired_interval[[1L]],
+  interval_high = paired_interval[[2L]],
+  stringsAsFactors = FALSE
+)
+
+utils::write.csv(
+  rbind(one_way_row, independent_row, pair_rows, stratum_rows, paired_row),
+  file.path(output_dir, "m4-categorical-results.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+
 installed <- as.data.frame(utils::installed.packages()[, c("Package", "Version")])
 installed <- installed[order(installed$Package), , drop = FALSE]
 utils::write.csv(

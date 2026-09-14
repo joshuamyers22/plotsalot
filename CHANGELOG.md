@@ -41,3 +41,17 @@
   retained row/level/subject/condition/composition performance grid.
 - Completed M3A and M3B after the full production gate, adversarial finding
   disposition, independent review, and Joshua Myers's final milestone approval.
+- Added the detailed M4 contract for raw and count-weighted categorical tables,
+  one-way/independent/paired designs, shared bar/pie analysis, follow-up
+  families, grouped execution, resource bounds, evidence, and `0.2` acceptance.
+- Added the approval-ready M4 classical categorical method proposal and pending
+  accountable sign-off record for C1–C5/G5.
+- Recorded Joshua Myers's approval of the M4 classical categorical methods.
+- Added owned raw/count-weighted categorical tables, one-way, independent, and
+  exact binary paired analyses, noncentral effect intervals, complete pairwise
+  and stratum Holm families, and schema-v1 categorical results.
+- Added semantic normalized bars, faceted pies, atomic grouped categorical
+  variants, stable cross-group colors, extraction/composition coverage, and
+  explicit categorical resource ceilings.
+- Added pinned-R C1–C5 oracle fixtures, analytic and failure-path tests, M4
+  compatibility documentation, and the categorical performance workload grid.

@@ -35,6 +35,8 @@ class ResourceLimits:
     maximum_rendered_observations: int | None = None
     maximum_subject_paths: int | None = None
     maximum_panels: int | None = None
+    maximum_cells: int | None = None
+    maximum_total_count: int | None = None
 
     def __post_init__(self) -> None:
         values = (
@@ -47,6 +49,8 @@ class ResourceLimits:
             self.maximum_rendered_observations,
             self.maximum_subject_paths,
             self.maximum_panels,
+            self.maximum_cells,
+            self.maximum_total_count,
         )
         if any(
             value is not None and (type(value) is not int or value < 1)
@@ -504,6 +508,7 @@ class GroupedResult:
             "grouped_ggcorrmat_pearson",
             "grouped_ggbetweenstats_welch",
             "grouped_ggwithinstats_parametric",
+            "grouped_categorical_classical",
         }:
             raise ValueError("grouped analysis identity is unsupported")
         if not self.group_column or not self.groups:
@@ -516,6 +521,7 @@ class GroupedResult:
             "within_group_matrix",
             "within_each_comparison_result_none_across_outer_groups",
             "within_each_repeated_result_none_across_outer_groups",
+            "within_each_categorical_result_none_across_outer_groups",
         }:
             raise ValueError("grouped correction scope is unsupported")
         if any(not warning for warning in self.warnings):

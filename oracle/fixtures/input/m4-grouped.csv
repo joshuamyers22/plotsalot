@@ -1,0 +1,9 @@
+group,x,y,n
+east,a,u,20
+east,a,v,10
+east,b,u,10
+east,b,v,20
+west,a,u,15
+west,a,v,25
+west,b,u,25
+west,b,v,15

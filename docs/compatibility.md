@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M3 release-candidate implemented-surface disposition
+- Status: M3 complete; M4 categorical release candidate implemented
 
 Definitions:
 
@@ -19,21 +19,21 @@ Definitions:
 | `extract_caption` | `extract_caption` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `extract_stats` | `extract_stats` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `extract_subtitle` | `extract_subtitle` | 0.1 | Adapted; implemented for individual and grouped containers |
-| `ggbarstats` | `ggbarstats` | 0.2 | Planned |
+| `ggbarstats` | `ggbarstats` | 0.2 | Adapted; shared classical categorical analysis and normalized bars implemented |
 | `ggbetweenstats` | `ggbetweenstats` | 0.1 | Adapted; Welch parametric/Holm mode implemented |
 | `ggcoefstats` | `ggcoefstats` | 0.3 | Planned |
 | `ggcorrmat` | `ggcorrmat` | 0.1 | Adapted; Pearson/Holm mode implemented |
 | `ggdotplotstats` | `ggdotplotstats` | 0.1 | Adapted; labeled parametric mode implemented |
 | `gghistostats` | `gghistostats` | M0/0.1 | Adapted; one-sample parametric mode implemented |
-| `ggpiestats` | `ggpiestats` | 0.2 | Planned |
+| `ggpiestats` | `ggpiestats` | 0.2 | Adapted; shared classical categorical analysis and faceted pies implemented |
 | `ggscatterstats` | `ggscatterstats` | 0.1 | Adapted; Pearson mode implemented |
 | `ggwithinstats` | `ggwithinstats` | 0.2 | Adapted; explicit-subject complete-block parametric mode implemented |
-| `grouped_ggbarstats` | same name | 0.2 | Planned |
+| `grouped_ggbarstats` | same name | 0.2 | Adapted; atomic grouped categorical bars implemented |
 | `grouped_ggbetweenstats` | same name | 0.1 | Adapted; atomic per-group Welch container implemented |
 | `grouped_ggcorrmat` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
 | `grouped_ggdotplotstats` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
 | `grouped_gghistostats` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
-| `grouped_ggpiestats` | same name | 0.2 | Planned |
+| `grouped_ggpiestats` | same name | 0.2 | Adapted; atomic grouped categorical pies implemented |
 | `grouped_ggscatterstats` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
 | `grouped_ggwithinstats` | same name | 0.2 | Adapted; atomic per-group complete-block container implemented |
 | `theme_ggstatsplot` | `theme_ggstatsplot` | 0.1 | Adapted; immutable local Matplotlib theme implemented |
@@ -90,3 +90,21 @@ order. The R oracle is a compatibility reference: upstream and Python test
 statistics are compared where their approved methods coincide, while the
 pairwise and effect-size adaptations above are asserted separately by analytic
 and independent-reference tests.
+
+## M4 method and argument disposition
+
+The M4 bar and pie signatures are explicit allowlists governed by
+`M4_STATISTICAL_METHODS.md`. Both renderers consume the same owned table and
+typed result; visual differences do not imply separate inference.
+
+| Surface | Supported method/arguments | Explicit M4 disposition |
+|---|---|---|
+| `ggbarstats`, `ggpiestats` | raw or nonnegative integer `counts`; one-way Pearson goodness-of-fit with exact keyed `ratio`; two-way Pearson independence; binary paired exact-binomial inference; noncentral effect intervals; count/percentage labels | upstream Pearson omnibus statistics are retained; Pearson's C is adapted to Cohen's w/Cramér's V; upstream asymptotic McNemar is adapted to exact binomial/Cohen's g; continuity correction, nonparametric, robust, Bayesian, simulation, structural-zero, and multicategory paired paths are deferred |
+| independent follow-ups | complete `x`-level pairwise Pearson family and per-`y` goodness-of-fit family; Holm or no adjustment; display filtering | upstream Fisher exact pairwise tests are adapted to Pearson behind the approved adequacy gate; upstream unadjusted stratum labels are adapted to a separate Holm family |
+| grouped categorical surfaces | one explicit outer group, first-observed group order, common `x` color domain, complete nested results, atomic failure | no correction is pooled across outer groups; partial success, nested grouping, and category-domain sampling are rejected/deferred |
+
+Every Pearson test requires all expected counts at least one and, for 2×2
+tables, all at least five; other tables require at least 80% at five or more.
+Failure never triggers an automatic exact or simulated replacement. Defaults
+limit inputs to one million rows, 20 levels per axis, 400 cells/labels, 190
+pairwise hypotheses, 20 groups, and weighted total 1,000,000,000.

@@ -30,5 +30,13 @@ Fisher intervals, pairwise sample counts, and Holm-adjusted matrix p-values.
 `tools/verify_oracle.py` compares those retained values to the Python result
 contracts and checks every oracle artifact hash.
 
+M3 adds independent and complete-block repeated comparison objects plus
+normalized Welch, Greenhouse–Geisser, paired-contrast, interval, and Holm
+references. M4 adds one-way, independent, paired, raw-row, aggregate-count,
+bar, pie, and grouped categorical objects. Base R independently inverts the M4
+noncentral chi-square intervals and computes exact binomial intervals; the
+verifier explicitly asserts upstream Fisher, McNemar, Pearson's-C, and stratum
+adjustment differences as adaptations.
+
 Do not publish the oracle image. Its development-only dependency graph has
 licenses distinct from the eventual plotsalot distribution decision.

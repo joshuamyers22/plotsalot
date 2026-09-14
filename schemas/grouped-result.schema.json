@@ -23,7 +23,8 @@
         "grouped_ggscatterstats_pearson",
         "grouped_ggcorrmat_pearson",
         "grouped_ggbetweenstats_welch",
-        "grouped_ggwithinstats_parametric"
+        "grouped_ggwithinstats_parametric",
+        "grouped_categorical_classical"
       ]
     },
     "group_column": { "type": "string", "minLength": 1 },
@@ -46,7 +47,8 @@
         "none_across_groups",
         "within_group_matrix",
         "within_each_comparison_result_none_across_outer_groups",
-        "within_each_repeated_result_none_across_outer_groups"
+        "within_each_repeated_result_none_across_outer_groups",
+        "within_each_categorical_result_none_across_outer_groups"
       ]
     },
     "groups": {
@@ -71,7 +73,8 @@
               { "$ref": "dotplot-result.schema.json" },
               { "$ref": "correlation-result.schema.json" },
               { "$ref": "correlation-matrix-result.schema.json" },
-              { "$ref": "comparison-result.schema.json" }
+              { "$ref": "comparison-result.schema.json" },
+              { "$ref": "categorical-result.schema.json" }
             ]
           }
         }
@@ -90,6 +93,8 @@
         ,"maximum_rendered_observations"
         ,"maximum_subject_paths"
         ,"maximum_panels"
+        ,"maximum_cells"
+        ,"maximum_total_count"
       ],
       "properties": {
         "maximum_rows": { "type": "integer", "minimum": 1 },
@@ -106,7 +111,9 @@
         "maximum_pairwise_hypotheses": { "type": ["integer", "null"], "minimum": 1 },
         "maximum_rendered_observations": { "type": ["integer", "null"], "minimum": 1 },
         "maximum_subject_paths": { "type": ["integer", "null"], "minimum": 1 },
-        "maximum_panels": { "type": ["integer", "null"], "minimum": 1 }
+        "maximum_panels": { "type": ["integer", "null"], "minimum": 1 },
+        "maximum_cells": { "type": ["integer", "null"], "minimum": 1 },
+        "maximum_total_count": { "type": ["integer", "null"], "minimum": 1 }
       }
     },
     "warnings": {

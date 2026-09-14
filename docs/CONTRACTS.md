@@ -1,8 +1,8 @@
 # Shared Analysis, Data, and Rendering Contracts
 
 These contracts are the M1 foundation extended by the approved M2 univariate
-and correlation records and the approved M3 comparison, composition, and theme
-records.
+and correlation records, the approved M3 comparison, composition, and theme
+records, and the approved M4 categorical records.
 
 ## Data boundary
 
@@ -35,6 +35,13 @@ subject-by-condition block; incomplete subjects are audited and excluded from
 both inference and rendering. Its numeric matrix and identity arrays are owned
 and read-only.
 
+`select_categorical_table` accepts raw rows or an explicit nonnegative integer
+count column. It applies one null-removal pass, preserves declared Enum order
+and otherwise uses deterministic scalar order, aggregates without expanding
+counts, materializes zero cells over the complete level cross-product, and owns
+a read-only `int64` table. Physical rows and weighted totals have separate,
+reconciling audit fields.
+
 ## Result boundary
 
 `StructuredResult` is the minimum interface accepted by `StatsPlot`: a schema
@@ -44,9 +51,9 @@ than forcing unrelated methods into a universal bag of optional fields.
 
 Concrete schema-v1 result families are `AnalysisResult`, `DotPlotResult`,
 `CorrelationResult`, `CorrelationMatrixResult`, `ComparisonResult`,
-`GroupedResult`, and `CompositionResult`. Their serialized shapes are governed
-by the checked-in files under `schemas/`. M2 and M3 results retain their
-configured resource ceilings in `ResourceLimits`.
+`CategoricalResult`, `GroupedResult`, and `CompositionResult`. Their serialized
+shapes are governed by the checked-in files under `schemas/`. M2 through M4
+results retain their configured resource ceilings in `ResourceLimits`.
 
 `ComparisonResult` contains the exact analyzed sample audit, ordered per-level
 descriptives, omnibus test, two-level estimate/interval when applicable, named
@@ -54,6 +61,12 @@ effect size, complete pairwise family, raw and adjusted probabilities, display
 policy, repeated-measures correction metadata, limits, and warnings. It rejects
 incomplete hypothesis families and inconsistent design, method, interval,
 correction, count, or limit metadata.
+
+`CategoricalResult` retains the design, complete observed/expected cells,
+margins, ratio, omnibus test, effect interval, expected-count diagnostics,
+complete pairwise and stratum families with their exact subtables, display and
+correction policy, confidence level, limits, and adaptations. Its bar and pie
+renderers share the same `CategoricalAnalysis`; neither recomputes inference.
 
 ## Analysis and rendering boundary
 
@@ -75,6 +88,11 @@ only from `ComparisonResult`. Between rendering includes semantic distribution,
 raw-observation, mean-interval, and optional pairwise layers. Within rendering
 uses the same layers plus subject paths from the complete analyzed block.
 
+The categorical family follows the same split through `analyze_categorical`,
+`render_ggbarstats`, and `render_ggpiestats`. Bars and pies derive geometry,
+labels, totals, colors, subtitles, and p-value annotations from the retained
+result. The convenience functions expose explicit allowlisted signatures.
+
 ## Plot boundary
 
 `StatsPlot` pairs a structured result with its Matplotlib figure, named axes,
@@ -94,6 +112,10 @@ M3 grouped comparisons use the same atomic outer boundary. Each inner result
 has its own complete hypothesis family and no p-value correction is pooled
 across outer groups. Repeated subject identities are scoped within their outer
 group.
+
+M4 grouped categorical analyses retain a separate complete inner result per
+outer group, use no pooled outer correction, enforce the global color domain,
+and fail atomically when any group or combined category domain is invalid.
 
 ## Composition and theme boundary
 
