@@ -2,8 +2,10 @@
 
 These contracts are the M1 foundation extended by the approved M2 univariate
 and correlation records, the approved M3 comparison, composition, and theme
-records, the approved M4 categorical records, and the implemented M5
-coefficient/meta-analysis family.
+records, the approved M4 categorical records, the implemented M5
+coefficient/meta-analysis family, the technically verified M6C pass-1
+coefficient-summary boundaries, and the implemented M6C pass-2 aggregate
+engines whose statistical gate remains blocked.
 
 ## Data boundary
 
@@ -51,6 +53,14 @@ would make meta mode ambiguous. Additional nonparticipating columns are
 ignored. Estimates and errors cross into owned, read-only `float64` arrays in
 source order.
 
+`select_robust_coefficient_summaries` and
+`select_posterior_coefficient_summaries` accept only their complete R4-C/B5-C
+Polars profiles. Participating arrays are finite, aligned, owned, and read-only;
+reserved confidence/test/posterior/model/draw fields from another profile fail
+instead of becoming ignored extras. Robust intervals contain their estimates.
+Equal-tail credible intervals contain their posterior medians, and the three
+directional probabilities partition one within `1e-12` absolute tolerance.
+
 ## Result boundary
 
 `StructuredResult` is the minimum interface accepted by `StatsPlot`: a schema
@@ -87,6 +97,17 @@ limits; and warnings. Its constructor rejects contradictory weights, positions,
 intervals, degrees of freedom, pooled values, prediction thresholds, and
 boundary states before serialization.
 
+M6C adds `RobustCoefficientTableResult` and `RobustMetaResult` at schema version
+2 and
+`PosteriorCoefficientTableResult` at schema version 3. Both retain exact
+identity/order/exclusion audits, additive scale declarations, interval kind,
+limits, and normalized `caller_reported_unverified` provenance. They contain no
+reconstructed test or evidence measure, and their constructors reject mixed
+mode/profile/interval identities and non-reconciled probability, null, order,
+or resource states. `BayesianMetaResult` at schema version 3 additionally
+retains proper priors, all four sensitivity fits, population/tau/prediction
+posteriors, BF10, quadrature diagnostics, work, and software provenance.
+
 ## Analysis and rendering boundary
 
 `analyze_gghistostats` performs validation and statistical computation without
@@ -120,6 +141,14 @@ point/interval/reference layers, extraction, composition, and resource policy.
 The renderer reads coefficient or study, pooled, prediction, heterogeneity,
 reference-line, label, and annotation values from the retained result and never
 reruns model fitting, REML, or inference.
+
+`analyze_ggcoefstats` now dispatches coefficient summaries through explicit
+`type="robust"` and `type="bayes"` modes and returns
+`ReportedCoefficientAnalysis`. Aggregate robust and Bayesian modes return
+`RobustMetaAnalysis` and `BayesianMetaAnalysis`; the former uses fixed-t4
+multistart/profile inference and the latter analytic conditional calculations
+plus bounded one-dimensional quadrature. Their semantic renderer remains a
+pass-3 boundary and fails before constructing a figure.
 
 ## Plot boundary
 

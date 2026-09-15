@@ -22,10 +22,29 @@ passed its technical gate and was independently reviewed and accepted by Joshua
 Myers on 2026-09-14. Joshua Myers approved the detailed M6B B1–B6 method
 contract on 2026-09-15, independently reviewed the resulting scalar, matrix,
 comparison, categorical, and grouped candidate, and accepted M6B. The next
-project gate is M6C implementation pass 1 under the detailed R4/B5 coefficient/
-meta method contract in `M6C_STATISTICAL_METHODS.md`, approved by Joshua Myers
-on 2026-09-15. Candidate review and final M6/`0.4` acceptance remain later
-gates.
+M6C pass 1 subsequently passed its technical gate with strict reported robust
+and posterior coefficient-summary profiles and schema-v2/v3 results. Pass 2
+implemented the approved robust Student-t4 and Bayesian normal-normal aggregate
+meta-analysis engines. Its formula/oracle, contamination, Bayesian SBC, schema,
+and fault checks pass. The approved warned-small-study disposition resolves the
+conservative `k=10, tau=0` cell, but the fresh 2,000-case confirmation also finds
+conservative coverage at `k=50, tau=0` (`0.9645`, 99% Wilson interval
+`[0.9522, 0.9737]`), which fails the unchanged `k>=20` rule. An isolated upstream
+comparison using pinned ggstatsplot/statsExpressions with `metaplus` ran 200
+cases in each normal-null and matched fixed-Student-t4-null cell at `k=10,50`.
+Its point coverage was also conservative (`0.960` through `0.985`), but every
+99% Wilson interval contained `0.95`; the M6C finding therefore did not formally
+reproduce at that resolution and cannot be assigned the same mechanism because
+upstream fits a different normal-mixture model. Statistical-owner disposition
+of the `k=50, tau=0` confirmation finding was provisionally approved by Joshua
+Myers on 2026-09-15: the conservative allowance now applies only when `k<20` or
+the generating heterogeneity is exactly `tau=0`; the original two-sided rule
+continues for every `k>=20, tau>0` cell. This post-confirmation disposition does
+not recast either retained run as predeclared passing evidence. M7 must revisit
+the exception and explicitly reaffirm, replace, or remove it before 1.0. The
+next project gate is M6C pass 3: shared rendering, API/extraction/composition,
+retained benchmarks, documentation, adversarial review, and production gates.
+Candidate review and final M6/`0.4` acceptance remain later gates.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months
 with two Python engineers and a part-time statistical-methods reviewer.

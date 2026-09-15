@@ -1,10 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://plotsalot.dev/schemas/coefficient-result.schema.json",
-  "title": "plotsalot coefficient and meta-analysis result schema v1",
+  "title": "plotsalot coefficient and meta-analysis result schema v1-v3",
   "oneOf": [
     {"$ref": "#/$defs/meta_result"},
-    {"$ref": "#/$defs/table_result"}
+    {"$ref": "#/$defs/table_result"},
+    {"$ref": "#/$defs/robust_table_result"},
+    {"$ref": "#/$defs/posterior_table_result"},
+    {"$ref": "#/$defs/robust_meta_result"},
+    {"$ref": "#/$defs/bayesian_meta_result"}
   ],
   "$defs": {
     "meta_result": {
@@ -72,6 +76,425 @@
         "sort": {"enum": ["none", "ascending", "descending"]},
         "limits": {"$ref": "#/$defs/coefficient_limits"},
         "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "robust_table_result": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "analysis", "mode", "method", "compatibility_tier",
+        "source_kind", "inference_profile", "identity_columns", "input_rows",
+        "retained_rows", "source_order", "display_order", "terms",
+        "excluded_intercepts", "provenance", "estimate_label", "effect_scale",
+        "effect_direction", "effect_units", "null_value", "conf_level",
+        "interval_kind", "stats_labels", "only_significant", "sort", "limits",
+        "warnings"
+      ],
+      "properties": {
+        "schema_version": {"const": 2},
+        "analysis": {"const": "ggcoefstats_coefficients"},
+        "mode": {"const": "robust"},
+        "method": {"const": "caller_reported_robust_interval"},
+        "compatibility_tier": {"const": "adapted"},
+        "source_kind": {"const": "table"},
+        "inference_profile": {"const": "robust_interval"},
+        "identity_columns": {"type": "array", "maxItems": 3, "items": {"enum": ["response", "component", "group"]}},
+        "input_rows": {"type": "integer", "minimum": 1},
+        "retained_rows": {"type": "integer", "minimum": 1},
+        "source_order": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/coefficient_identity"}},
+        "display_order": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/coefficient_identity"}},
+        "terms": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/robust_coefficient_term"}},
+        "excluded_intercepts": {"type": "array", "items": {"$ref": "#/$defs/coefficient_identity"}},
+        "provenance": {"$ref": "#/$defs/robust_coefficient_provenance"},
+        "estimate_label": {"type": "string", "minLength": 1},
+        "effect_scale": {"type": "string", "minLength": 1},
+        "effect_direction": {"type": "string", "minLength": 1},
+        "effect_units": {"type": "string", "minLength": 1},
+        "null_value": {"type": "number"},
+        "conf_level": {"type": "number", "minimum": 0.8, "maximum": 0.99},
+        "interval_kind": {"const": "confidence"},
+        "stats_labels": {"type": "boolean"},
+        "only_significant": {"const": false},
+        "sort": {"enum": ["none", "ascending", "descending"]},
+        "limits": {"$ref": "#/$defs/coefficient_limits"},
+        "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "posterior_table_result": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "analysis", "mode", "method", "compatibility_tier",
+        "source_kind", "inference_profile", "identity_columns", "input_rows",
+        "retained_rows", "source_order", "display_order", "terms",
+        "excluded_intercepts", "provenance", "estimate_label", "effect_scale",
+        "effect_direction", "effect_units", "null_value", "credible_level",
+        "interval_kind", "stats_labels", "only_significant", "sort", "limits",
+        "warnings"
+      ],
+      "properties": {
+        "schema_version": {"const": 3},
+        "analysis": {"const": "ggcoefstats_coefficients"},
+        "mode": {"const": "bayes"},
+        "method": {"const": "caller_reported_posterior_summary"},
+        "compatibility_tier": {"const": "adapted"},
+        "source_kind": {"const": "table"},
+        "inference_profile": {"const": "posterior_summary"},
+        "identity_columns": {"type": "array", "maxItems": 3, "items": {"enum": ["response", "component", "group"]}},
+        "input_rows": {"type": "integer", "minimum": 1},
+        "retained_rows": {"type": "integer", "minimum": 1},
+        "source_order": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/coefficient_identity"}},
+        "display_order": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/coefficient_identity"}},
+        "terms": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/posterior_coefficient_term"}},
+        "excluded_intercepts": {"type": "array", "items": {"$ref": "#/$defs/coefficient_identity"}},
+        "provenance": {"$ref": "#/$defs/posterior_coefficient_provenance"},
+        "estimate_label": {"type": "string", "minLength": 1},
+        "effect_scale": {"type": "string", "minLength": 1},
+        "effect_direction": {"type": "string", "minLength": 1},
+        "effect_units": {"type": "string", "minLength": 1},
+        "null_value": {"type": "number"},
+        "credible_level": {"type": "number", "minimum": 0.8, "maximum": 0.99},
+        "interval_kind": {"const": "equal_tail_credible"},
+        "stats_labels": {"type": "boolean"},
+        "only_significant": {"const": false},
+        "sort": {"enum": ["none", "ascending", "descending"]},
+        "limits": {"$ref": "#/$defs/coefficient_limits"},
+        "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "robust_coefficient_provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["robust_method", "robust_tuning", "interval_method", "source"],
+      "properties": {
+        "robust_method": {"type": "string", "minLength": 1, "maxLength": 200},
+        "robust_tuning": {"type": "string", "minLength": 1, "maxLength": 200},
+        "interval_method": {"type": "string", "minLength": 1, "maxLength": 200},
+        "source": {"const": "caller_reported_unverified"}
+      }
+    },
+    "posterior_coefficient_provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["posterior_model", "likelihood", "prior_description", "computation_method", "source"],
+      "properties": {
+        "posterior_model": {"type": "string", "minLength": 1, "maxLength": 200},
+        "likelihood": {"type": "string", "minLength": 1, "maxLength": 200},
+        "prior_description": {"type": "string", "minLength": 1, "maxLength": 200},
+        "computation_method": {"type": "string", "minLength": 1, "maxLength": 200},
+        "source": {"const": "caller_reported_unverified"}
+      }
+    },
+    "robust_coefficient_term": {
+      "type": "object", "additionalProperties": false,
+      "required": ["identity", "is_intercept", "source_position", "display_position", "estimate", "interval"],
+      "properties": {
+        "identity": {"$ref": "#/$defs/coefficient_identity"},
+        "is_intercept": {"type": "boolean"},
+        "source_position": {"type": "integer", "minimum": 0},
+        "display_position": {"type": "integer", "minimum": 0},
+        "estimate": {"type": "number"},
+        "interval": {"$ref": "#/$defs/robust_coefficient_interval"}
+      }
+    },
+    "posterior_coefficient_term": {
+      "type": "object", "additionalProperties": false,
+      "required": ["identity", "is_intercept", "source_position", "display_position", "summary"],
+      "properties": {
+        "identity": {"$ref": "#/$defs/coefficient_identity"},
+        "is_intercept": {"type": "boolean"},
+        "source_position": {"type": "integer", "minimum": 0},
+        "display_position": {"type": "integer", "minimum": 0},
+        "summary": {"$ref": "#/$defs/posterior_coefficient_summary"}
+      }
+    },
+    "posterior_coefficient_summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["median", "interval", "null_value", "probability_above_null", "probability_below_null", "probability_at_null"],
+      "properties": {
+        "median": {"type": "number"},
+        "interval": {"$ref": "#/$defs/posterior_coefficient_interval"},
+        "null_value": {"type": "number"},
+        "probability_above_null": {"type": "number", "minimum": 0, "maximum": 1},
+        "probability_below_null": {"type": "number", "minimum": 0, "maximum": 1},
+        "probability_at_null": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "robust_coefficient_interval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"const": "coefficient"},
+        "method": {"const": "caller_reported_robust_confidence_interval"},
+        "level": {"type": "number", "minimum": 0.8, "maximum": 0.99},
+        "low": {"type": "number"}, "high": {"type": "number"}
+      }
+    },
+    "posterior_coefficient_interval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"const": "coefficient"},
+        "method": {"const": "caller_reported_equal_tail_credible_interval"},
+        "level": {"type": "number", "minimum": 0.8, "maximum": 0.99},
+        "low": {"type": "number"}, "high": {"type": "number"}
+      }
+    },
+    "robust_meta_result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "analysis", "mode", "method", "compatibility_tier", "source_kind", "inference_profile", "input_rows", "retained_rows", "source_order", "display_order", "studies", "meta_analysis", "conf_level", "stats_labels", "only_significant", "convergence", "work", "limits", "warnings"],
+      "properties": {
+        "schema_version": {"const": 2},
+        "analysis": {"const": "ggcoefstats_meta_analysis"},
+        "mode": {"const": "robust"},
+        "method": {"const": "student_t4_marginal_ml_profile_likelihood"},
+        "compatibility_tier": {"const": "adapted"},
+        "source_kind": {"const": "table"},
+        "inference_profile": {"const": "study_effect_standard_error"},
+        "input_rows": {"type": "integer", "minimum": 10, "maximum": 500},
+        "retained_rows": {"type": "integer", "minimum": 10, "maximum": 500},
+        "source_order": {"type": "array", "minItems": 10, "maxItems": 500, "items": {"type": "string", "minLength": 1}},
+        "display_order": {"type": "array", "minItems": 10, "maxItems": 500, "items": {"type": "string", "minLength": 1}},
+        "studies": {"type": "array", "minItems": 10, "maxItems": 500, "items": {"$ref": "#/$defs/robust_meta_study"}},
+        "meta_analysis": {"$ref": "#/$defs/robust_meta_analysis"},
+        "conf_level": {"type": "number", "minimum": 0.8, "maximum": 0.99},
+        "stats_labels": {"type": "boolean"},
+        "only_significant": {"const": false},
+        "convergence": {"$ref": "#/$defs/robust_meta_convergence"},
+        "work": {"$ref": "#/$defs/m6c_work"},
+        "limits": {"$ref": "#/$defs/m6c_meta_limits"},
+        "warnings": {"type": "array", "items": {"enum": ["few_studies_robust_profile_likelihood"]}}
+      }
+    },
+    "bayesian_meta_result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "analysis", "mode", "method", "compatibility_tier", "source_kind", "inference_profile", "estimand", "effect_scale", "effect_direction", "effect_units", "dependence", "null_value", "input_rows", "retained_rows", "source_order", "display_order", "studies", "credible_level", "primary", "sensitivities", "stats_labels", "only_significant", "work", "limits", "warnings"],
+      "properties": {
+        "schema_version": {"const": 3},
+        "analysis": {"const": "ggcoefstats_meta_analysis"},
+        "mode": {"const": "bayes"},
+        "method": {"const": "proper_prior_normal_normal_quadrature"},
+        "compatibility_tier": {"const": "adapted"},
+        "source_kind": {"const": "table"},
+        "inference_profile": {"const": "study_effect_standard_error"},
+        "estimand": {"type": "string", "minLength": 1},
+        "effect_scale": {"type": "string", "minLength": 1},
+        "effect_direction": {"type": "string", "minLength": 1},
+        "effect_units": {"type": "string", "minLength": 1},
+        "dependence": {"const": "independent"},
+        "null_value": {"type": "number"},
+        "input_rows": {"type": "integer", "minimum": 3, "maximum": 500},
+        "retained_rows": {"type": "integer", "minimum": 3, "maximum": 500},
+        "source_order": {"type": "array", "minItems": 3, "maxItems": 500, "items": {"type": "string", "minLength": 1}},
+        "display_order": {"type": "array", "minItems": 3, "maxItems": 500, "items": {"type": "string", "minLength": 1}},
+        "studies": {"type": "array", "minItems": 3, "maxItems": 500, "items": {"$ref": "#/$defs/bayesian_meta_study"}},
+        "credible_level": {"type": "number", "minimum": 0.8, "maximum": 0.99},
+        "primary": {"$ref": "#/$defs/bayesian_meta_fit"},
+        "sensitivities": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/bayesian_meta_fit"}},
+        "stats_labels": {"type": "boolean"},
+        "only_significant": {"const": false},
+        "work": {"$ref": "#/$defs/m6c_work"},
+        "limits": {"$ref": "#/$defs/m6c_meta_limits"},
+        "warnings": {"type": "array", "items": {"enum": ["few_studies_prior_sensitive"]}}
+      }
+    },
+    "meta_study_identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["term", "source_position", "display_position"],
+      "properties": {
+        "term": {"type": "string", "minLength": 1},
+        "source_position": {"type": "integer", "minimum": 0},
+        "display_position": {"type": "integer", "minimum": 0}
+      }
+    },
+    "m6c_sampling_interval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"const": "study_effect"},
+        "method": {"const": "normal_approximation_from_reported_standard_error"},
+        "level": {"type": "number", "minimum": 0.8, "maximum": 0.99},
+        "low": {"type": "number"}, "high": {"type": "number"}
+      }
+    },
+    "m6c_work": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reserved_work", "actual_work", "maximum_work", "work_unit"],
+      "properties": {
+        "reserved_work": {"type": "integer", "minimum": 1},
+        "actual_work": {"type": "integer", "minimum": 0},
+        "maximum_work": {"type": "integer", "minimum": 1, "maximum": 500000000},
+        "work_unit": {"const": "integrand_or_likelihood_evaluation"}
+      }
+    },
+    "m6c_meta_limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maximum_studies", "maximum_rendered_points", "maximum_labels", "maximum_work", "hard_maximum_work", "maximum_serialized_fields"],
+      "properties": {
+        "maximum_studies": {"type": "integer", "minimum": 3, "maximum": 500},
+        "maximum_rendered_points": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "maximum_labels": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "maximum_work": {"type": "integer", "minimum": 1, "maximum": 500000000},
+        "hard_maximum_work": {"const": 500000000},
+        "maximum_serialized_fields": {"type": "integer", "minimum": 1}
+      }
+    },
+    "robust_meta_study": {
+      "type": "object", "additionalProperties": false,
+      "required": ["identity", "estimate", "standard_error", "sampling_interval", "standardized_residual", "latent_precision", "effective_precision", "normalized_share", "weighted_contribution"],
+      "properties": {
+        "identity": {"$ref": "#/$defs/meta_study_identity"},
+        "estimate": {"type": "number"},
+        "standard_error": {"type": "number", "exclusiveMinimum": 0},
+        "sampling_interval": {"$ref": "#/$defs/m6c_sampling_interval"},
+        "standardized_residual": {"type": "number"},
+        "latent_precision": {"type": "number", "exclusiveMinimum": 0, "maximum": 1.25},
+        "effective_precision": {"type": "number", "exclusiveMinimum": 0},
+        "normalized_share": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "weighted_contribution": {"type": "number"}
+      }
+    },
+    "robust_meta_start": {
+      "type": "object", "additionalProperties": false,
+      "required": ["start", "converged", "cycles", "successive_cycles", "scaled_mu", "scaled_tau_squared", "log_likelihood", "score_norm", "boundary"],
+      "properties": {
+        "start": {"enum": ["m5_reml", "median_mad", "fixed_effect"]},
+        "converged": {"type": "boolean"},
+        "cycles": {"type": "integer", "minimum": 0, "maximum": 10000},
+        "successive_cycles": {"type": "integer", "minimum": 0, "maximum": 3},
+        "scaled_mu": {"type": "number"},
+        "scaled_tau_squared": {"type": "number", "minimum": 0},
+        "log_likelihood": {"type": "number"},
+        "score_norm": {"type": "number", "minimum": 0},
+        "boundary": {"type": "boolean"}
+      }
+    },
+    "robust_meta_convergence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["algorithm", "degrees_of_freedom", "maximum_cycles_per_start", "log_likelihood_relative_tolerance", "parameter_tolerance", "score_tolerance", "ambiguity_likelihood_tolerance", "ambiguity_parameter_tolerance", "selected_start", "starts", "center", "scale", "profile_root_iterations", "profile_evaluations", "converged"],
+      "properties": {
+        "algorithm": {"const": "three_start_ecme_fixed_point"},
+        "degrees_of_freedom": {"const": 4},
+        "maximum_cycles_per_start": {"const": 10000},
+        "log_likelihood_relative_tolerance": {"const": 1e-10},
+        "parameter_tolerance": {"const": 1e-8},
+        "score_tolerance": {"const": 1e-8},
+        "ambiguity_likelihood_tolerance": {"const": 1e-8},
+        "ambiguity_parameter_tolerance": {"const": 1e-7},
+        "selected_start": {"enum": ["m5_reml", "median_mad", "fixed_effect"]},
+        "starts": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"$ref": "#/$defs/robust_meta_start"}},
+        "center": {"type": "number"}, "scale": {"type": "number", "exclusiveMinimum": 0},
+        "profile_root_iterations": {"type": "integer", "minimum": 0},
+        "profile_evaluations": {"type": "integer", "minimum": 0},
+        "converged": {"const": true}
+      }
+    },
+    "robust_meta_pooled": {
+      "type": "object", "additionalProperties": false,
+      "required": ["method", "estimate", "tau_squared", "tau", "statistic_name", "statistic", "p_value", "interval", "heterogeneity_absence_reason", "prediction_absence_reason"],
+      "properties": {
+        "method": {"const": "student_t4_marginal_ml_profile_likelihood"},
+        "estimate": {"type": "number"}, "tau_squared": {"type": "number", "minimum": 0}, "tau": {"type": "number", "minimum": 0},
+        "statistic_name": {"const": "profile_likelihood_ratio_chi_squared_1"},
+        "statistic": {"type": "number", "minimum": 0}, "p_value": {"type": "number", "minimum": 0, "maximum": 1},
+        "interval": {"$ref": "#/$defs/robust_meta_interval"},
+        "heterogeneity_absence_reason": {"const": "not_defined_for_student_t4_working_model"},
+        "prediction_absence_reason": {"const": "robust_meta_prediction_method_not_approved"}
+      }
+    },
+    "robust_meta_interval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"const": "population_student_t4_location"},
+        "method": {"const": "student_t4_profile_likelihood"},
+        "level": {"type": "number", "minimum": 0.8, "maximum": 0.99},
+        "low": {"type": "number"}, "high": {"type": "number"}
+      }
+    },
+    "robust_meta_analysis": {
+      "type": "object", "additionalProperties": false,
+      "required": ["estimand", "effect_scale", "effect_direction", "effect_units", "dependence", "null_value", "sampling_model", "pooled", "convergence"],
+      "properties": {
+        "estimand": {"type": "string", "minLength": 1}, "effect_scale": {"type": "string", "minLength": 1},
+        "effect_direction": {"type": "string", "minLength": 1}, "effect_units": {"type": "string", "minLength": 1},
+        "dependence": {"const": "independent"}, "null_value": {"type": "number"},
+        "sampling_model": {"const": "student_t4_random_effects"},
+        "pooled": {"$ref": "#/$defs/robust_meta_pooled"},
+        "convergence": {"$ref": "#/$defs/robust_meta_convergence"}
+      }
+    },
+    "bayesian_meta_study": {
+      "type": "object", "additionalProperties": false,
+      "required": ["identity", "estimate", "standard_error", "sampling_interval"],
+      "properties": {
+        "identity": {"$ref": "#/$defs/meta_study_identity"}, "estimate": {"type": "number"},
+        "standard_error": {"type": "number", "exclusiveMinimum": 0},
+        "sampling_interval": {"$ref": "#/$defs/m6c_sampling_interval"}
+      }
+    },
+    "bayesian_meta_prior": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mean_family", "mean_location", "mean_scale", "mean_prior_95_interval", "tau_family", "tau_scale", "tau_prior_median", "tau_prior_95_quantile", "prior_predictive_effect_standard_deviation", "proper"],
+      "properties": {
+        "mean_family": {"const": "normal"}, "mean_location": {"type": "number"}, "mean_scale": {"type": "number", "exclusiveMinimum": 0},
+        "mean_prior_95_interval": {"$ref": "#/$defs/bayesian_meta_prior_interval"},
+        "tau_family": {"const": "half_normal"}, "tau_scale": {"type": "number", "exclusiveMinimum": 0},
+        "tau_prior_median": {"type": "number", "exclusiveMinimum": 0}, "tau_prior_95_quantile": {"type": "number", "exclusiveMinimum": 0},
+        "prior_predictive_effect_standard_deviation": {"type": "number", "exclusiveMinimum": 0}, "proper": {"const": true}
+      }
+    },
+    "bayesian_meta_prior_interval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {"target": {"const": "prior_population_mean"}, "method": {"const": "normal_prior"}, "level": {"const": 0.95}, "low": {"type": "number"}, "high": {"type": "number"}}
+    },
+    "bayesian_meta_evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["null_hypothesis", "alternative_hypothesis", "log_bf10", "display", "prior_model_odds"],
+      "properties": {
+        "null_hypothesis": {"const": "mu_equals_null_value"},
+        "alternative_hypothesis": {"const": "mu_normal_prior_centered_at_null_value"},
+        "log_bf10": {"type": "number"}, "display": {"type": "string", "minLength": 1}, "prior_model_odds": {"const": 1.0}
+      }
+    },
+    "bayesian_meta_quadrature": {
+      "type": "object", "additionalProperties": false,
+      "required": ["algorithm", "transformation", "epsabs", "epsrel", "maximum_subdivisions", "evaluations", "h1_log_marginal", "h0_log_marginal", "h1_relative_error", "h0_relative_error", "posterior_normalization_error", "cdf_monotonicity_checked", "root_brackets", "numpy_version", "scipy_version", "converged"],
+      "properties": {
+        "algorithm": {"const": "adaptive_gauss_kronrod"}, "transformation": {"const": "tau=prior_tau_scale*x/(1-x)"},
+        "epsabs": {"const": 1e-12}, "epsrel": {"const": 1e-10}, "maximum_subdivisions": {"const": 200},
+        "evaluations": {"type": "integer", "minimum": 1}, "h1_log_marginal": {"type": "number"}, "h0_log_marginal": {"type": "number"},
+        "h1_relative_error": {"type": "number", "minimum": 0, "maximum": 1e-10}, "h0_relative_error": {"type": "number", "minimum": 0, "maximum": 1e-10},
+        "posterior_normalization_error": {"type": "number", "minimum": 0, "maximum": 1e-10}, "cdf_monotonicity_checked": {"const": true},
+        "root_brackets": {"type": "array", "minItems": 9, "maxItems": 9, "items": {"type": "array", "minItems": 3, "maxItems": 3}},
+        "numpy_version": {"type": "string", "minLength": 1}, "scipy_version": {"type": "string", "minLength": 1}, "converged": {"const": true}
+      }
+    },
+    "bayesian_meta_posterior": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "median", "null_value", "interval", "probability_above_null", "probability_below_null", "probability_at_null"],
+      "properties": {
+        "target": {"enum": ["population_mean", "between_study_tau", "between_study_tau_squared", "true_effect_in_new_exchangeable_study"]},
+        "median": {"type": "number"}, "null_value": {"type": "number"}, "interval": {"$ref": "#/$defs/bayesian_meta_interval"},
+        "probability_above_null": {"type": "number", "minimum": 0, "maximum": 1}, "probability_below_null": {"type": "number", "minimum": 0, "maximum": 1},
+        "probability_at_null": {"const": 0.0}
+      }
+    },
+    "bayesian_meta_interval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"enum": ["population_mean", "between_study_tau", "between_study_tau_squared", "true_effect_in_new_exchangeable_study"]},
+        "method": {"const": "bayesian_equal_tail"}, "level": {"type": "number", "minimum": 0.8, "maximum": 0.99},
+        "low": {"type": "number"}, "high": {"type": "number"}
+      }
+    },
+    "bayesian_meta_fit": {
+      "type": "object", "additionalProperties": false,
+      "required": ["label", "prior", "population_mean", "tau", "tau_squared", "true_effect_prediction", "evidence", "quadrature"],
+      "properties": {
+        "label": {"enum": ["primary", "mean_scale_half", "mean_scale_double", "tau_scale_half", "tau_scale_double"]},
+        "prior": {"$ref": "#/$defs/bayesian_meta_prior"}, "population_mean": {"$ref": "#/$defs/bayesian_meta_posterior"},
+        "tau": {"$ref": "#/$defs/bayesian_meta_posterior"}, "tau_squared": {"$ref": "#/$defs/bayesian_meta_posterior"},
+        "true_effect_prediction": {"$ref": "#/$defs/bayesian_meta_posterior"}, "evidence": {"$ref": "#/$defs/bayesian_meta_evidence"},
+        "quadrature": {"$ref": "#/$defs/bayesian_meta_quadrature"}
       }
     },
     "coefficient_identity": {

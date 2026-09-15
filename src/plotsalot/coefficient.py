@@ -2,13 +2,19 @@
 
 from __future__ import annotations
 
-from typing import Protocol, cast
+from typing import Literal, Protocol, cast
 
 from matplotlib.colors import is_color_like
 from matplotlib.figure import Figure
 
 from plotsalot.coefficient_analysis import CoefficientAnalysis, analyze_ggcoefstats
+from plotsalot.coefficient_meta_analysis import (
+    DEFAULT_MAXIMUM_WORK,
+    BayesianMetaAnalysis,
+    RobustMetaAnalysis,
+)
 from plotsalot.coefficient_result import CoefficientResult, CoefficientTableResult
+from plotsalot.coefficient_summary_analysis import ReportedCoefficientAnalysis
 from plotsalot.coefficient_table_analysis import TableCoefficientAnalysis
 from plotsalot.plot import PlotAnnotations, StatsPlot
 from plotsalot.theme import StatsTheme, theme_ggstatsplot
@@ -253,7 +259,11 @@ def _render_coefficients(
 
 
 def render_ggcoefstats(
-    analysis: CoefficientAnalysis | TableCoefficientAnalysis,
+    analysis: CoefficientAnalysis
+    | TableCoefficientAnalysis
+    | ReportedCoefficientAnalysis
+    | RobustMetaAnalysis
+    | BayesianMetaAnalysis,
     *,
     title: str | None = None,
     results_subtitle: bool = True,
@@ -264,7 +274,16 @@ def render_ggcoefstats(
     pooled_color: str = "#e45756",
     theme: StatsTheme | None = None,
 ) -> StatsPlot[CoefficientResult] | StatsPlot[CoefficientTableResult]:
-    """Render one typed M5 coefficient analysis without recomputing statistics."""
+    """Render one typed coefficient analysis without recomputing statistics."""
+
+    if isinstance(
+        analysis,
+        (ReportedCoefficientAnalysis, RobustMetaAnalysis, BayesianMetaAnalysis),
+    ):
+        raise NotImplementedError(
+            "M6C robust and Bayesian coefficient/meta rendering is assigned to "
+            "implementation pass 3"
+        )
 
     for value, label in (
         (results_subtitle, "results_subtitle"),
@@ -400,6 +419,7 @@ def ggcoefstats(
     data: object,
     *,
     meta_analytic_effect: bool = False,
+    type: Literal["parametric", "robust", "bayes"] = "parametric",
     estimate_label: str = "",
     estimand: str = "",
     effect_scale: str = "",
@@ -408,6 +428,7 @@ def ggcoefstats(
     dependence: str = "independent",
     null_value: float = 0.0,
     conf_level: float = 0.95,
+    credible_level: float = 0.95,
     alpha: float = 0.05,
     stats_labels: bool = True,
     only_significant: bool = False,
@@ -417,6 +438,16 @@ def ggcoefstats(
     maximum_studies: int = 500,
     maximum_rendered_points: int = 500,
     maximum_labels: int = 200,
+    robust_method: str = "",
+    robust_tuning: str = "",
+    interval_method: str = "",
+    posterior_model: str = "",
+    likelihood: str = "",
+    prior_description: str = "",
+    computation_method: str = "",
+    prior_mean_scale: float | None = None,
+    prior_tau_scale: float | None = None,
+    maximum_work: int = DEFAULT_MAXIMUM_WORK,
     title: str | None = None,
     results_subtitle: bool = True,
     show_intervals: bool = True,
@@ -431,6 +462,7 @@ def ggcoefstats(
     analysis = analyze_ggcoefstats(
         data,
         meta_analytic_effect=meta_analytic_effect,
+        type=type,
         estimate_label=estimate_label,
         estimand=estimand,
         effect_scale=effect_scale,
@@ -439,6 +471,7 @@ def ggcoefstats(
         dependence=dependence,
         null_value=null_value,
         conf_level=conf_level,
+        credible_level=credible_level,
         alpha=alpha,
         stats_labels=stats_labels,
         only_significant=only_significant,
@@ -448,6 +481,16 @@ def ggcoefstats(
         maximum_studies=maximum_studies,
         maximum_rendered_points=maximum_rendered_points,
         maximum_labels=maximum_labels,
+        robust_method=robust_method,
+        robust_tuning=robust_tuning,
+        interval_method=interval_method,
+        posterior_model=posterior_model,
+        likelihood=likelihood,
+        prior_description=prior_description,
+        computation_method=computation_method,
+        prior_mean_scale=prior_mean_scale,
+        prior_tau_scale=prior_tau_scale,
+        maximum_work=maximum_work,
     )
     return render_ggcoefstats(
         analysis,

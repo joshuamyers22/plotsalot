@@ -1,6 +1,6 @@
 # M6C Coefficient and Meta-analysis Method Proposal
 
-- Status: R4-C, B5-C, R4-M, B5-M, and entry controls approved for implementation
+- Status: methods approved; passes 1–2 passed; provisional boundary rule requires M7 review
 - Version: 0.1.0
 - Date: 2026-09-15
 - Product/statistical owner: Joshua Myers
@@ -484,7 +484,20 @@ display scales, and raw-outcome effect-size calculation remain outside scope.
   movement on every locked fixture.
 - On at least 2,000 held-out clean Student-t4 simulations per declared cell,
   the two-sided 99% Wilson interval around the observed coverage of the 95%
-  R4-M profile interval must contain `0.95`. Under the locked 10%
+  R4-M profile interval must contain `0.95` for every `k>=20, tau>0` cell. For
+  the visibly warned `k=10` through `k=19` band, or for a declared generating
+  boundary cell with exactly `tau=0`, the 99% Wilson upper bound must be at
+  least `0.95`; conservative overcoverage does not fail that cell. Joshua Myers
+  approved the small-study rule on 2026-09-15 after the first locked
+  `k=10, tau=0` finding, then provisionally approved the boundary-only extension
+  after the fresh confirmation found conservative coverage at `k=50, tau=0`.
+  The extension applies only to clean simulation acceptance; it changes no
+  estimator, fitted-model behavior, reported interval, or runtime warning.
+  Both failed runs remain retained with their original rules and statuses, and
+  the post-confirmation exception is not described as predeclared evidence.
+  M7 must explicitly reaffirm, replace, or remove the `tau=0` extension before
+  1.0.
+  Under the locked 10%
   gross-contamination grid, its median absolute pooled error must not exceed M5
   REML's. Simulation seeds and exact case counts are frozen before held-out
   execution; failing cells are not pooled away.
@@ -539,6 +552,20 @@ Joshua Myers approved without revision on 2026-09-15:
    contract, no new runtime dependency, no MCMC/RQMC, and no fallback; and
 6. the three-pass verification loop, oracle/license boundary, simulation and
    calibration thresholds, compatibility dispositions, and explicit exclusions.
+
+Joshua Myers additionally approved the warned-small-study conservative-coverage
+amendment above on 2026-09-15. It changes no estimator, likelihood, interval,
+warning, study floor, or result field and does not retroactively convert the
+first held-out finding into passing evidence.
+
+After the fresh confirmation produced the separate `k=50, tau=0` finding,
+Joshua Myers provisionally approved the boundary-only extension on 2026-09-15.
+The approved one-sided conservative rule therefore applies when `k<20` or the
+declared generating `tau=0`; the symmetric rule remains for `k>=20, tau>0`.
+This owner disposition clears the pass-2 calibration gate without modifying or
+relabeling either retained artifact. It is explicitly temporary governance
+debt: M7/1.0 hardening must reconsider the boundary calibration and record a
+final disposition.
 
 This approval authorizes M6C implementation and acceptance-fixture construction
 only. Independent review, M6C acceptance, combined M6 acceptance, and the

@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M0–M5, M6A, and M6B complete; M6C methods approved for implementation
+- Status: M0–M5, M6A, and M6B complete; M6C passes 1–2 passed, pass 3 open
 
 Definitions:
 
@@ -207,6 +207,10 @@ model adapter or posterior-draw input.
 | Bayesian aggregate meta-analysis | normal-normal hierarchy; caller-supplied proper normal/half-normal scales; numeric BF10, posterior heterogeneity, true-effect prediction, four sensitivity fits, bounded quadrature | Adapted proper-prior native model; universal/data-derived priors and MCMC are rejected |
 
 Joshua Myers approved these entry classifications without revision on
-2026-09-15. Implementation is authorized; the resulting behavior remains
-unimplemented until verified, and the candidate will require independent review
-before any row becomes implemented/accepted compatibility behavior.
+2026-09-15. The robust and posterior coefficient analysis profiles passed the
+M6C pass-1 technical gate. Both aggregate engines are implemented, but one
+predeclared small-study and one confirmation zero-heterogeneity coverage cell
+remain retained findings. Joshua Myers provisionally accepted a conservative
+rule limited to `k<20` or generating `tau=0`, with mandatory M7 review; pass 2
+therefore passed, while the shared renderer remains open. Independent review is
+still required before these rows become accepted compatibility behavior.

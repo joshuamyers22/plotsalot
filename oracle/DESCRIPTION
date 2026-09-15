@@ -6,5 +6,6 @@ Description: Locks the development-only ggstatsplot parity oracle.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports:
+    bayesmeta (== 3.5),
     ggstatsplot,
     metafor (== 5.0-1)

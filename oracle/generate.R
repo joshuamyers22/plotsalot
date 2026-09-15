@@ -1374,6 +1374,134 @@ utils::write.csv(
   na = "NA"
 )
 
+# M6C robust and Bayesian aggregate meta-analysis ----------------------------
+
+m6c_robust <- utils::read.csv(file.path(input_dir, "m6c-robust-meta.csv"))
+m6c_robust_loglik <- function(mu, tau_squared) {
+  sum(stats::dt(
+    (m6c_robust$estimate - mu) /
+      sqrt(m6c_robust$standard_error^2 + tau_squared),
+    df = 4,
+    log = TRUE
+  ) - 0.5 * log(m6c_robust$standard_error^2 + tau_squared))
+}
+m6c_robust_profile <- function(mu) {
+  optimized <- stats::optimize(
+    function(tau_squared) m6c_robust_loglik(mu, tau_squared),
+    interval = c(0, 25),
+    maximum = TRUE,
+    tol = 1e-12
+  )
+  at_zero <- m6c_robust_loglik(mu, 0)
+  if (at_zero >= optimized$objective) {
+    c(log_likelihood = at_zero, tau_squared = 0)
+  } else {
+    c(log_likelihood = optimized$objective, tau_squared = optimized$maximum)
+  }
+}
+m6c_robust_mu <- stats::optimize(
+  function(mu) m6c_robust_profile(mu)[["log_likelihood"]],
+  interval = c(min(m6c_robust$estimate) - 5, max(m6c_robust$estimate) + 5),
+  maximum = TRUE,
+  tol = 1e-12
+)$maximum
+m6c_robust_fit <- m6c_robust_profile(m6c_robust_mu)
+m6c_robust_cutoff <- stats::qchisq(0.95, df = 1)
+m6c_robust_root <- function(mu) {
+  2 * (m6c_robust_fit[["log_likelihood"]] -
+    m6c_robust_profile(mu)[["log_likelihood"]]) - m6c_robust_cutoff
+}
+m6c_robust_low <- stats::uniroot(
+  m6c_robust_root,
+  c(m6c_robust_mu - 5, m6c_robust_mu),
+  tol = 1e-10
+)$root
+m6c_robust_high <- stats::uniroot(
+  m6c_robust_root,
+  c(m6c_robust_mu, m6c_robust_mu + 5),
+  tol = 1e-10
+)$root
+m6c_robust_null <- m6c_robust_profile(0)[["log_likelihood"]]
+m6c_robust_statistic <- 2 * (
+  m6c_robust_fit[["log_likelihood"]] - m6c_robust_null
+)
+utils::write.csv(
+  data.frame(
+    estimate = m6c_robust_mu,
+    tau_squared = m6c_robust_fit[["tau_squared"]],
+    log_likelihood = m6c_robust_fit[["log_likelihood"]],
+    interval_low = m6c_robust_low,
+    interval_high = m6c_robust_high,
+    statistic = m6c_robust_statistic,
+    p_value = stats::pchisq(m6c_robust_statistic, df = 1, lower.tail = FALSE)
+  ),
+  file.path(output_dir, "m6c-robust-meta-results.csv"),
+  row.names = FALSE
+)
+
+m6c_bayes <- utils::read.csv(file.path(input_dir, "m6c-bayes-meta.csv"))
+m6c_bayes_specs <- data.frame(
+  label = c(
+    "primary",
+    "mean_scale_half",
+    "mean_scale_double",
+    "tau_scale_half",
+    "tau_scale_double"
+  ),
+  mean_scale = c(1, 0.5, 2, 1, 1),
+  tau_scale = c(0.5, 0.5, 0.5, 0.25, 1),
+  stringsAsFactors = FALSE
+)
+m6c_bayes_rows <- lapply(seq_len(nrow(m6c_bayes_specs)), function(index) {
+  specification <- m6c_bayes_specs[index, ]
+  fit <- bayesmeta::bayesmeta(
+    y = m6c_bayes$estimate,
+    sigma = m6c_bayes$standard_error,
+    tau.prior = function(tau) bayesmeta::dhalfnormal(
+      tau,
+      scale = specification$tau_scale
+    ),
+    mu.prior.mean = 0,
+    mu.prior.sd = specification$mean_scale,
+    interval.type = "central",
+    delta = 1e-5,
+    epsilon = 1e-10,
+    rel.tol.integrate = 1e-10,
+    abs.tol.integrate = 1e-12,
+    tol.uniroot = 1e-10
+  )
+  probabilities <- c(0.025, 0.5, 0.975)
+  mu <- fit$qposterior(mu.p = probabilities)
+  tau <- fit$qposterior(tau.p = probabilities)
+  prediction <- fit$qposterior(theta.p = probabilities, predict = TRUE)
+  data.frame(
+    label = specification$label,
+    mean_scale = specification$mean_scale,
+    tau_scale = specification$tau_scale,
+    mu_low = mu[[1L]],
+    mu_median = mu[[2L]],
+    mu_high = mu[[3L]],
+    mu_probability_below_null = fit$pposterior(mu = 0),
+    tau_low = tau[[1L]],
+    tau_median = tau[[2L]],
+    tau_high = tau[[3L]],
+    prediction_low = prediction[[1L]],
+    prediction_median = prediction[[2L]],
+    prediction_high = prediction[[3L]],
+    prediction_probability_below_null = fit$pposterior(
+      theta = 0,
+      predict = TRUE
+    ),
+    log_bf10 = -log(fit$bayesfactor[["actual", "mu=0"]]),
+    stringsAsFactors = FALSE
+  )
+})
+utils::write.csv(
+  do.call(rbind, m6c_bayes_rows),
+  file.path(output_dir, "m6c-bayes-meta-results.csv"),
+  row.names = FALSE
+)
+
 installed <- as.data.frame(utils::installed.packages()[, c("Package", "Version")])
 installed <- installed[order(installed$Package), , drop = FALSE]
 utils::write.csv(

@@ -7,9 +7,10 @@ M0 through M5 are complete, including the accepted `0.3` product gate. The
 M6 robust/Bayesian work is active. The M6A robust continuous-analysis track is
 implemented, independently reviewed, and accepted. M6B Bayesian data analysis
 is also implemented, independently reviewed, and accepted. The detailed
-R4/B5 M6C coefficient/meta method contract is approved, authorizing the next
-implementation pass. No M6C implementation or candidate acceptance has yet
-been recorded. The project remains pre-release and is not yet ready for
+R4/B5 M6C coefficient/meta method contract is approved; pass 1 is technically
+verified and pass 2 passed under a provisional, boundary-only calibration
+disposition that must be revisited in M7. Pass 3 and M6C candidate acceptance
+remain open. The project remains pre-release and is not yet ready for
 production analytical use.
 
 ## Development
@@ -287,8 +288,12 @@ default 100,000,000 and hard 500,000,000 resample-work ceiling. Bayesian paths
 use approved proper priors and bounded exact, quadrature, or RQMC calculations;
 see `docs/M6B_STATISTICAL_METHODS.md` for their family-specific contracts.
 Unsupported upstream arguments, nonparametric modes, and robust categorical
-analysis remain deferred. The approved M6C coefficient/meta paths are not yet
-implemented or available. See
+analysis remain deferred. M6C exposes renderer-independent analysis for
+strict caller-reported robust confidence and posterior credible coefficient
+summaries plus pass-2 robust Student-t4 and proper-prior Bayesian normal-normal
+aggregate meta-analysis engines. Rendering remains assigned to pass 3; the
+pass-2 statistical gate passed under the provisional boundary-only calibration
+disposition that must be revisited in M7. See
 [`docs/MILESTONE_0.md`](docs/MILESTONE_0.md),
 [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md),
 [`docs/MILESTONE_2.md`](docs/MILESTONE_2.md),

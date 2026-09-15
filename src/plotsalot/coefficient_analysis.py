@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from builtins import type as builtin_type
 from collections.abc import Callable
 from dataclasses import dataclass
 from importlib import import_module
@@ -15,6 +16,13 @@ from plotsalot.coefficient_data import (
     StudyEffectTable,
     select_study_effects,
 )
+from plotsalot.coefficient_meta_analysis import (
+    DEFAULT_MAXIMUM_WORK,
+    BayesianMetaAnalysis,
+    RobustMetaAnalysis,
+    analyze_bayesian_meta,
+    analyze_robust_meta,
+)
 from plotsalot.coefficient_result import (
     CoefficientInferenceResult,
     CoefficientResourceLimits,
@@ -25,6 +33,10 @@ from plotsalot.coefficient_result import (
     MetaConvergenceResult,
     PooledEffectResult,
     PredictionResult,
+)
+from plotsalot.coefficient_summary_analysis import (
+    ReportedCoefficientAnalysis,
+    analyze_reported_coefficients,
 )
 from plotsalot.coefficient_table_analysis import (
     DEFAULT_MAX_LABELS as DEFAULT_MAX_COEFFICIENT_LABELS,
@@ -238,6 +250,7 @@ def analyze_ggcoefstats(
     data: object,
     *,
     meta_analytic_effect: Literal[True],
+    type: Literal["parametric"] = "parametric",
     estimate_label: str = "",
     estimand: str = "",
     effect_scale: str = "",
@@ -246,6 +259,7 @@ def analyze_ggcoefstats(
     dependence: str = "independent",
     null_value: float = 0.0,
     conf_level: float = 0.95,
+    credible_level: float = 0.95,
     alpha: float = 0.05,
     stats_labels: bool = True,
     only_significant: bool = False,
@@ -255,6 +269,16 @@ def analyze_ggcoefstats(
     maximum_studies: int = DEFAULT_MAX_STUDIES,
     maximum_rendered_points: int = DEFAULT_MAX_COEFFICIENT_POINTS,
     maximum_labels: int = DEFAULT_MAX_COEFFICIENT_LABELS,
+    robust_method: str = "",
+    robust_tuning: str = "",
+    interval_method: str = "",
+    posterior_model: str = "",
+    likelihood: str = "",
+    prior_description: str = "",
+    computation_method: str = "",
+    prior_mean_scale: float | None = None,
+    prior_tau_scale: float | None = None,
+    maximum_work: int = DEFAULT_MAXIMUM_WORK,
 ) -> CoefficientAnalysis: ...
 
 
@@ -263,6 +287,7 @@ def analyze_ggcoefstats(
     data: object,
     *,
     meta_analytic_effect: Literal[False] = False,
+    type: Literal["parametric"] = "parametric",
     estimate_label: str = "",
     estimand: str = "",
     effect_scale: str = "",
@@ -271,6 +296,7 @@ def analyze_ggcoefstats(
     dependence: str = "independent",
     null_value: float = 0.0,
     conf_level: float = 0.95,
+    credible_level: float = 0.95,
     alpha: float = 0.05,
     stats_labels: bool = True,
     only_significant: bool = False,
@@ -280,6 +306,16 @@ def analyze_ggcoefstats(
     maximum_studies: int = DEFAULT_MAX_STUDIES,
     maximum_rendered_points: int = DEFAULT_MAX_COEFFICIENT_POINTS,
     maximum_labels: int = DEFAULT_MAX_COEFFICIENT_LABELS,
+    robust_method: str = "",
+    robust_tuning: str = "",
+    interval_method: str = "",
+    posterior_model: str = "",
+    likelihood: str = "",
+    prior_description: str = "",
+    computation_method: str = "",
+    prior_mean_scale: float | None = None,
+    prior_tau_scale: float | None = None,
+    maximum_work: int = DEFAULT_MAXIMUM_WORK,
 ) -> TableCoefficientAnalysis: ...
 
 
@@ -287,7 +323,8 @@ def analyze_ggcoefstats(
 def analyze_ggcoefstats(
     data: object,
     *,
-    meta_analytic_effect: bool,
+    meta_analytic_effect: Literal[False] = False,
+    type: Literal["robust", "bayes"],
     estimate_label: str = "",
     estimand: str = "",
     effect_scale: str = "",
@@ -296,6 +333,7 @@ def analyze_ggcoefstats(
     dependence: str = "independent",
     null_value: float = 0.0,
     conf_level: float = 0.95,
+    credible_level: float = 0.95,
     alpha: float = 0.05,
     stats_labels: bool = True,
     only_significant: bool = False,
@@ -305,13 +343,67 @@ def analyze_ggcoefstats(
     maximum_studies: int = DEFAULT_MAX_STUDIES,
     maximum_rendered_points: int = DEFAULT_MAX_COEFFICIENT_POINTS,
     maximum_labels: int = DEFAULT_MAX_COEFFICIENT_LABELS,
-) -> CoefficientAnalysis | TableCoefficientAnalysis: ...
+    robust_method: str = "",
+    robust_tuning: str = "",
+    interval_method: str = "",
+    posterior_model: str = "",
+    likelihood: str = "",
+    prior_description: str = "",
+    computation_method: str = "",
+    prior_mean_scale: float | None = None,
+    prior_tau_scale: float | None = None,
+    maximum_work: int = DEFAULT_MAXIMUM_WORK,
+) -> ReportedCoefficientAnalysis: ...
+
+
+@overload
+def analyze_ggcoefstats(
+    data: object,
+    *,
+    meta_analytic_effect: bool,
+    type: Literal["parametric", "robust", "bayes"] = "parametric",
+    estimate_label: str = "",
+    estimand: str = "",
+    effect_scale: str = "",
+    effect_direction: str = "",
+    effect_units: str = "",
+    dependence: str = "independent",
+    null_value: float = 0.0,
+    conf_level: float = 0.95,
+    credible_level: float = 0.95,
+    alpha: float = 0.05,
+    stats_labels: bool = True,
+    only_significant: bool = False,
+    exclude_intercept: bool = False,
+    sort: str = "none",
+    maximum_coefficients: int = 500,
+    maximum_studies: int = DEFAULT_MAX_STUDIES,
+    maximum_rendered_points: int = DEFAULT_MAX_COEFFICIENT_POINTS,
+    maximum_labels: int = DEFAULT_MAX_COEFFICIENT_LABELS,
+    robust_method: str = "",
+    robust_tuning: str = "",
+    interval_method: str = "",
+    posterior_model: str = "",
+    likelihood: str = "",
+    prior_description: str = "",
+    computation_method: str = "",
+    prior_mean_scale: float | None = None,
+    prior_tau_scale: float | None = None,
+    maximum_work: int = DEFAULT_MAXIMUM_WORK,
+) -> (
+    CoefficientAnalysis
+    | TableCoefficientAnalysis
+    | ReportedCoefficientAnalysis
+    | RobustMetaAnalysis
+    | BayesianMetaAnalysis
+): ...
 
 
 def analyze_ggcoefstats(
     data: object,
     *,
     meta_analytic_effect: bool = False,
+    type: Literal["parametric", "robust", "bayes"] = "parametric",
     estimate_label: str = "",
     estimand: str = "",
     effect_scale: str = "",
@@ -320,6 +412,7 @@ def analyze_ggcoefstats(
     dependence: str = "independent",
     null_value: float = 0.0,
     conf_level: float = 0.95,
+    credible_level: float = 0.95,
     alpha: float = 0.05,
     stats_labels: bool = True,
     only_significant: bool = False,
@@ -329,19 +422,82 @@ def analyze_ggcoefstats(
     maximum_studies: int = DEFAULT_MAX_STUDIES,
     maximum_rendered_points: int = DEFAULT_MAX_COEFFICIENT_POINTS,
     maximum_labels: int = DEFAULT_MAX_COEFFICIENT_LABELS,
-) -> CoefficientAnalysis | TableCoefficientAnalysis:
-    """Analyze an approved M5A coefficient or explicit M5B meta-analysis input."""
+    robust_method: str = "",
+    robust_tuning: str = "",
+    interval_method: str = "",
+    posterior_model: str = "",
+    likelihood: str = "",
+    prior_description: str = "",
+    computation_method: str = "",
+    prior_mean_scale: float | None = None,
+    prior_tau_scale: float | None = None,
+    maximum_work: int = DEFAULT_MAXIMUM_WORK,
+) -> (
+    CoefficientAnalysis
+    | TableCoefficientAnalysis
+    | ReportedCoefficientAnalysis
+    | RobustMetaAnalysis
+    | BayesianMetaAnalysis
+):
+    """Analyze an approved coefficient or explicit meta-analysis input."""
 
-    if type(meta_analytic_effect) is not bool:
+    if type not in {"parametric", "robust", "bayes"}:
+        raise ValueError("type must be 'parametric', 'robust', or 'bayes'")
+    if builtin_type(meta_analytic_effect) is not bool:
         raise TypeError("meta_analytic_effect must be boolean")
     if not meta_analytic_effect:
         if (
             estimand
             or dependence != "independent"
             or maximum_studies != DEFAULT_MAX_STUDIES
+            or prior_mean_scale is not None
+            or prior_tau_scale is not None
+            or maximum_work != DEFAULT_MAXIMUM_WORK
         ):
             raise ValueError(
                 "meta-analysis-only options cannot be used in coefficient mode"
+            )
+        if type != "parametric":
+            if alpha != 0.05:
+                raise ValueError("alpha is unavailable for reported summaries")
+            return analyze_reported_coefficients(
+                data,
+                mode=type,
+                estimate_label=estimate_label,
+                effect_scale=effect_scale,
+                effect_direction=effect_direction,
+                effect_units=effect_units,
+                null_value=null_value,
+                conf_level=conf_level,
+                credible_level=credible_level,
+                stats_labels=stats_labels,
+                only_significant=only_significant,
+                exclude_intercept=exclude_intercept,
+                sort=sort,
+                maximum_coefficients=maximum_coefficients,
+                maximum_rendered_points=maximum_rendered_points,
+                maximum_labels=maximum_labels,
+                robust_method=robust_method,
+                robust_tuning=robust_tuning,
+                interval_method=interval_method,
+                posterior_model=posterior_model,
+                likelihood=likelihood,
+                prior_description=prior_description,
+                computation_method=computation_method,
+            )
+        if credible_level != 0.95 or any(
+            (
+                robust_method,
+                robust_tuning,
+                interval_method,
+                posterior_model,
+                likelihood,
+                prior_description,
+                computation_method,
+            )
+        ):
+            raise ValueError(
+                "reported-summary options require type='robust' or 'bayes'"
             )
         return analyze_coefficients(
             data,
@@ -360,6 +516,20 @@ def analyze_ggcoefstats(
             maximum_rendered_points=maximum_rendered_points,
             maximum_labels=maximum_labels,
         )
+    if any(
+        (
+            robust_method,
+            robust_tuning,
+            interval_method,
+            posterior_model,
+            likelihood,
+            prior_description,
+            computation_method,
+        )
+    ):
+        raise ValueError(
+            "reported-summary options cannot be used in meta-analysis mode"
+        )
     if (
         estimate_label
         or alpha != 0.05
@@ -370,28 +540,41 @@ def analyze_ggcoefstats(
         raise ValueError(
             "coefficient-only options cannot be used in meta-analysis mode"
         )
-    declarations = tuple(
-        _string_option(value, label)
-        for value, label in (
-            (estimand, "estimand"),
-            (effect_scale, "effect_scale"),
-            (effect_direction, "effect_direction"),
-            (effect_units, "effect_units"),
-        )
+    declarations = (
+        _string_option(estimand, "estimand"),
+        _string_option(effect_scale, "effect_scale"),
+        _string_option(effect_direction, "effect_direction"),
+        _string_option(effect_units, "effect_units"),
     )
     if dependence != "independent":
-        raise ValueError("M5B supports only dependence='independent'")
+        raise ValueError("meta-analysis supports only dependence='independent'")
     null = _numeric_option(null_value, "null_value")
-    confidence = _numeric_option(conf_level, "conf_level")
-    if not 0.0 < confidence < 1.0:
-        raise ValueError("conf_level must lie within (0, 1)")
-    if type(stats_labels) is not bool or type(only_significant) is not bool:
+    if type == "bayes":
+        if conf_level != 0.95:
+            raise ValueError("conf_level is unavailable in Bayesian meta-analysis")
+        confidence = _numeric_option(credible_level, "credible_level")
+        if not 0.80 <= confidence <= 0.99:
+            raise ValueError("credible_level must lie within [0.80, 0.99]")
+    else:
+        if type == "robust" and credible_level != 0.95:
+            raise ValueError("credible_level is unavailable in robust meta-analysis")
+        if type == "parametric" and credible_level != 0.95:
+            raise ValueError("credible_level requires type='bayes'")
+        confidence = _numeric_option(conf_level, "conf_level")
+        if type == "robust" and not 0.80 <= confidence <= 0.99:
+            raise ValueError("conf_level must lie within [0.80, 0.99]")
+        if type == "parametric" and not 0.0 < confidence < 1.0:
+            raise ValueError("conf_level must lie within (0, 1)")
+    if (
+        builtin_type(stats_labels) is not bool
+        or builtin_type(only_significant) is not bool
+    ):
         raise TypeError("stats_labels and only_significant must be booleans")
     for value, label in (
         (maximum_rendered_points, "maximum_rendered_points"),
         (maximum_labels, "maximum_labels"),
     ):
-        if type(value) is not int or value < 1:
+        if builtin_type(value) is not int or value < 1:
             raise ValueError(f"{label} must be a positive integer")
     if maximum_rendered_points > HARD_MAX_RENDERED_POINTS:
         raise ValueError(
@@ -405,6 +588,52 @@ def analyze_ggcoefstats(
         raise ValueError(
             f"study count exceeds maximum_rendered_points={maximum_rendered_points}"
         )
+    if stats_labels and len(table.terms) > maximum_labels:
+        raise ValueError(f"study count exceeds maximum_labels={maximum_labels}")
+    if type == "robust":
+        if prior_mean_scale is not None or prior_tau_scale is not None:
+            raise ValueError("Bayesian prior scales cannot be used in robust mode")
+        if only_significant:
+            raise ValueError("only_significant=True is unavailable in robust meta mode")
+        return analyze_robust_meta(
+            table,
+            declarations=declarations,
+            null_value=null,
+            conf_level=confidence,
+            stats_labels=stats_labels,
+            maximum_studies=maximum_studies,
+            maximum_rendered_points=maximum_rendered_points,
+            maximum_labels=maximum_labels,
+            maximum_work=maximum_work,
+        )
+    if type == "bayes":
+        if prior_mean_scale is None or prior_tau_scale is None:
+            raise ValueError(
+                "Bayesian meta-analysis requires prior_mean_scale and prior_tau_scale"
+            )
+        if only_significant:
+            raise ValueError(
+                "only_significant=True is unavailable in Bayesian meta mode"
+            )
+        return analyze_bayesian_meta(
+            table,
+            declarations=declarations,
+            null_value=null,
+            credible_level=confidence,
+            prior_mean_scale=_numeric_option(prior_mean_scale, "prior_mean_scale"),
+            prior_tau_scale=_numeric_option(prior_tau_scale, "prior_tau_scale"),
+            stats_labels=stats_labels,
+            maximum_studies=maximum_studies,
+            maximum_rendered_points=maximum_rendered_points,
+            maximum_labels=maximum_labels,
+            maximum_work=maximum_work,
+        )
+    if (
+        prior_mean_scale is not None
+        or prior_tau_scale is not None
+        or maximum_work != DEFAULT_MAXIMUM_WORK
+    ):
+        raise ValueError("M6C prior/work options require type='robust' or 'bayes'")
     alpha = 1.0 - confidence
     z_critical = float(scipy_stats.norm.ppf(1.0 - alpha / 2.0))
     if not np.isfinite(z_critical):

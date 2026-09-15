@@ -841,6 +841,40 @@
       "Author": "Michel Lang [cre, aut] (ORCID: <https://orcid.org/0000-0001-9754-0393>), Duncan Murdoch [aut], R Core Team [aut]",
       "Repository": "CRAN"
     },
+    "bayesmeta": {
+      "Package": "bayesmeta",
+      "Version": "3.5",
+      "Source": "Repository",
+      "Priority": null,
+      "Depends": [
+        "forestplot (>= 2.0.0)",
+        "metafor (>= 2.0-0)",
+        "mvtnorm (>= 1.1-1)",
+        "numDeriv (>= 2016.8-1.1)"
+      ],
+      "Imports": [
+        null
+      ],
+      "LinkingTo": [
+        null
+      ],
+      "Suggests": [
+        "compute.es",
+        "knitr",
+        "rmarkdown",
+        "R.rsp"
+      ],
+      "Enhances": [
+        null
+      ],
+      "License": "GPL (>= 2)",
+      "License_is_FOSS": null,
+      "License_restricts_use": null,
+      "OS_type": null,
+      "NeedsCompilation": "no",
+      "Repository": "CRAN",
+      "Type": "source"
+    },
     "bayestestR": {
       "Package": "bayestestR",
       "Version": "0.19.0",
@@ -1179,6 +1213,46 @@
       "Author": "John Fox [aut], Sanford Weisberg [aut], Brad Price [aut, cre]",
       "Maintainer": "Brad Price <brad.price@mail.wvu.edu>",
       "Repository": "CRAN"
+    },
+    "checkmate": {
+      "Package": "checkmate",
+      "Version": "2.3.4",
+      "Source": "Repository",
+      "Priority": null,
+      "Depends": [
+        "R (>= 3.0.0)"
+      ],
+      "Imports": [
+        "backports (>= 1.1.0)",
+        "utils"
+      ],
+      "LinkingTo": [
+        null
+      ],
+      "Suggests": [
+        "R6",
+        "fastmatch",
+        "data.table (>= 1.9.8)",
+        "devtools",
+        "ggplot2",
+        "knitr",
+        "magrittr",
+        "microbenchmark",
+        "rmarkdown",
+        "testthat (>=\n3.0.4)",
+        "tinytest (>= 1.1.0)",
+        "tibble"
+      ],
+      "Enhances": [
+        null
+      ],
+      "License": "BSD_3_clause + file LICENSE",
+      "License_is_FOSS": null,
+      "License_restricts_use": null,
+      "OS_type": null,
+      "NeedsCompilation": "yes",
+      "Repository": "CRAN",
+      "Type": "source"
     },
     "cli": {
       "Package": "cli",
@@ -1972,6 +2046,50 @@
       "Author": "Rob Hyndman [aut, cre, cph] (ORCID: <https://orcid.org/0000-0002-2140-5352>), George Athanasopoulos [aut] (ORCID: <https://orcid.org/0000-0002-5389-2802>), Christoph Bergmeir [aut] (ORCID: <https://orcid.org/0000-0002-3665-9021>), Gabriel Caceres [aut] (ORCID: <https://orcid.org/0000-0002-2947-2023>), Leanne Chhay [aut], Kirill Kuroptev [aut], Maximilian Mücke [aut] (ORCID: <https://orcid.org/0009-0000-9432-9795>), Mitchell O'Hara-Wild [aut] (ORCID: <https://orcid.org/0000-0001-6729-7695>), Fotios Petropoulos [aut] (ORCID: <https://orcid.org/0000-0003-3039-4955>), Slava Razbash [aut], Earo Wang [aut] (ORCID: <https://orcid.org/0000-0001-6448-5260>), Farah Yasmeen [aut] (ORCID: <https://orcid.org/0000-0002-1479-5401>), Federico Garza [ctb], Daniele Girolimetto [ctb], Ross Ihaka [ctb, cph], R Core Team [ctb, cph], Daniel Reid [ctb], David Shaub [ctb], Yuan Tang [ctb] (ORCID: <https://orcid.org/0000-0001-5243-233X>), Xiaoqian Wang [ctb], Zhenyu Zhou [ctb]",
       "Maintainer": "Rob Hyndman <Rob.Hyndman@monash.edu>",
       "Repository": "CRAN"
+    },
+    "forestplot": {
+      "Package": "forestplot",
+      "Version": "3.2.0",
+      "Source": "Repository",
+      "Priority": null,
+      "Depends": [
+        "R (>= 4.1.0)",
+        "grid",
+        "checkmate",
+        "abind"
+      ],
+      "Imports": [
+        null
+      ],
+      "LinkingTo": [
+        null
+      ],
+      "Suggests": [
+        "dplyr",
+        "Gmisc",
+        "Greg",
+        "knitr",
+        "purrr",
+        "rlang",
+        "rmarkdown",
+        "rmeta",
+        "rms",
+        "testthat",
+        "tibble",
+        "tidyr",
+        "tidyselect",
+        "tidyverse"
+      ],
+      "Enhances": [
+        null
+      ],
+      "License": "GPL-2",
+      "License_is_FOSS": null,
+      "License_restricts_use": null,
+      "OS_type": null,
+      "NeedsCompilation": "no",
+      "Repository": "CRAN",
+      "Type": "source"
     },
     "fracdiff": {
       "Package": "fracdiff",

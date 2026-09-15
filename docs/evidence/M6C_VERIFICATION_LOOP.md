@@ -55,8 +55,8 @@
 | # | Planned slice | Required new evidence | Gate state |
 |---:|---|---|---|
 | 0 | Method-entry audit, R4/B5 proposal, sign-off ledger, and verification contract only | Published tMeta/NNHM review, GPL/MIT boundary, inherited M5/M6 constraints, exact pending decisions | Entry gate passed 2026-09-15; implementation authorized |
-| 1 | R4-C/B5-C strict table profiles and schema-v2/v3 result variants | Hand calculations, invalid/mixed profiles, probability partitions, source/order/mutation/JSON tests; v1 serialization stability | Not started |
-| 2 | R4-M/B5-M native engines and complete statistical results | Independent high-precision/R oracles, multistart/profile/quadrature faults, invariance, contamination, SBC, work/limit evidence | Not started |
+| 1 | R4-C/B5-C strict table profiles and schema-v2/v3 result variants | Hand calculations, invalid/mixed profiles, probability partitions, source/order/mutation/JSON tests; v1 serialization stability | Technical gate passed 2026-09-15; review remains open |
+| 2 | R4-M/B5-M native engines and complete statistical results | Independent high-precision/R oracles, multistart/profile/quadrature faults, invariance, contamination, SBC, work/limit evidence | Technical gate passed 2026-09-15 with provisional owner-approved `k<20 OR tau=0` conservative rule; M7 review required |
 | 3 | Shared renderer/API/extraction/composition, retained benchmark, docs, adversarial and production gates | Injection/artist identity, cross-mode composition, package audit/build/wheel/oracle/benchmark/reproducibility evidence | Not started |
 
 ## Entry findings and dispositions
@@ -71,8 +71,11 @@
 
 ## Current state
 
-- Status: pass-zero entry gate approved; implementation authorized
-- Verification passes used: zero of three implementation passes
-- Authorized work: M6C implementation and acceptance-fixture construction under
-  the approved contract
+- Status: pass 2 technical gate passed with provisional boundary disposition; pass 3 authorized
+- Verification passes used: two of three implementation passes
+- Pass 1 evidence: `M6C_PASS1_VERIFICATION.md`
+- Pass 2 evidence: `M6C_PASS2_VERIFICATION.md` and
+  `m6c-pass2-calibration.json`
+- Authorized work: pass 3 shared renderer/API/extraction/composition and final
+  technical evidence; preserve the boundary finding for M7 review
 - Not authorized: implementation-owner acceptance, final M6, or `0.4`

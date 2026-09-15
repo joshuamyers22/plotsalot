@@ -135,3 +135,24 @@
   revision on 2026-09-15, authorizing coefficient/meta implementation and
   acceptance-fixture construction while leaving technical verification,
   independent candidate acceptance, and final M6/`0.4` approval open.
+- Completed the M6C pass-1 technical slice: strict owned robust-interval and
+  posterior-summary coefficient tables, explicit public mode dispatch,
+  caller-reported-unverified provenance, immutable schema-v2/v3 results, and
+  atomic pass-2 meta/pass-3 renderer boundaries. Added profile, partition,
+  Unicode, mutation, ordering, resource, JSON, and frozen schema-v1 regression
+  evidence; independent review and later M6C passes remain open.
+- Implemented the M6C pass-2 fixed-Student-t4 robust and proper-prior Bayesian
+  aggregate engines, mode-v2/v3 immutable schemas, multistart/profile and
+  transformed-quadrature diagnostics, work limits, retained base-R/bayesmeta
+  oracle fixtures, fault tests, and 2,000-case calibration. Formula, oracle,
+  contamination, and Bayesian SBC checks pass; the frozen `k=10, tau=0` robust
+  cell was conservatively above the original symmetric coverage target and is
+  retained as a failed held-out finding.
+- Recorded the fresh confirmation's separate conservative `k=50, tau=0`
+  finding and Joshua Myers's provisional boundary-only disposition: the
+  one-sided conservative rule applies when `k<20` or generating `tau=0`, while
+  `k>=20, tau>0` retains the symmetric rule. The retained artifacts are not
+  relabeled, M6C pass 2 may proceed, and M7 must revisit the exception before
+  1.0.
+- Recorded an isolated ggstatsplot/metaplus comparison whose conservative point
+  coverage did not formally reproduce the M6C finding at 200 cases per cell.

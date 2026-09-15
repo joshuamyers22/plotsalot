@@ -12,7 +12,9 @@ independent review, M6C acceptance, and combined M6/`0.4` acceptance remain open
 | B5-M proper-prior Bayesian NNHM, evidence, prediction, and sensitivity | Statistical-methods reviewer | Joshua Myers | Approved, 2026-09-15 | Complete |
 | M6C native deterministic engine, schema, work, and no-fallback boundary | Architecture/statistical reviewer | Joshua Myers | Approved, 2026-09-15 | Complete |
 | M6C verification loop, oracle/license posture, and acceptance thresholds | Product/statistical reviewer | Joshua Myers | Approved, 2026-09-15 | Complete |
-| M6C technical release-candidate gates | Implementation owner | Codex | Not started | Blocking |
+| Warned `k=10–19` conservative-coverage disposition | Product/statistical reviewer | Joshua Myers | Approved 2026-09-15; fresh confirmation completed and retained | Complete |
+| Provisional exact-`tau=0` conservative-coverage disposition | Product/statistical reviewer | Joshua Myers | Approved for M6/0.4, 2026-09-15; mandatory M7 review | Complete |
+| M6C technical release-candidate gates | Implementation owner | Codex | Passes 1–2 passed; pass 3 not started, 2026-09-15 | In progress |
 | Independent adversarial review | Independent reviewer | Pending | Not started | Blocking |
 | M6C release acceptance | Product/statistical owner | Pending | Not started | Blocking |
 | Combined M6/`0.4` acceptance | Product/statistical owner | Pending | Not started | Blocking |

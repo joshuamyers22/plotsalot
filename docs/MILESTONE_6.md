@@ -1,6 +1,6 @@
 # Milestone M6: Robust and Bayesian Methods
 
-- Status: M6A and M6B complete and accepted; M6C implementation authorized
+- Status: M6A and M6B accepted; M6C passes 1–2 passed, pass 3 next
 - Contract date: 2026-09-14
 - Target duration: 8–13 weeks
 - Product and statistical owner: Joshua Myers
@@ -128,11 +128,11 @@ function.
 | M6 statistical method specification | Approved R1–R4, B1–B6, and G6 decisions with estimands and failure behavior | All | R1–R3/G6 approved 2026-09-14; B1–B6 and R4/B5 M6C approved 2026-09-15 |
 | Robust analysis contracts | Typed, immutable robust analyses for every M6A family with analytic/independent evidence | M6A | Technical candidate verified |
 | Bayesian analysis contracts | Typed Bayesian analyses for every M6B family with prior/computation provenance and calibration evidence | M6B | Complete and accepted 2026-09-15 |
-| Coefficient/meta extensions | Strict robust/posterior coefficient summaries plus approved robust/Bayesian aggregate meta-analysis | M6C | Entry contract approved; implementation not started |
-| Result schemas | Versioned JSON-safe robust, posterior, evidence, diagnostic, warning, audit, and limit records | All | M6A schema v2 and M6B schema v3 verified; M6C mode-version extension approved for implementation |
+| Coefficient/meta extensions | Strict robust/posterior coefficient summaries plus approved robust/Bayesian aggregate meta-analysis | M6C | Passes 1–2 verified; provisional zero-heterogeneity calibration disposition requires M7 review |
+| Result schemas | Versioned JSON-safe robust, posterior, evidence, diagnostic, warning, audit, and limit records | All | M6A/M6B verified; M6C coefficient and aggregate v2/v3 variants implemented |
 | Semantic renderers | Layer/injection tests prove every displayed estimate, interval, evidence label, diagnostic, and centrality value comes from the result | All | M6A and M6B verified |
 | Grouping/extraction/composition | Atomic grouped execution and exact result identity across classical/robust/Bayesian mixed dashboards | All | M6A/M6B verified; M6C has no grouped coefficient surface |
-| Oracle and independent evidence | Raw pinned-R objects, normalized fields, independent calculations, simulation/calibration summaries, and hashed manifest | All | M6A/M6B verified; M6C entry audit prepared and implementation evidence planned |
+| Oracle and independent evidence | Raw pinned-R objects, normalized fields, independent calculations, simulation/calibration summaries, and hashed manifest | All | M6A/M6B verified; M6C pass-2 oracle passes and its retained boundary finding has a provisional owner disposition |
 | Performance and work baselines | Phase-separated robust and Bayesian grids with time, memory, draws/evaluations, and ceilings | All | M6A/M6B verified; M6C planned |
 | Compatibility disposition | Every touched `type`, tuning, prior, evidence, model, and meta argument classified and tested | All | M6A/M6B complete; M6C entry disposition approved |
 | Public documentation | Supported modes, assumptions, priors, diagnostics, reproducibility, limits, errors, adaptations, and examples match implementation | All | M6A/M6B complete; M6C entry contract documented |
@@ -569,5 +569,13 @@ independently reviewed the three-pass M6B candidate, and accepted M6B on
 `evidence/M6B_SIGNOFF.md`, and `evidence/M6B_VERIFICATION_LOOP.md`. The R4/B5
 M6C proposal, entry audit, sign-off ledger, and pass-zero verification
 loop are now prepared. Joshua Myers approved every R4/B5 entry decision without
-revision on 2026-09-15. M6C implementation pass 1 is the next gate; candidate
-acceptance and final M6/`0.4` acceptance remain open.
+revision on 2026-09-15. M6C implementation pass 1 passed its technical gate on
+that date. Pass 2 implemented the robust and Bayesian aggregate meta-analysis
+engines and passed its formula, oracle, fault, schema, contamination, and
+Bayesian calibration checks. After retained conservative findings at `k=10`
+and `k=50` with generating `tau=0`, Joshua Myers provisionally approved the
+one-sided conservative rule only when `k<20` or `tau=0`; `k>=20, tau>0` retains
+the two-sided rule. M7 must revisit that exception before 1.0. The next gate is
+M6C pass 3 shared rendering, integration, benchmark, documentation, adversarial,
+and production evidence. Candidate acceptance and final M6/`0.4` acceptance
+remain open.

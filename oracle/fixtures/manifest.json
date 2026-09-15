@@ -66,6 +66,10 @@
     "m6a-between-ggstatsplot.R",
     "m6a-within-ggstatsplot.R"
   ],
+  "m6c_input_fixtures": [
+    "m6c-robust-meta",
+    "m6c-bayes-meta"
+  ],
   "normal_fixtures": [
     "normal",
     "null-containing",
@@ -73,7 +77,7 @@
   ],
   "schema_version": 1,
   "sha256": {
-    "oracle/DESCRIPTION": "87cde8ba9289356c9a5a31390c30a926929d4b175dccb61530a14c44d22e52c1",
+    "oracle/DESCRIPTION": "30bbcdfca56c7a5d03f2440a55bedc1d1d0e390e9a26ec933d8a7f325efcdf15",
     "oracle/Dockerfile": "7f7612da94d25c4a933a53ba6a180f5cf41573a099e41c3fdc19b0806a8f37ad",
     "oracle/fixtures/input/degenerate.csv": "2687952049f35cb20dba9afee00e482347a5ebee6f79c1b3c88841cc490d8ba8",
     "oracle/fixtures/input/m2-correlation.csv": "26e617a711a866c7d78de2f5384464337b967349a1cb018bfcb68819f6500e8a",
@@ -92,12 +96,14 @@
     "oracle/fixtures/input/m6a-correlation.csv": "0b97153523d6e0c7c21e6cd3e300b9d5a5c21fa66fc520473135d5bb943d492f",
     "oracle/fixtures/input/m6a-hist.csv": "bfa614f2627b6bff7ac47bf132b5db5b9f93c63c4a4a292bfc99c97b08a2925c",
     "oracle/fixtures/input/m6a-within.csv": "8b00fc28fbcc315fc893c5dff43e118f47e7a802c85a7c8016d6ef5265a07f53",
+    "oracle/fixtures/input/m6c-bayes-meta.csv": "adbc61a856105528f5c5cb2c5873cd3e7c8ba9a40040bd6536ac436b23a28e18",
+    "oracle/fixtures/input/m6c-robust-meta.csv": "6d6916310342fc30004b0b5161e61be9831c4a564b75b156f37aeb7822420a18",
     "oracle/fixtures/input/non-finite.csv": "71ed24d8df1e292eb4594a82d529af7888f78f2f8dd8aa2495d5a5864f3cc89d",
     "oracle/fixtures/input/normal.csv": "49a2bb5c9701a38d80ffef0e137313225d42dd385248eef984ea2d0f9cef6772",
     "oracle/fixtures/input/null-containing.csv": "c8720e565328654fefe825c85b502ed744c721336be7ce10cf64fb2cf83c6c89",
     "oracle/fixtures/input/small-sample.csv": "3bb60d321ea829f8adef22734c295a2bc0889162448056cfc4045d6f9da4e740",
     "oracle/fixtures/r-output/boundary-results.csv": "cf5d0759b27f6bb7f1557dd5821a74222548e5a555e5d6f992df8952944075a9",
-    "oracle/fixtures/r-output/installed-packages.csv": "72822f9f0a18ef1c25c4a8767ac6d3b43724ff803af3f21f2abc362b3e89f64a",
+    "oracle/fixtures/r-output/installed-packages.csv": "71345095802585ec02074f158b164c8a4c5daea325014da7ed3210aa4888ff7d",
     "oracle/fixtures/r-output/m2-correlation-results.csv": "3f4399410bfc74b5f734121adc7d84572696697102ef31a38794aa0173d3095c",
     "oracle/fixtures/r-output/m2-corrmat-ggstatsplot.R": "c0c089f8ed45f3ed40b1da07785e21ac4f0a2ad2a2e31b8c80356054a3685e2b",
     "oracle/fixtures/r-output/m2-dot-ggstatsplot.R": "e39dfaad94b78eee5531737e6ccd3bc68277860820d44c69b12996cd1a8c5b07",
@@ -133,12 +139,14 @@
     "oracle/fixtures/r-output/m6a-scatter-ggstatsplot.R": "5a374397421c8f6caefe14c7b26636f533037f8e3e12372a4e8d3cf796193a05",
     "oracle/fixtures/r-output/m6a-within-ggstatsplot.R": "1576c68099fecf79c65dd88f328809c0157c2d61816d6ada764ff1c89f97d76a",
     "oracle/fixtures/r-output/m6a-within-results.csv": "6bec70ce7e51c08c22709352771043b2c6a799bdb0c1abd75d189afcd943bc83",
+    "oracle/fixtures/r-output/m6c-bayes-meta-results.csv": "6aab73ae5c034cb7576da8d2474d6761ae3a5dfb4d3716a38df46970750b5f79",
+    "oracle/fixtures/r-output/m6c-robust-meta-results.csv": "ee5b597cdde03734c612742daed8d3455f693bfef391c9cc289a74ae551fe488",
     "oracle/fixtures/r-output/normal-ggstatsplot.R": "3e8db78ec38d05c372731e375ec3fabe67151050e6b80f9772f3ec7ced868119",
     "oracle/fixtures/r-output/normalized-results.csv": "456b0661f9d5a563d9727df6ca3061ecf10474eee3ab7d60e4738a6a8b9e019b",
     "oracle/fixtures/r-output/null-containing-ggstatsplot.R": "b55c612d2bd3586f84b79c0d35a2dfb0591311318ec03becb761d2afc25c16be",
-    "oracle/fixtures/r-output/session-info.txt": "a9ba5781d73b0a93876b4ea26bb21d288a42e4282dd4c16d8da3fb585bd2793e",
+    "oracle/fixtures/r-output/session-info.txt": "68059f00f52ea6d65b06f1fdc42a1f391d66b68870bad2d9572e1a478b35eb82",
     "oracle/fixtures/r-output/small-sample-ggstatsplot.R": "c265d30ba4f5628f8505d0b2f5e95e250cb90e657cc87ee7db823ad0b2f783ab",
-    "oracle/generate.R": "a8602b3b82b3633b243e9598abece6dfdc7c403bc9dc0241c6ef306cd38311b0",
-    "oracle/renv.lock": "4af8da5d828f96671001b5d477aa8252630d355746dee07ae21ecd5fee40aa7d"
+    "oracle/generate.R": "05cf9c7abd72282d8c450c588bc4f5733a3b270b33eefa60d27e1c68c395e701",
+    "oracle/renv.lock": "c52d86979fe49a1f4efc3e16da2528d2e15e2ba32de0eba4ebe4ec724337b1b5"
   }
 }

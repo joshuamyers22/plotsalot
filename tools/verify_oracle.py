@@ -73,6 +73,7 @@ M6A_RAW_FIXTURES = (
     "m6a-between-ggstatsplot.R",
     "m6a-within-ggstatsplot.R",
 )
+M6C_INPUT_FIXTURES = ("m6c-robust-meta", "m6c-bayes-meta")
 M5A_INPUT_FIXTURES = ("m5a-coefficients", "m5a-ols")
 M5A_RAW_FIXTURES = (
     "m5a-coefficients-ggstatsplot.R",
@@ -847,6 +848,77 @@ def _verify_m6a_results() -> None:
             _close_m6a(float(actual), row[field], f"m6a-within.{identity}.{field}")
 
 
+def _verify_m6c_results() -> None:
+    declarations = {
+        "meta_analytic_effect": True,
+        "estimand": "population treatment effect",
+        "effect_scale": "mean difference",
+        "effect_direction": "positive favors treatment",
+        "effect_units": "points",
+    }
+    robust_data = pl.read_csv(INPUT / "m6c-robust-meta.csv")
+    robust = analyze_ggcoefstats(robust_data, type="robust", **declarations).result
+    with (OUTPUT / "m6c-robust-meta-results.csv").open(newline="") as handle:
+        robust_reference = next(csv.DictReader(handle))
+    robust_actual = {
+        "estimate": robust.meta_analysis.pooled.estimate,
+        "tau_squared": robust.meta_analysis.pooled.tau_squared,
+        "interval_low": robust.meta_analysis.pooled.interval.low,
+        "interval_high": robust.meta_analysis.pooled.interval.high,
+        "statistic": robust.meta_analysis.pooled.statistic,
+        "p_value": robust.meta_analysis.pooled.p_value,
+    }
+    for field, actual in robust_actual.items():
+        expected = float(robust_reference[field])
+        if not math.isclose(actual, expected, rel_tol=1e-8, abs_tol=1e-9):
+            raise AssertionError(
+                f"m6c-robust.{field}: Python={actual:.17g}, R={expected:.17g}"
+            )
+
+    bayes_data = pl.read_csv(INPUT / "m6c-bayes-meta.csv")
+    bayes = analyze_ggcoefstats(
+        bayes_data,
+        type="bayes",
+        prior_mean_scale=1.0,
+        prior_tau_scale=0.5,
+        **declarations,
+    ).result
+    with (OUTPUT / "m6c-bayes-meta-results.csv").open(newline="") as handle:
+        bayes_reference = {row["label"]: row for row in csv.DictReader(handle)}
+    fits = {fit.label: fit for fit in (bayes.primary, *bayes.sensitivities)}
+    if set(fits) != set(bayes_reference):
+        raise AssertionError("m6c-bayes sensitivity identities differ")
+    for label, fit in fits.items():
+        actual_fields = {
+            "mean_scale": fit.prior.mean_scale,
+            "tau_scale": fit.prior.tau_scale,
+            "mu_low": fit.population_mean.interval.low,
+            "mu_median": fit.population_mean.median,
+            "mu_high": fit.population_mean.interval.high,
+            "mu_probability_below_null": fit.population_mean.probability_below_null,
+            "tau_low": fit.tau.interval.low,
+            "tau_median": fit.tau.median,
+            "tau_high": fit.tau.interval.high,
+            "prediction_low": fit.true_effect_prediction.interval.low,
+            "prediction_median": fit.true_effect_prediction.median,
+            "prediction_high": fit.true_effect_prediction.interval.high,
+            "prediction_probability_below_null": (
+                fit.true_effect_prediction.probability_below_null
+            ),
+            "log_bf10": fit.evidence.log_bf10,
+        }
+        for field, actual in actual_fields.items():
+            expected = float(bayes_reference[label][field])
+            tolerance = (
+                1e-12 if field in {"mean_scale", "tau_scale", "log_bf10"} else 5e-6
+            )
+            if not math.isclose(actual, expected, rel_tol=tolerance, abs_tol=tolerance):
+                raise AssertionError(
+                    f"m6c-bayes.{label}.{field}: "
+                    f"Python={actual:.17g}, R={expected:.17g}"
+                )
+
+
 def _artifact_paths() -> list[Path]:
     paths = [ORACLE / "Dockerfile", ORACLE / "DESCRIPTION", ORACLE / "generate.R"]
     paths.extend(sorted(INPUT.glob("*.csv")))
@@ -882,6 +954,7 @@ def _manifest_payload() -> dict[str, Any]:
         "m5b_raw_fixtures": list(M5B_RAW_FIXTURES),
         "m6a_input_fixtures": list(M6A_INPUT_FIXTURES),
         "m6a_raw_fixtures": list(M6A_RAW_FIXTURES),
+        "m6c_input_fixtures": list(M6C_INPUT_FIXTURES),
         "sha256": _hashes(),
     }
 
@@ -896,6 +969,7 @@ def verify_oracle() -> None:
     _verify_m5a_results()
     _verify_m5b_results()
     _verify_m6a_results()
+    _verify_m6c_results()
     retained = json.loads(MANIFEST.read_text())
     if retained != _manifest_payload():
         raise AssertionError("oracle artifact hashes differ from manifest")
@@ -913,6 +987,7 @@ def main() -> None:
         _verify_m5a_results()
         _verify_m5b_results()
         _verify_m6a_results()
+        _verify_m6c_results()
         payload = _manifest_payload()
         MANIFEST.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     else:

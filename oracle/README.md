@@ -57,5 +57,13 @@ Python verifier compares those normalized fields at `1e-10` relative and
 `1e-12` absolute tolerance and treats the raw upstream objects as explicit
 compatibility evidence rather than the acceptance target.
 
+M6C adds a separately written base-R `dt`/`optimize` fixed-Student-t4
+meta-analysis fixture and a locked `bayesmeta==3.5` proper-prior normal-normal
+fixture covering the primary fit plus all four half/double prior sensitivities.
+The Bayesian oracle tightens its integration and finite-mixture settings and is
+compared at `5e-6`; independent dense integration separately checks BF10 at
+high precision. `bayesmeta`, `forestplot`, and `checkmate` remain
+development-only GPL oracle packages and never enter the Python wheel.
+
 Do not publish the oracle image. Its development-only dependency graph has
 licenses distinct from the eventual plotsalot distribution decision.
