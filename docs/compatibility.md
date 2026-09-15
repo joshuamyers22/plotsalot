@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M0–M5 and M6A complete; M6B method decisions pending
+- Status: M0–M5, M6A, and M6B complete; M6C pending
 
 Definitions:
 
@@ -171,6 +171,24 @@ pairs. The full request is rejected before drawing if it exceeds its selected
 ceiling; rows, pairs, variables, or groups are never silently reduced. Invalid
 effective counts, non-finite input, degenerate Winsorized scale/covariance,
 insufficient valid bootstrap replicates, and robust repeated-matrix degeneracy
-fail without returning a classical result. Bayesian modes, robust categorical
-methods, and robust coefficient/meta-analysis remain deferred to approved M6B
-or M6C contracts.
+fail without returning a classical result. Robust categorical and robust
+coefficient/meta-analysis remain deferred to M6C contracts.
+
+## M6B Bayesian-method disposition
+
+M6B adds explicit `type="bayes"` paths to the retained data-analysis surfaces.
+Every path is classified as adapted and reports only numeric BF10 values with
+H1/H0 orientation; upstream qualitative evidence labels are not reproduced.
+
+| Surface | Implemented M6B behavior | Upstream/adaptation disposition |
+|---|---|---|
+| `gghistostats`, `ggdotplotstats` | proper standardized normal-inverse-gamma model; posterior medians/equal-tail intervals; exact BF10 and half/double prior sensitivity | Adapted proper conjugate model; no data-derived prior scale |
+| `ggscatterstats`, `ggcorrmat` | exact sampling-density correlation posterior and BF10 under a transformed symmetric-beta prior; adaptive bounded quadrature | Adapted from upstream correlation BF helpers with explicit prior and numerical provenance |
+| `ggbetweenstats` | homoscedastic conjugate cell-means model; common-mean H0; complete pointwise posterior contrast/BF family | Heteroscedastic selection and qualitative BF thresholds are rejected |
+| `ggwithinstats` | explicit complete blocks; orthonormal Helmert/compound-symmetry inference; Savage–Dickey pair evidence | Inferred subjects, imputation, sphericity switching, and fallback models are rejected |
+| `ggbarstats`, `ggpiestats` | fixed-total/fixed-row Dirichlet-multinomial models; zero cells retained; row/category contrasts and posterior Cramer's V | Paired categorical Bayesian inference and structural-zero models are deferred |
+| grouped M6B surfaces | atomic execution; aggregate work provenance; identity-derived seeds and preflight before RQMC generation | Partial results, hidden retries, and automatic work reduction are rejected |
+
+The native engine uses locked NumPy/SciPy exact expressions, adaptive
+Gauss–Kronrod quadrature, or eight independently scrambled 4,096-point Sobol
+replicates. Bayesian coefficient and meta-analysis remain deferred to M6C.

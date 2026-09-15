@@ -11,6 +11,20 @@ from typing import Literal, Protocol, cast
 import numpy as np
 import polars as pl
 
+from plotsalot.bayesian import (
+    DEFAULT_MAX_BAYESIAN_WORK,
+    independent_categorical_posterior,
+    one_way_categorical_posterior,
+)
+from plotsalot.bayesian import (
+    method_result as bayesian_method_result,
+)
+from plotsalot.bayesian_result import (
+    BayesianCategoricalCellResult,
+    BayesianCategoricalContrastResult,
+    BayesianCategoricalResult,
+    BayesianPosteriorSummary,
+)
 from plotsalot.categorical_data import (
     DEFAULT_MAX_CELLS,
     DEFAULT_MAX_LEVELS,
@@ -116,8 +130,8 @@ def _validate_options(
     pairwise_display: str,
     maximum_labels: int,
 ) -> CategoricalDisplay:
-    if method_type != "parametric":
-        raise ValueError("only type='parametric' is supported")
+    if method_type not in {"parametric", "bayes"}:
+        raise ValueError("type must be 'parametric' or 'bayes'")
     if alternative != "two-sided":
         raise ValueError("only alternative='two-sided' is supported")
     conf_value = cast(object, conf_level)
@@ -374,6 +388,10 @@ def analyze_categorical(
     maximum_cells: int = DEFAULT_MAX_CELLS,
     maximum_total_count: int = DEFAULT_MAX_TOTAL_COUNT,
     maximum_labels: int = DEFAULT_MAX_LABELS,
+    prior_cell_concentration: float = 1.0,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> CategoricalAnalysis:
     display = _validate_options(
         method_type=type,
@@ -405,6 +423,137 @@ def analyze_categorical(
         if y is None or proportion_test or ratio is not None
         else None
     )
+    if type == "bayes":
+        if paired:
+            raise ValueError("paired Bayesian categorical analysis is not approved")
+        if p_adjust != "none":
+            raise ValueError("Bayesian categorical analysis requires p_adjust='none'")
+        if display not in {"all", "none"}:
+            raise ValueError(
+                "Bayesian categorical pairwise_display must be 'all' or 'none'"
+            )
+        if y is None:
+            if resolved_ratio is None:
+                raise ValueError("Bayesian fixed-total analysis requires a ratio")
+            prior, summaries, omnibus, computation = one_way_categorical_posterior(
+                table.observed,
+                resolved_ratio,
+                prior_cell_concentration=prior_cell_concentration,
+                credible_level=credible_level,
+                maximum_work=maximum_bayesian_work,
+            )
+            effect = None
+            raw_contrasts: tuple[
+                tuple[int, int, int, BayesianPosteriorSummary], ...
+            ] = ()
+            design: CategoricalDesign = "one_way"
+        else:
+            if ratio is not None:
+                raise ValueError("ratio is unsupported for Bayesian fixed-row analysis")
+            prior, summaries, raw_contrasts, omnibus, effect, computation = (
+                independent_categorical_posterior(
+                    table.observed,
+                    row_identities=table.x_levels,
+                    column_identities=table.y_levels,
+                    prior_cell_concentration=prior_cell_concentration,
+                    credible_level=credible_level,
+                    random_seed=random_seed,
+                    maximum_work=maximum_bayesian_work,
+                )
+            )
+            design = "independent"
+        total = int(table.observed.sum())
+        columns = table.observed.sum(axis=0)
+        bayesian_cells: list[BayesianCategoricalCellResult] = []
+        for index, summary in enumerate(summaries):
+            row = index // table.observed.shape[1]
+            column = index % table.observed.shape[1]
+            observed = int(table.observed[row, column])
+            denominator = int(columns[column])
+            bayesian_cells.append(
+                BayesianCategoricalCellResult(
+                    x_level=cast(ScalarIdentity, table.x_levels[row]),
+                    y_level=(
+                        None
+                        if y is None
+                        else cast(ScalarIdentity, table.y_levels[column])
+                    ),
+                    observed=observed,
+                    displayed_proportion=(
+                        0.0 if denominator == 0 else observed / denominator
+                    ),
+                    joint_proportion=observed / total,
+                    posterior=summary,
+                )
+            )
+        bayesian_result = BayesianCategoricalResult(
+            schema_version=3,
+            analysis=(
+                "categorical_bayesian_fixed_total"
+                if y is None
+                else "categorical_bayesian_fixed_rows"
+            ),
+            mode="bayes",
+            design=design,
+            x=x,
+            y=y,
+            counts=counts,
+            sample=table.audit,
+            x_levels=table.x_levels,
+            y_levels=table.y_levels,
+            cells=tuple(bayesian_cells),
+            contrasts=tuple(
+                BayesianCategoricalContrastResult(
+                    left=table.x_levels[left],
+                    right=table.x_levels[right],
+                    category=table.y_levels[column],
+                    posterior=posterior,
+                )
+                for left, right, column, posterior in raw_contrasts
+            ),
+            row_totals=tuple(int(value) for value in table.observed.sum(axis=1)),
+            column_totals=(
+                ()
+                if y is None
+                else tuple(int(value) for value in table.observed.sum(axis=0))
+            ),
+            ratio=(
+                None
+                if resolved_ratio is None or y is not None
+                else tuple(float(value) for value in resolved_ratio)
+            ),
+            method=bayesian_method_result(
+                "dirichlet_multinomial_fixed_total"
+                if y is None
+                else "dirichlet_multinomial_fixed_rows"
+            ),
+            prior=prior,
+            omnibus=omnibus,
+            effect=effect,
+            computation=computation,
+            credible_level=credible_level,
+            pairwise_display=display,
+            proportion_test=proportion_test,
+            limits=ResourceLimits(
+                maximum_rows=maximum_rows,
+                maximum_groups=20,
+                maximum_variables=maximum_levels,
+                maximum_labels=maximum_labels,
+                maximum_levels=maximum_levels,
+                maximum_pairwise_hypotheses=(
+                    maximum_levels * (maximum_levels - 1) // 2
+                ),
+                maximum_cells=maximum_cells,
+                maximum_total_count=maximum_total_count,
+            ),
+            warnings=(
+                "Bayes factors are numeric BF10 with H1/H0 orientation",
+                "zero cells are supported by the proper Dirichlet prior",
+            ),
+        )
+        return CategoricalAnalysis(
+            table=table, result=cast(CategoricalResult, bayesian_result)
+        )
     pairwise: tuple[CategoricalFollowupResult, ...] = ()
     strata: tuple[CategoricalFollowupResult, ...] = ()
     if y is None:

@@ -11,6 +11,21 @@ from warnings import catch_warnings, simplefilter
 import numpy as np
 import polars as pl
 
+from plotsalot.bayesian import (
+    CORRELATION_RESERVED_WORK,
+    DEFAULT_MAX_BAYESIAN_WORK,
+    correlation_posterior,
+    correlation_prior,
+    validate_work_limit,
+)
+from plotsalot.bayesian import (
+    method_result as bayesian_method_result,
+)
+from plotsalot.bayesian_result import (
+    BayesianCorrelationMatrixCell,
+    BayesianCorrelationMatrixResult,
+    BayesianCorrelationResult,
+)
 from plotsalot.data import (
     DEFAULT_MAX_ROWS,
     FloatArray,
@@ -183,20 +198,40 @@ def analyze_ggscatterstats(
     bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
     random_seed: int | None = None,
     maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
+    correlation_prior_shape: float = 1.0,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> CorrelationAnalysis:
-    """Analyze an approved Pearson or Winsorized correlation."""
+    """Analyze an approved classical, robust, or Bayesian correlation."""
 
     if not 0.0 < conf_level < 1.0:
         raise ValueError("conf_level must be strictly between 0 and 1")
-    if type not in {"parametric", "robust"}:
-        raise ValueError("type must be 'parametric' or 'robust'")
+    if type not in {"parametric", "robust", "bayes"}:
+        raise ValueError("type must be 'parametric', 'robust', or 'bayes'")
     if type == "parametric" and (
         trim_fraction != TRIM_FRACTION
         or bootstrap_resamples != DEFAULT_BOOTSTRAP_RESAMPLES
         or random_seed is not None
         or maximum_resample_work != DEFAULT_MAX_RESAMPLE_WORK
+        or correlation_prior_shape != 1.0
+        or credible_level != 0.95
+        or maximum_bayesian_work != DEFAULT_MAX_BAYESIAN_WORK
     ):
-        raise ValueError("robust resampling options are unused for parametric analysis")
+        raise ValueError("robust/Bayesian options are unused for parametric analysis")
+    if type == "robust" and (
+        correlation_prior_shape != 1.0
+        or credible_level != 0.95
+        or maximum_bayesian_work != DEFAULT_MAX_BAYESIAN_WORK
+    ):
+        raise ValueError("Bayesian options are unused for robust analysis")
+    if type == "bayes" and (
+        conf_level != 0.95
+        or trim_fraction != TRIM_FRACTION
+        or bootstrap_resamples != DEFAULT_BOOTSTRAP_RESAMPLES
+        or random_seed is not None
+        or maximum_resample_work != DEFAULT_MAX_RESAMPLE_WORK
+    ):
+        raise ValueError("classical/robust options are unused for Bayesian analysis")
     sample = select_numeric_pair(
         data,
         x,
@@ -227,6 +262,39 @@ def analyze_ggscatterstats(
         )
         return CorrelationAnalysis(
             sample=sample, result=cast(CorrelationResult, result)
+        )
+    if type == "bayes":
+        sample_r, prior, posterior, evidence, computation = correlation_posterior(
+            sample.x_values,
+            sample.y_values,
+            prior_shape=correlation_prior_shape,
+            credible_level=credible_level,
+            maximum_work=maximum_bayesian_work,
+        )
+        return CorrelationAnalysis(
+            sample=sample,
+            result=cast(
+                CorrelationResult,
+                BayesianCorrelationResult(
+                    schema_version=3,
+                    analysis="ggscatterstats_bayesian_pearson",
+                    mode="bayes",
+                    x=x,
+                    y=y,
+                    sample=sample.audit,
+                    method=bayesian_method_result("exact_sample_correlation"),
+                    prior=prior,
+                    posterior=posterior,
+                    evidence=evidence,
+                    computation=computation,
+                    sample_correlation=sample_r,
+                    limits=ResourceLimits(maximum_rows=maximum_rows),
+                    warnings=(
+                        "pointwise adapted Bayesian correlation under "
+                        "bivariate normality",
+                    ),
+                ),
+            ),
         )
     with catch_warnings():
         simplefilter("error")
@@ -308,8 +376,11 @@ def analyze_ggcorrmat(
     bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
     random_seed: int | None = None,
     maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
+    correlation_prior_shape: float = 1.0,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> CorrelationMatrixAnalysis:
-    """Analyze a pairwise-complete Pearson or Winsorized matrix."""
+    """Analyze a classical, robust, or Bayesian correlation matrix."""
 
     if not isinstance(columns, (list, tuple)):
         raise TypeError("columns must be a list or tuple of column names")
@@ -322,15 +393,37 @@ def analyze_ggcorrmat(
         raise ValueError("columns must contain 2-50 unique names")
     if p_adjust not in {"holm", "none"}:
         raise ValueError("p_adjust must be 'holm' or 'none'")
-    if type not in {"parametric", "robust"}:
-        raise ValueError("type must be 'parametric' or 'robust'")
+    if type not in {"parametric", "robust", "bayes"}:
+        raise ValueError("type must be 'parametric', 'robust', or 'bayes'")
     if type == "parametric" and (
         trim_fraction != TRIM_FRACTION
         or bootstrap_resamples != DEFAULT_BOOTSTRAP_RESAMPLES
         or random_seed is not None
         or maximum_resample_work != DEFAULT_MAX_RESAMPLE_WORK
+        or correlation_prior_shape != 1.0
+        or credible_level != 0.95
+        or maximum_bayesian_work != DEFAULT_MAX_BAYESIAN_WORK
     ):
-        raise ValueError("robust resampling options are unused for parametric analysis")
+        raise ValueError("robust/Bayesian options are unused for parametric analysis")
+    if type == "robust" and (
+        correlation_prior_shape != 1.0
+        or credible_level != 0.95
+        or maximum_bayesian_work != DEFAULT_MAX_BAYESIAN_WORK
+    ):
+        raise ValueError("Bayesian options are unused for robust analysis")
+    if type == "bayes" and (
+        conf_level != 0.95
+        or sig_level != 0.05
+        or p_adjust != "none"
+        or trim_fraction != TRIM_FRACTION
+        or bootstrap_resamples != DEFAULT_BOOTSTRAP_RESAMPLES
+        or random_seed is not None
+        or maximum_resample_work != DEFAULT_MAX_RESAMPLE_WORK
+    ):
+        raise ValueError(
+            "classical/robust options are unused for Bayesian matrix analysis; "
+            "p_adjust must be 'none'"
+        )
     if not 0.0 < sig_level < 1.0:
         raise ValueError("sig_level must be strictly between 0 and 1")
     if not isinstance(data, pl.DataFrame):
@@ -346,6 +439,82 @@ def analyze_ggcorrmat(
         finite_values = series.drop_nulls().to_numpy().astype(np.float64, copy=False)
         if not bool(np.isfinite(finite_values).all()):
             raise ValueError(f"column {column!r} contains NaN or infinite values")
+
+    if type == "bayes":
+        unique_pair_count = len(selected) * (len(selected) - 1) // 2
+        validate_work_limit(
+            maximum_bayesian_work,
+            unique_pair_count * CORRELATION_RESERVED_WORK,
+        )
+        bayesian_pairs: dict[tuple[str, str], BayesianCorrelationResult] = {}
+        actual_work = 0
+        for left_index, x in enumerate(selected):
+            for y in selected[left_index + 1 :]:
+                try:
+                    pair = analyze_ggscatterstats(
+                        data,
+                        x,
+                        y,
+                        type="bayes",
+                        correlation_prior_shape=correlation_prior_shape,
+                        credible_level=credible_level,
+                        maximum_bayesian_work=maximum_bayesian_work,
+                        maximum_rows=maximum_rows,
+                    ).result
+                except (TypeError, ValueError) as error:
+                    raise ValueError(
+                        f"correlation pair ({x!r}, {y!r}) failed: {error}"
+                    ) from error
+                if not isinstance(pair, BayesianCorrelationResult):
+                    raise RuntimeError(
+                        "Bayesian matrix pair construction is inconsistent"
+                    )
+                bayesian_pairs[(x, y)] = pair
+                actual_work += pair.computation.calculated_work
+        validate_work_limit(maximum_bayesian_work, actual_work)
+        bayesian_cells: list[BayesianCorrelationMatrixCell] = []
+        for x in selected:
+            for y in selected:
+                if x == y:
+                    bayesian_cells.append(
+                        BayesianCorrelationMatrixCell(
+                            x=x,
+                            y=y,
+                            n_obs=data.get_column(x).drop_nulls().len(),
+                            posterior=None,
+                            evidence=None,
+                        )
+                    )
+                    continue
+                key = (x, y) if (x, y) in bayesian_pairs else (y, x)
+                pair = bayesian_pairs[key]
+                bayesian_cells.append(
+                    BayesianCorrelationMatrixCell(
+                        x=x,
+                        y=y,
+                        n_obs=pair.sample.analyzed_rows,
+                        posterior=pair.posterior,
+                        evidence=pair.evidence,
+                    )
+                )
+        result = BayesianCorrelationMatrixResult(
+            schema_version=3,
+            analysis="ggcorrmat_bayesian_pearson",
+            mode="bayes",
+            columns=selected,
+            method=bayesian_method_result("exact_sample_correlation_matrix"),
+            prior=correlation_prior(correlation_prior_shape),
+            cells=tuple(bayesian_cells),
+            evidence_scope="pointwise_no_multiplicity_adjustment",
+            calculated_bayesian_work=actual_work,
+            maximum_bayesian_work=maximum_bayesian_work,
+            limits=ResourceLimits(maximum_rows=maximum_rows, maximum_variables=50),
+            warnings=(
+                "Bayes factors and credible intervals are pointwise",
+                "no frequentist multiplicity adjustment is applied",
+            ),
+        )
+        return CorrelationMatrixAnalysis(result=cast(CorrelationMatrixResult, result))
 
     if type == "robust" and trim_fraction != TRIM_FRACTION:
         raise ValueError("trim_fraction must equal 0.20 for M6A robust methods")

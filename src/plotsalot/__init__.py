@@ -1,5 +1,15 @@
 """Statistical visualizations and extractable results for Python."""
 
+from plotsalot.bayesian_result import (
+    BayesianCategoricalResult,
+    BayesianComparisonResult,
+    BayesianCorrelationMatrixResult,
+    BayesianCorrelationResult,
+    BayesianDotPlotResult,
+    BayesianEvidenceResult,
+    BayesianOneSampleResult,
+    BayesianPosteriorSummary,
+)
 from plotsalot.categorical import (
     ggbarstats,
     ggpiestats,
@@ -133,6 +143,14 @@ from plotsalot.theme import StatsTheme, theme_ggstatsplot
 
 __all__ = [
     "AnalysisResult",
+    "BayesianCategoricalResult",
+    "BayesianComparisonResult",
+    "BayesianCorrelationResult",
+    "BayesianCorrelationMatrixResult",
+    "BayesianDotPlotResult",
+    "BayesianEvidenceResult",
+    "BayesianOneSampleResult",
+    "BayesianPosteriorSummary",
     "CategoricalAnalysis",
     "CategoricalResult",
     "CategoricalSampleAudit",

@@ -19,7 +19,10 @@ independently reviewed and accepted both M5 tracks and approved the combined
 M5/`0.3` candidate on 2026-09-14. M6 is active. Joshua Myers approved the M6A
 robust architecture/method entry gate on 2026-09-14. The M6A technical candidate
 passed its technical gate and was independently reviewed and accepted by Joshua
-Myers on 2026-09-14. The next M6 gate is B1–B6 method approval before M6B begins.
+Myers on 2026-09-14. Joshua Myers approved the detailed M6B B1–B6 method
+contract on 2026-09-15, independently reviewed the resulting scalar, matrix,
+comparison, categorical, and grouped candidate, and accepted M6B. The next
+project gate is the detailed R4/M6C coefficient/meta method contract.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months
 with two Python engineers and a part-time statistical-methods reviewer.

@@ -8,6 +8,11 @@ import numpy as np
 import polars as pl
 from matplotlib.figure import Figure
 
+from plotsalot.bayesian import DEFAULT_MAX_BAYESIAN_WORK
+from plotsalot.bayesian_result import (
+    BayesianComparisonResult,
+    BayesianPairwiseComparisonResult,
+)
 from plotsalot.comparison_analysis import (
     DEFAULT_MAX_LEVELS,
     DEFAULT_MAX_RENDERED_OBSERVATIONS,
@@ -135,18 +140,32 @@ def _p_value_text(p_value: float) -> str:
 
 
 def _displayed_pairwise(
-    result: ComparisonResult | RobustComparisonResult,
-) -> tuple[PairwiseComparisonResult | RobustPairwiseComparisonResult, ...]:
+    result: ComparisonResult | RobustComparisonResult | BayesianComparisonResult,
+) -> tuple[
+    PairwiseComparisonResult
+    | RobustPairwiseComparisonResult
+    | BayesianPairwiseComparisonResult,
+    ...,
+]:
     if result.pairwise_display == "none":
         return ()
     if result.pairwise_display == "all":
         return result.pairwise
+    if isinstance(result, BayesianComparisonResult):
+        return ()
     if result.pairwise_display == "significant":
         return tuple(item for item in result.pairwise if item.significant)
     return tuple(item for item in result.pairwise if not item.significant)
 
 
-def _subtitle(result: ComparisonResult | RobustComparisonResult) -> str:
+def _subtitle(
+    result: ComparisonResult | RobustComparisonResult | BayesianComparisonResult,
+) -> str:
+    if isinstance(result, BayesianComparisonResult):
+        return (
+            f"{result.omnibus.display}; posterior medians with "
+            f"{result.credible_level:.0%} equal-tail credible intervals"
+        )
     test = result.omnibus
     effect = result.effect_size
     robust = isinstance(result, RobustComparisonResult)
@@ -180,22 +199,34 @@ def _subtitle(result: ComparisonResult | RobustComparisonResult) -> str:
     )
 
 
-def _caption(result: ComparisonResult | RobustComparisonResult) -> str:
+def _caption(
+    result: ComparisonResult | RobustComparisonResult | BayesianComparisonResult,
+) -> str:
     sample = result.sample
     if isinstance(sample, SampleAudit):
         caption = (
             f"n = {sample.analyzed_rows}; "
             f"{sample.dropped_null_rows} null row(s) excluded; "
-            f"pairwise p adjustment: {result.p_adjust}"
+            + (
+                "pointwise Bayesian evidence"
+                if isinstance(result, BayesianComparisonResult)
+                else f"pairwise p adjustment: {result.p_adjust}"
+            )
         )
     else:
         caption = (
             f"n = {sample.analyzed_subjects} complete subject(s); "
             f"{sample.excluded_incomplete_subjects} incomplete subject(s) excluded; "
-            f"pairwise p adjustment: {result.p_adjust}"
+            + (
+                "pointwise Bayesian evidence"
+                if isinstance(result, BayesianComparisonResult)
+                else f"pairwise p adjustment: {result.p_adjust}"
+            )
         )
     if isinstance(result, RobustComparisonResult):
         caption += "; 20% trimmed locations; pairwise CIs are pointwise"
+    if isinstance(result, BayesianComparisonResult):
+        caption += "; eight scrambled Sobol replicates; BF10 orientation H1/H0"
     return caption
 
 
@@ -266,7 +297,7 @@ def _draw_means(
 
 def _draw_pairwise(
     axes: _ComparisonAxes,
-    result: ComparisonResult | RobustComparisonResult,
+    result: ComparisonResult | RobustComparisonResult | BayesianComparisonResult,
     values: tuple[FloatArray, ...],
 ) -> None:
     displayed = _displayed_pairwise(result)
@@ -292,7 +323,11 @@ def _draw_pairwise(
             color="#333333",
             linewidth=0.8,
         )
-        label = _p_value_text(item.adjusted_p_value)
+        label = (
+            item.evidence.display
+            if isinstance(item, BayesianPairwiseComparisonResult)
+            else _p_value_text(item.adjusted_p_value)
+        )
         axes.text((left + right) / 2.0, height, label, ha="center", va="bottom")
 
 
@@ -306,7 +341,10 @@ def render_comparison(
 ) -> StatsPlot[ComparisonResult]:
     """Render an approved comparison without recomputing its statistics."""
 
-    result = cast(ComparisonResult | RobustComparisonResult, analysis.result)
+    result = cast(
+        ComparisonResult | RobustComparisonResult | BayesianComparisonResult,
+        analysis.result,
+    )
     if result.sample.analyzed_rows > cast(
         int, result.limits.maximum_rendered_observations
     ):
@@ -419,6 +457,11 @@ def ggbetweenstats(
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     trim_fraction: float = TRIM_FRACTION,
+    prior_location: float | None = None,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     title: str | None = None,
     results_subtitle: bool = True,
     theme: StatsTheme | None = None,
@@ -439,6 +482,11 @@ def ggbetweenstats(
         maximum_levels=maximum_levels,
         maximum_rendered_observations=maximum_rendered_observations,
         trim_fraction=trim_fraction,
+        prior_location=prior_location,
+        prior_scale=prior_scale,
+        credible_level=credible_level,
+        random_seed=random_seed,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_ggbetweenstats(
         analysis,
@@ -486,6 +534,11 @@ def ggwithinstats(
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     maximum_subject_paths: int = DEFAULT_MAX_SUBJECT_PATHS,
     trim_fraction: float = TRIM_FRACTION,
+    prior_location: float | None = None,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     title: str | None = None,
     results_subtitle: bool = True,
     show_subject_paths: bool = True,
@@ -509,6 +562,11 @@ def ggwithinstats(
         maximum_rendered_observations=maximum_rendered_observations,
         maximum_subject_paths=maximum_subject_paths,
         trim_fraction=trim_fraction,
+        prior_location=prior_location,
+        prior_scale=prior_scale,
+        credible_level=credible_level,
+        random_seed=random_seed,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_ggwithinstats(
         analysis,

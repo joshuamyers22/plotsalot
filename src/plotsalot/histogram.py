@@ -8,6 +8,8 @@ import numpy as np
 import polars as pl
 from matplotlib.figure import Figure
 
+from plotsalot.bayesian import DEFAULT_MAX_BAYESIAN_WORK
+from plotsalot.bayesian_result import BayesianOneSampleResult
 from plotsalot.data import DEFAULT_MAX_ROWS, FloatArray
 from plotsalot.histogram_analysis import (
     Alternative,
@@ -86,18 +88,23 @@ def render_gghistostats(
         raise ValueError("binwidth must be finite and greater than zero")
 
     values = analysis.sample.values
-    result = cast(AnalysisResult | RobustOneSampleResult, analysis.result)
+    result = cast(
+        AnalysisResult | RobustOneSampleResult | BayesianOneSampleResult,
+        analysis.result,
+    )
     sample = result.sample
     x = analysis.sample.column
-    if result.test.null_value is None:
-        raise ValueError("one-sample result requires a null value")
-    test_value = result.test.null_value
-    conf_level = result.interval.level
-    mean = result.estimate.value
-    statistic = result.test.statistic
-    p_value = result.test.p_value
-    df = result.test.df
-    effect_size = result.effect_size.value
+    bayesian = isinstance(result, BayesianOneSampleResult)
+    if bayesian:
+        test_value = result.location.null_value
+        conf_level = result.location.interval.level
+        mean = result.location.median
+    else:
+        if result.test.null_value is None:
+            raise ValueError("one-sample result requires a null value")
+        test_value = result.test.null_value
+        conf_level = result.interval.level
+        mean = result.estimate.value
 
     if binwidth is None:
         bins: str | int = "auto"
@@ -111,7 +118,11 @@ def render_gghistostats(
     renderer.hist(values, bins=bins, color="0.55", edgecolor="black", alpha=0.75)
     renderer.axvline(test_value, color="black", linestyle=":", label="test value")
     robust = isinstance(result, RobustOneSampleResult)
-    centrality_label = "20% trimmed mean" if robust else "sample mean"
+    centrality_label = (
+        "posterior median"
+        if bayesian
+        else ("20% trimmed mean" if robust else "sample mean")
+    )
     renderer.axvline(mean, color="#1f77b4", linestyle="--", label=centrality_label)
     renderer.set_xlabel(x)
     renderer.set_ylabel("Count")
@@ -119,7 +130,27 @@ def render_gghistostats(
     renderer.set_title(rendered_title)
     renderer.legend()
 
-    if robust:
+    if bayesian:
+        subtitle = (
+            f"posterior median = {result.location.median:.2f}; "
+            f"P(effect > 0) = {result.effect.probability_above_null:.3f}; "
+            f"{result.evidence.display}"
+        )
+        caption = (
+            f"n = {sample.analyzed_rows}; {sample.dropped_null_rows} null row(s) "
+            f"excluded; {conf_level:.0%} equal-tail credible interval "
+            f"[{result.location.interval.low:.2f}, "
+            f"{result.location.interval.high:.2f}]; adapted NIG prior"
+        )
+    elif robust:
+        statistic = result.test.statistic
+        if statistic is None:
+            raise ValueError("robust one-sample result requires a statistic")
+        effect_size = result.effect_size.value
+        if effect_size is None:
+            raise ValueError("robust one-sample result requires a raw effect")
+        df = result.test.df
+        p_value = result.test.p_value
         subtitle = (
             f"20% trimmed-mean t({df:.0f}) = {statistic:.2f}, "
             f"{_p_value_text(p_value)}; raw difference = {effect_size:.2f}; "
@@ -131,6 +162,10 @@ def render_gghistostats(
             f"[{result.interval.low:.2f}, {result.interval.high:.2f}]"
         )
     else:
+        statistic = result.test.statistic
+        effect_size = result.effect_size.value
+        df = result.test.df
+        p_value = result.test.p_value
         subtitle = (
             f"t({df:.0f}) = {statistic:.2f}, {_p_value_text(p_value)}, "
             f"Cohen's d = {effect_size:.2f}"
@@ -173,11 +208,14 @@ def gghistostats(
     conf_level: float = 0.95,
     type: str = "parametric",
     trim_fraction: float = TRIM_FRACTION,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     maximum_rows: int = DEFAULT_MAX_ROWS,
     binwidth: float | None = None,
     title: str | None = None,
 ) -> StatsPlot[AnalysisResult]:
-    """Analyze and render an approved classical or robust histogram."""
+    """Analyze and render an approved classical, robust, or Bayesian histogram."""
 
     analysis = analyze_gghistostats(
         data,
@@ -187,6 +225,9 @@ def gghistostats(
         conf_level=conf_level,
         type=type,
         trim_fraction=trim_fraction,
+        prior_scale=prior_scale,
+        credible_level=credible_level,
+        maximum_bayesian_work=maximum_bayesian_work,
         maximum_rows=maximum_rows,
     )
     return render_gghistostats(analysis, binwidth=binwidth, title=title)

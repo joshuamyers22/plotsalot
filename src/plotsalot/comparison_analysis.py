@@ -11,6 +11,15 @@ import numpy as np
 import polars as pl
 from numpy.typing import NDArray
 
+from plotsalot.bayesian import (
+    DEFAULT_MAX_BAYESIAN_WORK,
+    independent_comparison_posterior,
+    repeated_comparison_posterior,
+)
+from plotsalot.bayesian import (
+    method_result as bayesian_method_result,
+)
+from plotsalot.bayesian_result import BayesianComparisonResult
 from plotsalot.comparison_data import (
     ComparisonSample,
     RepeatedSample,
@@ -122,12 +131,14 @@ def _validate_options(
     maximum_levels: int,
     maximum_rendered_observations: int,
 ) -> PairwiseDisplay:
-    if method_type not in {"parametric", "robust"}:
-        raise ValueError("type must be 'parametric' or 'robust'")
+    if method_type not in {"parametric", "robust", "bayes"}:
+        raise ValueError("type must be 'parametric', 'robust', or 'bayes'")
     if alternative not in {"two-sided", "less", "greater"}:
         raise ValueError("alternative must be 'two-sided', 'less', or 'greater'")
     if method_type == "parametric" and alternative != "two-sided":
         raise ValueError("parametric comparison alternative must be 'two-sided'")
+    if method_type == "bayes" and alternative != "two-sided":
+        raise ValueError("Bayesian comparison alternative must be 'two-sided'")
     if not np.isfinite(conf_level) or not 0.0 < conf_level < 1.0:
         raise ValueError("conf_level must be strictly between 0 and 1")
     if p_adjust not in {"holm", "none"}:
@@ -742,6 +753,11 @@ def analyze_ggbetweenstats(
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     trim_fraction: float = TRIM_FRACTION,
+    prior_location: float | None = None,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> ComparisonAnalysis:
     """Analyze an approved Welch or robust independent-groups comparison."""
 
@@ -762,6 +778,66 @@ def analyze_ggbetweenstats(
         maximum_rows=maximum_rows,
         maximum_levels=maximum_levels,
     )
+    if type == "bayes":
+        if p_adjust != "none":
+            raise ValueError("Bayesian comparison requires p_adjust='none'")
+        if display not in {"all", "none"}:
+            raise ValueError(
+                "Bayesian comparison pairwise_display must be 'all' or 'none'"
+            )
+        if prior_location is None or prior_scale is None:
+            raise ValueError(
+                "Bayesian comparison requires explicit prior_location and prior_scale"
+            )
+        if trim_fraction != TRIM_FRACTION:
+            raise ValueError("trim_fraction is unused for Bayesian analysis")
+        prior, levels, omnibus, bayesian_pairwise, computation = (
+            independent_comparison_posterior(
+                sample.values,
+                sample.levels,
+                prior_location=prior_location,
+                prior_scale=prior_scale,
+                credible_level=credible_level,
+                random_seed=random_seed,
+                maximum_work=maximum_bayesian_work,
+            )
+        )
+        return ComparisonAnalysis(
+            sample=sample,
+            result=cast(
+                ComparisonResult,
+                BayesianComparisonResult(
+                    schema_version=3,
+                    analysis="ggbetweenstats_bayesian_homoscedastic",
+                    mode="bayes",
+                    design="between",
+                    x=x,
+                    y=y,
+                    subject_id=None,
+                    sample=sample.audit,
+                    method=bayesian_method_result("homoscedastic_cell_means_nig"),
+                    prior=prior,
+                    levels=levels,
+                    omnibus=omnibus,
+                    pairwise=bayesian_pairwise,
+                    computation=computation,
+                    credible_level=credible_level,
+                    pairwise_display=display,
+                    limits=ResourceLimits(
+                        maximum_rows=maximum_rows,
+                        maximum_levels=maximum_levels,
+                        maximum_pairwise_hypotheses=(
+                            maximum_levels * (maximum_levels - 1) // 2
+                        ),
+                        maximum_rendered_observations=(maximum_rendered_observations),
+                    ),
+                    warnings=(
+                        "Bayes factors are numeric BF10 with pointwise contrasts",
+                        "posterior summaries use deterministic scrambled Sobol RQMC",
+                    ),
+                ),
+            ),
+        )
     if type == "robust":
         if trim_fraction != TRIM_FRACTION:
             raise ValueError("trim_fraction must equal 0.20 for M6A robust methods")
@@ -981,6 +1057,11 @@ def analyze_ggwithinstats(
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     maximum_subject_paths: int = DEFAULT_MAX_SUBJECT_PATHS,
     trim_fraction: float = TRIM_FRACTION,
+    prior_location: float | None = None,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> ComparisonAnalysis:
     """Analyze an approved classical or robust complete-block comparison."""
 
@@ -1006,6 +1087,69 @@ def analyze_ggwithinstats(
         minimum_subjects=5 if type == "robust" else 3,
     )
     columns = tuple(sample.values[:, index] for index in range(len(sample.conditions)))
+    if type == "bayes":
+        if p_adjust != "none":
+            raise ValueError("Bayesian comparison requires p_adjust='none'")
+        if display not in {"all", "none"}:
+            raise ValueError(
+                "Bayesian comparison pairwise_display must be 'all' or 'none'"
+            )
+        if prior_location is None or prior_scale is None:
+            raise ValueError(
+                "Bayesian comparison requires explicit prior_location and prior_scale"
+            )
+        if trim_fraction != TRIM_FRACTION:
+            raise ValueError("trim_fraction is unused for Bayesian analysis")
+        prior, levels, omnibus, bayesian_pairwise, computation = (
+            repeated_comparison_posterior(
+                sample.values,
+                sample.conditions,
+                prior_location=prior_location,
+                prior_scale=prior_scale,
+                credible_level=credible_level,
+                random_seed=random_seed,
+                maximum_work=maximum_bayesian_work,
+            )
+        )
+        return ComparisonAnalysis(
+            sample=sample,
+            result=cast(
+                ComparisonResult,
+                BayesianComparisonResult(
+                    schema_version=3,
+                    analysis="ggwithinstats_bayesian_complete_block",
+                    mode="bayes",
+                    design="within",
+                    x=x,
+                    y=y,
+                    subject_id=subject_id,
+                    sample=sample.audit,
+                    method=bayesian_method_result(
+                        "complete_block_helmert_compound_symmetry"
+                    ),
+                    prior=prior,
+                    levels=levels,
+                    omnibus=omnibus,
+                    pairwise=bayesian_pairwise,
+                    computation=computation,
+                    credible_level=credible_level,
+                    pairwise_display=display,
+                    limits=ResourceLimits(
+                        maximum_rows=maximum_rows,
+                        maximum_levels=maximum_levels,
+                        maximum_pairwise_hypotheses=(
+                            maximum_levels * (maximum_levels - 1) // 2
+                        ),
+                        maximum_rendered_observations=(maximum_rendered_observations),
+                        maximum_subject_paths=maximum_subject_paths,
+                    ),
+                    warnings=(
+                        "Bayes factors are numeric BF10 with pointwise contrasts",
+                        "complete-block posterior uses orthonormal Helmert contrasts",
+                    ),
+                ),
+            ),
+        )
     if type == "robust":
         if trim_fraction != TRIM_FRACTION:
             raise ValueError("trim_fraction must equal 0.20 for M6A robust methods")

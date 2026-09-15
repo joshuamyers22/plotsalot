@@ -8,6 +8,8 @@ import numpy as np
 import polars as pl
 from matplotlib.figure import Figure
 
+from plotsalot.bayesian import DEFAULT_MAX_BAYESIAN_WORK
+from plotsalot.bayesian_result import BayesianDotPlotResult
 from plotsalot.data import DEFAULT_MAX_ROWS, FloatArray
 from plotsalot.dotplot_analysis import (
     DEFAULT_MAX_LABELS,
@@ -87,7 +89,10 @@ def _draw_dotplot(
     title: str,
     show_intervals: bool,
 ) -> PlotAnnotations:
-    result = cast(DotPlotResult | RobustDotPlotResult, analysis.result)
+    result = cast(
+        DotPlotResult | RobustDotPlotResult | BayesianDotPlotResult,
+        analysis.result,
+    )
     positions = np.arange(len(result.estimates), dtype=np.float64)
     for position, estimate in zip(positions, result.estimates, strict=True):
         if show_intervals and estimate.interval is not None:
@@ -104,12 +109,21 @@ def _draw_dotplot(
         else:
             axes.plot(estimate.value, position, "o", color="black")
 
+    bayesian = isinstance(result, BayesianDotPlotResult)
     robust = isinstance(result, RobustDotPlotResult)
     axes.axvline(
-        result.one_sample.estimate.value,
+        (
+            result.one_sample.location.median
+            if bayesian
+            else result.one_sample.estimate.value
+        ),
         color="#1f77b4",
         linestyle="--",
-        label="overall 20% trimmed mean" if robust else "overall mean",
+        label=(
+            "overall posterior median"
+            if bayesian
+            else ("overall 20% trimmed mean" if robust else "overall mean")
+        ),
     )
     axes.set_yticks(positions, [str(estimate.label) for estimate in result.estimates])
     axes.set_xlabel(result.x)
@@ -117,8 +131,21 @@ def _draw_dotplot(
     axes.set_title(title)
     axes.legend()
 
-    test = result.one_sample.test
-    if robust:
+    if bayesian:
+        subtitle = (
+            f"posterior median = {result.one_sample.location.median:.2f}; "
+            f"P(effect > 0) = "
+            f"{result.one_sample.effect.probability_above_null:.3f}; "
+            f"{result.one_sample.evidence.display}"
+        )
+        caption = (
+            f"n = {result.sample.analyzed_rows}; "
+            f"{result.sample.dropped_null_rows} null row(s) excluded; "
+            f"{result.one_sample.location.interval.level:.0%} per-label "
+            "equal-tail credible intervals; label evidence is pointwise"
+        )
+    elif robust:
+        test = result.one_sample.test
         subtitle = (
             f"20% trimmed-mean t({test.df:.0f}) = {test.statistic:.2f}, "
             f"{_p_value_text(test.p_value)}; raw difference = "
@@ -131,6 +158,7 @@ def _draw_dotplot(
             f"{result.one_sample.interval.level:.0%} per-label trimmed-location CIs"
         )
     else:
+        test = result.one_sample.test
         subtitle = (
             f"t({test.df:.0f}) = {test.statistic:.2f}, "
             f"{_p_value_text(test.p_value)}, "
@@ -196,12 +224,15 @@ def ggdotplotstats(
     conf_level: float = 0.95,
     type: str = "parametric",
     trim_fraction: float = TRIM_FRACTION,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_labels: int = DEFAULT_MAX_LABELS,
     title: str | None = None,
     show_intervals: bool = True,
 ) -> StatsPlot[DotPlotResult]:
-    """Analyze and render an approved classical or robust labeled dot plot."""
+    """Analyze and render an approved classical, robust, or Bayesian dot plot."""
 
     analysis = analyze_ggdotplotstats(
         data,
@@ -212,6 +243,9 @@ def ggdotplotstats(
         conf_level=conf_level,
         type=type,
         trim_fraction=trim_fraction,
+        prior_scale=prior_scale,
+        credible_level=credible_level,
+        maximum_bayesian_work=maximum_bayesian_work,
         maximum_rows=maximum_rows,
         maximum_labels=maximum_labels,
     )

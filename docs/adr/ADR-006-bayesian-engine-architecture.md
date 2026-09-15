@@ -68,6 +68,21 @@ and all Bayesian statistical methods to B1–B6 approval.
   Bayes factor.
 - General Bayesian regression/model execution remains outside plotsalot.
 
+## Approved M6B clarification
+
+The B6 proposal in `../M6B_STATISTICAL_METHODS.md` selects existing locked
+NumPy/SciPy primitives for M6B closed-form marginal likelihoods, adaptive
+one-dimensional quadrature, and bounded randomized quasi-Monte Carlo of exact
+conjugate posteriors. It proposes no PyMC/ArviZ extra or MCMC path for M6B.
+
+For this proposal, randomized quasi-Monte Carlo is treated as a core numerical
+integration algorithm, not as the optional fitted-model sampling engine covered
+by the second decision bullet above. It still receives owned seeds, independent
+replicates, approximation diagnostics, work ceilings, and no-retry/no-fallback
+behavior. Joshua Myers approved this clarification with B6 on 2026-09-15. A
+future M6C MCMC or general posterior-sampling path would still require the
+isolated optional extra.
+
 ## Verification
 
 Approval of this architecture requires dependency-resolution and platform

@@ -9,6 +9,18 @@ from typing import cast
 import numpy as np
 import polars as pl
 
+from plotsalot.bayesian import (
+    DEFAULT_MAX_BAYESIAN_WORK,
+    one_sample_posterior,
+)
+from plotsalot.bayesian import (
+    method_result as bayesian_method_result,
+)
+from plotsalot.bayesian_result import (
+    BayesianDotEstimateResult,
+    BayesianDotPlotResult,
+    BayesianOneSampleResult,
+)
 from plotsalot.data import DEFAULT_MAX_ROWS, NumericSample, select_numeric_sample
 from plotsalot.histogram_analysis import (
     Alternative,
@@ -69,10 +81,13 @@ def analyze_ggdotplotstats(
     conf_level: float = 0.95,
     type: str = "parametric",
     trim_fraction: float = TRIM_FRACTION,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_labels: int = DEFAULT_MAX_LABELS,
 ) -> DotPlotAnalysis:
-    """Analyze an approved classical or robust labeled dot-plot method."""
+    """Analyze an approved classical, robust, or Bayesian dot-plot method."""
 
     if not isinstance(data, pl.DataFrame):
         raise TypeError("data must be a polars.DataFrame")
@@ -82,10 +97,25 @@ def analyze_ggdotplotstats(
         raise ValueError("alternative must be 'two-sided', 'less', or 'greater'")
     if not np.isfinite(test_value):
         raise ValueError("test_value must be finite")
-    if type not in {"parametric", "robust"}:
-        raise ValueError("type must be 'parametric' or 'robust'")
+    if type not in {"parametric", "robust", "bayes"}:
+        raise ValueError("type must be 'parametric', 'robust', or 'bayes'")
     if type == "robust" and trim_fraction != TRIM_FRACTION:
         raise ValueError("trim_fraction must equal 0.20 for M6A robust methods")
+    if type == "bayes":
+        if prior_scale is None:
+            raise ValueError("prior_scale is required for Bayesian analysis")
+        if alternative != "two-sided":
+            raise ValueError("Bayesian dot alternative must be 'two-sided'")
+        if conf_level != 0.95 or trim_fraction != TRIM_FRACTION:
+            raise ValueError(
+                "classical/robust options are unused for Bayesian analysis"
+            )
+    elif (
+        prior_scale is not None
+        or credible_level != 0.95
+        or maximum_bayesian_work != DEFAULT_MAX_BAYESIAN_WORK
+    ):
+        raise ValueError("Bayesian options are unused for non-Bayesian analysis")
     if maximum_rows < 2:
         raise ValueError("maximum_rows must be at least two")
     if maximum_labels < 1:
@@ -107,7 +137,9 @@ def analyze_ggdotplotstats(
     if len(partitions) > maximum_labels:
         raise ValueError(f"label count exceeds maximum_labels={maximum_labels}")
 
-    estimates: list[DotEstimateResult | RobustDotEstimateResult] = []
+    estimates: list[
+        DotEstimateResult | RobustDotEstimateResult | BayesianDotEstimateResult
+    ] = []
     seen_labels: set[tuple[type[object], ScalarIdentity]] = set()
     for partition in partitions:
         label = _label_identity(partition.get_column(y)[0])
@@ -119,13 +151,33 @@ def analyze_ggdotplotstats(
             label_sample = select_numeric_sample(
                 partition,
                 x,
-                minimum_size=5 if type == "robust" else 1,
+                minimum_size=5 if type == "robust" else (3 if type == "bayes" else 1),
                 maximum_rows=maximum_rows,
             )
         except (TypeError, ValueError) as error:
             raise ValueError(f"dot plot label {label!r} is invalid: {error}") from error
 
         values = label_sample.values
+        if type == "bayes":
+            assert prior_scale is not None
+            _prior, location, _effect, evidence, computation = one_sample_posterior(
+                values,
+                test_value=float(test_value),
+                prior_scale=prior_scale,
+                credible_level=credible_level,
+                maximum_work=maximum_bayesian_work,
+            )
+            estimates.append(
+                BayesianDotEstimateResult(
+                    label=label,
+                    sample=label_sample.audit,
+                    posterior=location,
+                    evidence=evidence,
+                    computation=computation,
+                    warnings=(),
+                )
+            )
+            continue
         if type == "robust":
             try:
                 kernel, _ = trimmed_kernel(values, trim_fraction=trim_fraction)
@@ -192,8 +244,8 @@ def analyze_ggdotplotstats(
     overall_selected = select_numeric_sample(
         complete,
         x,
-        minimum_size=5 if type == "robust" else 2,
-        require_variation=True,
+        minimum_size=5 if type == "robust" else (3 if type == "bayes" else 2),
+        require_variation=type != "bayes",
         maximum_rows=maximum_rows,
     )
     overall_sample = NumericSample(
@@ -210,12 +262,19 @@ def analyze_ggdotplotstats(
         analysis=(
             "ggdotplotstats_one_sample_robust"
             if type == "robust"
-            else "ggdotplotstats_one_sample_parametric"
+            else (
+                "ggdotplotstats_one_sample_bayesian"
+                if type == "bayes"
+                else "ggdotplotstats_one_sample_parametric"
+            )
         ),
         test_value=test_value,
         alternative=alternative,
         conf_level=conf_level,
         trim_fraction=trim_fraction,
+        prior_scale=prior_scale,
+        credible_level=credible_level,
+        maximum_bayesian_work=maximum_bayesian_work,
         maximum_rows=maximum_rows,
     ).result
     ordered_estimates = tuple(sorted(estimates, key=lambda estimate: estimate.value))
@@ -252,6 +311,37 @@ def analyze_ggdotplotstats(
         )
         return DotPlotAnalysis(
             sample=overall_sample, result=cast(DotPlotResult, robust_result)
+        )
+    if type == "bayes":
+        if not isinstance(one_sample, BayesianOneSampleResult) or any(
+            not isinstance(estimate, BayesianDotEstimateResult)
+            for estimate in ordered_estimates
+        ):
+            raise RuntimeError("Bayesian dot result construction is inconsistent")
+        bayesian_result = BayesianDotPlotResult(
+            schema_version=3,
+            analysis="ggdotplotstats_one_sample_bayesian",
+            mode="bayes",
+            x=x,
+            label_column=y,
+            sample=overall_sample.audit,
+            method=bayesian_method_result("conjugate_normal_labeled_location"),
+            prior=one_sample.prior,
+            one_sample=one_sample,
+            estimates=tuple(
+                estimate
+                for estimate in ordered_estimates
+                if isinstance(estimate, BayesianDotEstimateResult)
+            ),
+            limits=ResourceLimits(
+                maximum_rows=maximum_rows,
+                maximum_labels=maximum_labels,
+            ),
+            warnings=("label-level Bayes factors are pointwise",),
+        )
+        return DotPlotAnalysis(
+            sample=overall_sample,
+            result=cast(DotPlotResult, bayesian_result),
         )
     if not all(
         isinstance(estimate, DotEstimateResult) for estimate in ordered_estimates

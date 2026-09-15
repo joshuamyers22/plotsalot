@@ -4,10 +4,21 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import isfinite
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, cast
 
 import polars as pl
 
+from plotsalot.bayesian import (
+    CORRELATION_RESERVED_WORK,
+    DEFAULT_MAX_BAYESIAN_WORK,
+    validate_work_limit,
+)
+from plotsalot.bayesian_result import (
+    BayesianCorrelationMatrixResult,
+    BayesianCorrelationResult,
+    BayesianDotPlotResult,
+    BayesianOneSampleResult,
+)
 from plotsalot.correlation import render_ggcorrmat, render_ggscatterstats
 from plotsalot.correlation_analysis import (
     CorrelationAnalysis,
@@ -18,7 +29,6 @@ from plotsalot.correlation_analysis import (
 from plotsalot.data import (
     DEFAULT_MAX_ROWS,
     select_numeric_pair,
-    select_numeric_sample,
 )
 from plotsalot.dotplot import render_ggdotplotstats
 from plotsalot.dotplot_analysis import (
@@ -30,7 +40,7 @@ from plotsalot.histogram import render_gghistostats
 from plotsalot.histogram_analysis import (
     Alternative,
     HistogramAnalysis,
-    analyze_one_sample_sample,
+    analyze_gghistostats,
 )
 from plotsalot.plot import GroupedStatsPlot, PlotAnnotations
 from plotsalot.result import (
@@ -168,6 +178,9 @@ def grouped_result(
     resampling_root_seed: int | None = None,
     calculated_resample_work: int | None = None,
     maximum_resample_work: int | None = None,
+    bayesian_root_seed: int | None = None,
+    calculated_bayesian_work: int | None = None,
+    maximum_bayesian_work: int | None = None,
 ) -> GroupedResult:
     return GroupedResult(
         schema_version=1,
@@ -181,6 +194,9 @@ def grouped_result(
         resampling_root_seed=resampling_root_seed,
         calculated_resample_work=calculated_resample_work,
         maximum_resample_work=maximum_resample_work,
+        bayesian_root_seed=bayesian_root_seed,
+        calculated_bayesian_work=calculated_bayesian_work,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
 
 
@@ -200,11 +216,14 @@ def analyze_grouped_gghistostats(
     maximum_groups: int = DEFAULT_MAX_GROUPS,
     type: str = "parametric",
     trim_fraction: float = TRIM_FRACTION,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> GroupedAnalysis[HistogramAnalysis]:
     """Apply the approved histogram analysis atomically by group."""
 
-    if type not in {"parametric", "robust"}:
-        raise ValueError("type must be 'parametric' or 'robust'")
+    if type not in {"parametric", "robust", "bayes"}:
+        raise ValueError("type must be 'parametric', 'robust', or 'bayes'")
 
     partitions, sample = split_groups(
         data,
@@ -212,41 +231,52 @@ def analyze_grouped_gghistostats(
         maximum_rows=maximum_rows,
         maximum_groups=maximum_groups,
     )
+    if type == "bayes":
+        validate_work_limit(
+            maximum_bayesian_work,
+            sum(3 * partition.data.height for partition in partitions),
+        )
     groups: list[GroupAnalysisItem[HistogramAnalysis]] = []
     results: list[GroupResultItem] = []
     for partition in partitions:
         try:
-            item_sample = select_numeric_sample(
+            item_analysis = analyze_gghistostats(
                 partition.data,
                 x,
-                minimum_size=5 if type == "robust" else 2,
-                require_variation=True,
-                maximum_rows=maximum_rows,
-            )
-            item_analysis = analyze_one_sample_sample(
-                item_sample,
-                analysis=(
-                    "gghistostats_one_sample_robust"
-                    if type == "robust"
-                    else "gghistostats_one_sample_parametric"
-                ),
                 test_value=test_value,
                 alternative=alternative,
                 conf_level=conf_level,
+                type=type,
                 trim_fraction=trim_fraction,
+                prior_scale=prior_scale,
+                credible_level=credible_level,
+                maximum_bayesian_work=maximum_bayesian_work,
                 maximum_rows=maximum_rows,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
         groups.append(GroupAnalysisItem(partition.group, item_analysis))
         results.append(GroupResultItem(partition.group, item_analysis.result))
+    bayesian_work = (
+        sum(
+            item.analysis.result.computation.calculated_work
+            for item in groups
+            if isinstance(item.analysis.result, BayesianOneSampleResult)
+        )
+        if type == "bayes"
+        else None
+    )
     return GroupedAnalysis(
         groups=tuple(groups),
         result=grouped_result(
             analysis=(
-                "grouped_gghistostats_one_sample_robust"
-                if type == "robust"
-                else "grouped_gghistostats_one_sample_parametric"
+                "grouped_gghistostats_one_sample_bayesian"
+                if type == "bayes"
+                else (
+                    "grouped_gghistostats_one_sample_robust"
+                    if type == "robust"
+                    else "grouped_gghistostats_one_sample_parametric"
+                )
             ),
             group_column=group,
             sample=sample,
@@ -256,6 +286,8 @@ def analyze_grouped_gghistostats(
                 maximum_rows=maximum_rows,
                 maximum_groups=maximum_groups,
             ),
+            calculated_bayesian_work=bayesian_work,
+            maximum_bayesian_work=(maximum_bayesian_work if type == "bayes" else None),
         ),
     )
 
@@ -274,6 +306,9 @@ def analyze_grouped_ggdotplotstats(
     maximum_labels: int = DEFAULT_MAX_LABELS,
     type: str = "parametric",
     trim_fraction: float = TRIM_FRACTION,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> GroupedAnalysis[DotPlotAnalysis]:
     """Apply the approved labeled dot-plot analysis atomically by group."""
 
@@ -283,6 +318,11 @@ def analyze_grouped_ggdotplotstats(
         maximum_rows=maximum_rows,
         maximum_groups=maximum_groups,
     )
+    if type == "bayes":
+        validate_work_limit(
+            maximum_bayesian_work,
+            sum(6 * partition.data.height for partition in partitions),
+        )
     groups: list[GroupAnalysisItem[DotPlotAnalysis]] = []
     results: list[GroupResultItem] = []
     for partition in partitions:
@@ -298,18 +338,34 @@ def analyze_grouped_ggdotplotstats(
                 maximum_labels=maximum_labels,
                 type=type,
                 trim_fraction=trim_fraction,
+                prior_scale=prior_scale,
+                credible_level=credible_level,
+                maximum_bayesian_work=maximum_bayesian_work,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
         groups.append(GroupAnalysisItem(partition.group, item_analysis))
         results.append(GroupResultItem(partition.group, item_analysis.result))
+    bayesian_work: int | None = None
+    if type == "bayes":
+        bayesian_work = 0
+        for item in groups:
+            result = cast(BayesianDotPlotResult, item.analysis.result)
+            bayesian_work += result.one_sample.computation.calculated_work
+            bayesian_work += sum(
+                estimate.computation.calculated_work for estimate in result.estimates
+            )
     return GroupedAnalysis(
         groups=tuple(groups),
         result=grouped_result(
             analysis=(
-                "grouped_ggdotplotstats_one_sample_robust"
-                if type == "robust"
-                else "grouped_ggdotplotstats_one_sample_parametric"
+                "grouped_ggdotplotstats_one_sample_bayesian"
+                if type == "bayes"
+                else (
+                    "grouped_ggdotplotstats_one_sample_robust"
+                    if type == "robust"
+                    else "grouped_ggdotplotstats_one_sample_parametric"
+                )
             ),
             group_column=group,
             sample=sample,
@@ -320,6 +376,8 @@ def analyze_grouped_ggdotplotstats(
                 maximum_groups=maximum_groups,
                 maximum_labels=maximum_labels,
             ),
+            calculated_bayesian_work=bayesian_work,
+            maximum_bayesian_work=(maximum_bayesian_work if type == "bayes" else None),
         ),
     )
 
@@ -338,6 +396,9 @@ def analyze_grouped_ggscatterstats(
     bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
     random_seed: int | None = None,
     maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
+    correlation_prior_shape: float = 1.0,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> GroupedAnalysis[CorrelationAnalysis]:
     """Apply the approved Pearson scatter analysis atomically by group."""
 
@@ -347,6 +408,11 @@ def analyze_grouped_ggscatterstats(
         maximum_rows=maximum_rows,
         maximum_groups=maximum_groups,
     )
+    if type == "bayes":
+        validate_work_limit(
+            maximum_bayesian_work,
+            len(partitions) * CORRELATION_RESERVED_WORK,
+        )
     total_work = 0
     if type == "robust":
         for partition in partitions:
@@ -388,18 +454,34 @@ def analyze_grouped_ggscatterstats(
                 bootstrap_resamples=bootstrap_resamples,
                 random_seed=derived_seed,
                 maximum_resample_work=maximum_resample_work,
+                correlation_prior_shape=correlation_prior_shape,
+                credible_level=credible_level,
+                maximum_bayesian_work=maximum_bayesian_work,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
         groups.append(GroupAnalysisItem(partition.group, item_analysis))
         results.append(GroupResultItem(partition.group, item_analysis.result))
+    bayesian_work = (
+        sum(
+            item.analysis.result.computation.calculated_work
+            for item in groups
+            if isinstance(item.analysis.result, BayesianCorrelationResult)
+        )
+        if type == "bayes"
+        else None
+    )
     return GroupedAnalysis(
         groups=tuple(groups),
         result=grouped_result(
             analysis=(
-                "grouped_ggscatterstats_winsorized"
-                if type == "robust"
-                else "grouped_ggscatterstats_pearson"
+                "grouped_ggscatterstats_bayesian_pearson"
+                if type == "bayes"
+                else (
+                    "grouped_ggscatterstats_winsorized"
+                    if type == "robust"
+                    else "grouped_ggscatterstats_pearson"
+                )
             ),
             group_column=group,
             sample=sample,
@@ -412,6 +494,8 @@ def analyze_grouped_ggscatterstats(
             resampling_root_seed=root_seed if type == "robust" else None,
             calculated_resample_work=total_work if type == "robust" else None,
             maximum_resample_work=(maximum_resample_work if type == "robust" else None),
+            calculated_bayesian_work=bayesian_work,
+            maximum_bayesian_work=(maximum_bayesian_work if type == "bayes" else None),
         ),
     )
 
@@ -431,6 +515,9 @@ def analyze_grouped_ggcorrmat(
     bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
     random_seed: int | None = None,
     maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
+    correlation_prior_shape: float = 1.0,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> GroupedAnalysis[CorrelationMatrixAnalysis]:
     """Apply the approved Pearson matrix analysis atomically by group."""
 
@@ -440,6 +527,12 @@ def analyze_grouped_ggcorrmat(
         maximum_rows=maximum_rows,
         maximum_groups=maximum_groups,
     )
+    if type == "bayes":
+        pair_count = len(columns) * (len(columns) - 1) // 2
+        validate_work_limit(
+            maximum_bayesian_work,
+            len(partitions) * pair_count * CORRELATION_RESERVED_WORK,
+        )
     total_work = 0
     if type == "robust":
         for partition in partitions:
@@ -484,18 +577,34 @@ def analyze_grouped_ggcorrmat(
                 bootstrap_resamples=bootstrap_resamples,
                 random_seed=derived_seed,
                 maximum_resample_work=maximum_resample_work,
+                correlation_prior_shape=correlation_prior_shape,
+                credible_level=credible_level,
+                maximum_bayesian_work=maximum_bayesian_work,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
         groups.append(GroupAnalysisItem(partition.group, item_analysis))
         results.append(GroupResultItem(partition.group, item_analysis.result))
+    bayesian_work = (
+        sum(
+            item.analysis.result.calculated_bayesian_work
+            for item in groups
+            if isinstance(item.analysis.result, BayesianCorrelationMatrixResult)
+        )
+        if type == "bayes"
+        else None
+    )
     return GroupedAnalysis(
         groups=tuple(groups),
         result=grouped_result(
             analysis=(
-                "grouped_ggcorrmat_winsorized"
-                if type == "robust"
-                else "grouped_ggcorrmat_pearson"
+                "grouped_ggcorrmat_bayesian_pearson"
+                if type == "bayes"
+                else (
+                    "grouped_ggcorrmat_winsorized"
+                    if type == "robust"
+                    else "grouped_ggcorrmat_pearson"
+                )
             ),
             group_column=group,
             sample=sample,
@@ -509,6 +618,8 @@ def analyze_grouped_ggcorrmat(
             resampling_root_seed=root_seed if type == "robust" else None,
             calculated_resample_work=total_work if type == "robust" else None,
             maximum_resample_work=(maximum_resample_work if type == "robust" else None),
+            calculated_bayesian_work=bayesian_work,
+            maximum_bayesian_work=(maximum_bayesian_work if type == "bayes" else None),
         ),
     )
 
@@ -627,6 +738,9 @@ def grouped_gghistostats(
     maximum_groups: int = DEFAULT_MAX_GROUPS,
     type: str = "parametric",
     trim_fraction: float = TRIM_FRACTION,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     binwidth: float | None = None,
     title: str | None = None,
 ) -> GroupedStatsPlot[AnalysisResult]:
@@ -643,6 +757,9 @@ def grouped_gghistostats(
         maximum_groups=maximum_groups,
         type=type,
         trim_fraction=trim_fraction,
+        prior_scale=prior_scale,
+        credible_level=credible_level,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_grouped_gghistostats(
         analysis,
@@ -665,6 +782,9 @@ def grouped_ggdotplotstats(
     maximum_labels: int = DEFAULT_MAX_LABELS,
     type: str = "parametric",
     trim_fraction: float = TRIM_FRACTION,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     show_intervals: bool = True,
     title: str | None = None,
 ) -> GroupedStatsPlot[DotPlotResult]:
@@ -683,6 +803,9 @@ def grouped_ggdotplotstats(
         maximum_labels=maximum_labels,
         type=type,
         trim_fraction=trim_fraction,
+        prior_scale=prior_scale,
+        credible_level=credible_level,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_grouped_ggdotplotstats(
         analysis,
@@ -705,6 +828,9 @@ def grouped_ggscatterstats(
     bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
     random_seed: int | None = None,
     maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
+    correlation_prior_shape: float = 1.0,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     title: str | None = None,
 ) -> GroupedStatsPlot[CorrelationResult]:
     """Analyze and render Pearson scatter plots by group."""
@@ -722,6 +848,9 @@ def grouped_ggscatterstats(
         bootstrap_resamples=bootstrap_resamples,
         random_seed=random_seed,
         maximum_resample_work=maximum_resample_work,
+        correlation_prior_shape=correlation_prior_shape,
+        credible_level=credible_level,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_grouped_ggscatterstats(analysis, title=title)
 
@@ -741,6 +870,9 @@ def grouped_ggcorrmat(
     bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
     random_seed: int | None = None,
     maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
+    correlation_prior_shape: float = 1.0,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     title: str | None = None,
 ) -> GroupedStatsPlot[CorrelationMatrixResult]:
     """Analyze and render Pearson correlation matrices by group."""
@@ -759,5 +891,8 @@ def grouped_ggcorrmat(
         bootstrap_resamples=bootstrap_resamples,
         random_seed=random_seed,
         maximum_resample_work=maximum_resample_work,
+        correlation_prior_shape=correlation_prior_shape,
+        credible_level=credible_level,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_grouped_ggcorrmat(analysis, title=title)

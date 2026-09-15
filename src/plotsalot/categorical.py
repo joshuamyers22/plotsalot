@@ -11,6 +11,8 @@ import polars as pl
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
+from plotsalot.bayesian import DEFAULT_MAX_BAYESIAN_WORK
+from plotsalot.bayesian_result import BayesianCategoricalResult
 from plotsalot.categorical_analysis import (
     DEFAULT_MAX_LABELS,
     CategoricalAnalysis,
@@ -159,6 +161,17 @@ def _label(value: int, proportion: float, mode: str) -> str:
 
 
 def _subtitle(result: CategoricalResult) -> str:
+    bayesian = cast(CategoricalResult | BayesianCategoricalResult, result)
+    if isinstance(bayesian, BayesianCategoricalResult):
+        effect = (
+            ""
+            if bayesian.effect is None
+            else f"; posterior median Cramer's V = {bayesian.effect.median:.3f}"
+        )
+        return (
+            f"{bayesian.omnibus.display}; {bayesian.credible_level:.0%} "
+            f"equal-tail credible intervals{effect}"
+        )
     test = result.omnibus
     effect = result.effect
     p_text = "p < 0.001" if test.p_value < 0.001 else f"p = {test.p_value:.3f}"
@@ -169,6 +182,18 @@ def _subtitle(result: CategoricalResult) -> str:
 
 
 def _caption(result: CategoricalResult) -> str:
+    bayesian = cast(CategoricalResult | BayesianCategoricalResult, result)
+    if isinstance(bayesian, BayesianCategoricalResult):
+        algorithm = (
+            "closed-form Dirichlet-multinomial"
+            if bayesian.computation.root_seed is None
+            else "eight scrambled Sobol replicates"
+        )
+        return (
+            f"N = {bayesian.sample.weighted_total}; "
+            f"{bayesian.sample.input_rows - bayesian.sample.analyzed_rows} "
+            f"null row(s) excluded; {algorithm}; BF10 orientation H1/H0"
+        )
     base = (
         f"N = {result.sample.weighted_total}; "
         f"{result.sample.input_rows - result.sample.analyzed_rows} "
@@ -379,6 +404,10 @@ def ggbarstats(
     maximum_cells: int = DEFAULT_MAX_CELLS,
     maximum_total_count: int = DEFAULT_MAX_TOTAL_COUNT,
     maximum_labels: int = DEFAULT_MAX_LABELS,
+    prior_cell_concentration: float = 1.0,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     title: str | None = None,
     results_subtitle: bool = True,
     theme: StatsTheme | None = None,
@@ -402,6 +431,10 @@ def ggbarstats(
         maximum_cells=maximum_cells,
         maximum_total_count=maximum_total_count,
         maximum_labels=maximum_labels,
+        prior_cell_concentration=prior_cell_concentration,
+        credible_level=credible_level,
+        random_seed=random_seed,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_ggbarstats(
         analysis,
@@ -433,6 +466,10 @@ def ggpiestats(
     maximum_cells: int = DEFAULT_MAX_CELLS,
     maximum_total_count: int = DEFAULT_MAX_TOTAL_COUNT,
     maximum_labels: int = DEFAULT_MAX_LABELS,
+    prior_cell_concentration: float = 1.0,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     title: str | None = None,
     results_subtitle: bool = True,
     theme: StatsTheme | None = None,
@@ -456,6 +493,10 @@ def ggpiestats(
         maximum_cells=maximum_cells,
         maximum_total_count=maximum_total_count,
         maximum_labels=maximum_labels,
+        prior_cell_concentration=prior_cell_concentration,
+        credible_level=credible_level,
+        random_seed=random_seed,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_ggpiestats(
         analysis,

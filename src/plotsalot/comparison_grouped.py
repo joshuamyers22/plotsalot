@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+from plotsalot.bayesian import (
+    DEFAULT_MAX_BAYESIAN_WORK,
+    bayesian_child_seed,
+    validate_random_seed,
+    validate_work_limit,
+)
 from plotsalot.comparison import render_ggbetweenstats, render_ggwithinstats
 from plotsalot.comparison_analysis import (
     DEFAULT_MAX_LEVELS,
@@ -11,6 +17,7 @@ from plotsalot.comparison_analysis import (
     analyze_ggbetweenstats,
     analyze_ggwithinstats,
 )
+from plotsalot.comparison_data import select_comparison_sample, select_repeated_sample
 from plotsalot.comparison_result import ComparisonResult
 from plotsalot.data import DEFAULT_MAX_ROWS
 from plotsalot.grouped import (
@@ -45,6 +52,11 @@ def analyze_grouped_ggbetweenstats(
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     trim_fraction: float = TRIM_FRACTION,
+    prior_location: float | None = None,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> GroupedAnalysis[ComparisonAnalysis]:
     """Apply the approved independent comparison atomically by outer group."""
 
@@ -56,6 +68,23 @@ def analyze_grouped_ggbetweenstats(
     )
     groups: list[GroupAnalysisItem[ComparisonAnalysis]] = []
     results: list[GroupResultItem] = []
+    root_seed = validate_random_seed(random_seed) if type == "bayes" else 0
+    bayesian_work = 0
+    if type == "bayes":
+        for partition in partitions:
+            try:
+                retained = select_comparison_sample(
+                    partition.data,
+                    x,
+                    y,
+                    maximum_rows=maximum_rows,
+                    maximum_levels=maximum_levels,
+                )
+            except (TypeError, ValueError) as error:
+                raise group_error(partition.group, error) from error
+            levels = len(retained.levels)
+            bayesian_work += 8 * 4096 * (levels + 1)
+        validate_work_limit(maximum_bayesian_work, bayesian_work)
     for partition in partitions:
         try:
             item_analysis = analyze_ggbetweenstats(
@@ -72,6 +101,19 @@ def analyze_grouped_ggbetweenstats(
                 maximum_levels=maximum_levels,
                 maximum_rendered_observations=maximum_rendered_observations,
                 trim_fraction=trim_fraction,
+                prior_location=prior_location,
+                prior_scale=prior_scale,
+                credible_level=credible_level,
+                random_seed=(
+                    bayesian_child_seed(
+                        root_seed,
+                        "grouped_ggbetweenstats_bayesian",
+                        (("group", partition.group),),
+                    )
+                    if type == "bayes"
+                    else random_seed
+                ),
+                maximum_bayesian_work=maximum_bayesian_work,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
@@ -81,9 +123,13 @@ def analyze_grouped_ggbetweenstats(
         groups=tuple(groups),
         result=grouped_result(
             analysis=(
-                "grouped_ggbetweenstats_robust"
-                if type == "robust"
-                else "grouped_ggbetweenstats_welch"
+                "grouped_ggbetweenstats_bayesian"
+                if type == "bayes"
+                else (
+                    "grouped_ggbetweenstats_robust"
+                    if type == "robust"
+                    else "grouped_ggbetweenstats_welch"
+                )
             ),
             group_column=group,
             sample=sample,
@@ -98,6 +144,9 @@ def analyze_grouped_ggbetweenstats(
                 ),
                 maximum_rendered_observations=maximum_rendered_observations,
             ),
+            bayesian_root_seed=root_seed if type == "bayes" else None,
+            calculated_bayesian_work=bayesian_work if type == "bayes" else None,
+            maximum_bayesian_work=(maximum_bayesian_work if type == "bayes" else None),
         ),
     )
 
@@ -121,6 +170,11 @@ def analyze_grouped_ggwithinstats(
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     maximum_subject_paths: int = DEFAULT_MAX_SUBJECT_PATHS,
     trim_fraction: float = TRIM_FRACTION,
+    prior_location: float | None = None,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> GroupedAnalysis[ComparisonAnalysis]:
     """Apply the approved repeated comparison atomically by outer group."""
 
@@ -132,6 +186,25 @@ def analyze_grouped_ggwithinstats(
     )
     groups: list[GroupAnalysisItem[ComparisonAnalysis]] = []
     results: list[GroupResultItem] = []
+    root_seed = validate_random_seed(random_seed) if type == "bayes" else 0
+    bayesian_work = 0
+    if type == "bayes":
+        for partition in partitions:
+            try:
+                retained = select_repeated_sample(
+                    partition.data,
+                    x,
+                    y,
+                    subject_id,
+                    maximum_rows=maximum_rows,
+                    maximum_levels=maximum_levels,
+                    minimum_subjects=3,
+                )
+            except (TypeError, ValueError) as error:
+                raise group_error(partition.group, error) from error
+            conditions = retained.values.shape[1]
+            bayesian_work += 8 * 4096 * (conditions + 2)
+        validate_work_limit(maximum_bayesian_work, bayesian_work)
     for partition in partitions:
         try:
             item_analysis = analyze_ggwithinstats(
@@ -150,6 +223,19 @@ def analyze_grouped_ggwithinstats(
                 maximum_rendered_observations=maximum_rendered_observations,
                 maximum_subject_paths=maximum_subject_paths,
                 trim_fraction=trim_fraction,
+                prior_location=prior_location,
+                prior_scale=prior_scale,
+                credible_level=credible_level,
+                random_seed=(
+                    bayesian_child_seed(
+                        root_seed,
+                        "grouped_ggwithinstats_bayesian",
+                        (("group", partition.group),),
+                    )
+                    if type == "bayes"
+                    else random_seed
+                ),
+                maximum_bayesian_work=maximum_bayesian_work,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
@@ -159,9 +245,13 @@ def analyze_grouped_ggwithinstats(
         groups=tuple(groups),
         result=grouped_result(
             analysis=(
-                "grouped_ggwithinstats_robust"
-                if type == "robust"
-                else "grouped_ggwithinstats_parametric"
+                "grouped_ggwithinstats_bayesian"
+                if type == "bayes"
+                else (
+                    "grouped_ggwithinstats_robust"
+                    if type == "robust"
+                    else "grouped_ggwithinstats_parametric"
+                )
             ),
             group_column=group,
             sample=sample,
@@ -177,6 +267,9 @@ def analyze_grouped_ggwithinstats(
                 maximum_rendered_observations=maximum_rendered_observations,
                 maximum_subject_paths=maximum_subject_paths,
             ),
+            bayesian_root_seed=root_seed if type == "bayes" else None,
+            calculated_bayesian_work=bayesian_work if type == "bayes" else None,
+            maximum_bayesian_work=(maximum_bayesian_work if type == "bayes" else None),
         ),
     )
 
@@ -256,6 +349,11 @@ def grouped_ggbetweenstats(
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     trim_fraction: float = TRIM_FRACTION,
+    prior_location: float | None = None,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     title: str | None = None,
     results_subtitle: bool = True,
     theme: StatsTheme | None = None,
@@ -278,6 +376,11 @@ def grouped_ggbetweenstats(
         maximum_levels=maximum_levels,
         maximum_rendered_observations=maximum_rendered_observations,
         trim_fraction=trim_fraction,
+        prior_location=prior_location,
+        prior_scale=prior_scale,
+        credible_level=credible_level,
+        random_seed=random_seed,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_grouped_ggbetweenstats(
         analysis,
@@ -306,6 +409,11 @@ def grouped_ggwithinstats(
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     maximum_subject_paths: int = DEFAULT_MAX_SUBJECT_PATHS,
     trim_fraction: float = TRIM_FRACTION,
+    prior_location: float | None = None,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     title: str | None = None,
     results_subtitle: bool = True,
     show_subject_paths: bool = True,
@@ -331,6 +439,11 @@ def grouped_ggwithinstats(
         maximum_rendered_observations=maximum_rendered_observations,
         maximum_subject_paths=maximum_subject_paths,
         trim_fraction=trim_fraction,
+        prior_location=prior_location,
+        prior_scale=prior_scale,
+        credible_level=credible_level,
+        random_seed=random_seed,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_grouped_ggwithinstats(
         analysis,

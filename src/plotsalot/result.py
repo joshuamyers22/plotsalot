@@ -500,6 +500,9 @@ class GroupedResult:
     resampling_root_seed: int | None = None
     calculated_resample_work: int | None = None
     maximum_resample_work: int | None = None
+    bayesian_root_seed: int | None = None
+    calculated_bayesian_work: int | None = None
+    maximum_bayesian_work: int | None = None
 
     def __post_init__(self) -> None:
         if self.schema_version != 1:
@@ -507,17 +510,24 @@ class GroupedResult:
         if self.analysis not in {
             "grouped_gghistostats_one_sample_parametric",
             "grouped_gghistostats_one_sample_robust",
+            "grouped_gghistostats_one_sample_bayesian",
             "grouped_ggdotplotstats_one_sample_parametric",
             "grouped_ggdotplotstats_one_sample_robust",
+            "grouped_ggdotplotstats_one_sample_bayesian",
             "grouped_ggscatterstats_pearson",
             "grouped_ggscatterstats_winsorized",
+            "grouped_ggscatterstats_bayesian_pearson",
             "grouped_ggcorrmat_pearson",
             "grouped_ggcorrmat_winsorized",
+            "grouped_ggcorrmat_bayesian_pearson",
             "grouped_ggbetweenstats_welch",
             "grouped_ggbetweenstats_robust",
+            "grouped_ggbetweenstats_bayesian",
             "grouped_ggwithinstats_parametric",
             "grouped_ggwithinstats_robust",
+            "grouped_ggwithinstats_bayesian",
             "grouped_categorical_classical",
+            "grouped_categorical_bayesian",
         }:
             raise ValueError("grouped analysis identity is unsupported")
         if not self.group_column or not self.groups:
@@ -559,6 +569,32 @@ class GroupedResult:
                 or self.calculated_resample_work > self.maximum_resample_work
             ):
                 raise ValueError("grouped robust work is invalid")
+        bayesian = "bayesian" in self.analysis
+        bayesian_work = (
+            self.calculated_bayesian_work,
+            self.maximum_bayesian_work,
+        )
+        if bayesian and any(value is None for value in bayesian_work):
+            raise ValueError("grouped Bayesian result must retain aggregate work")
+        if not bayesian and (
+            any(value is not None for value in bayesian_work)
+            or self.bayesian_root_seed is not None
+        ):
+            raise ValueError("non-Bayesian grouped result cannot retain Bayesian work")
+        if bayesian:
+            if (
+                self.calculated_bayesian_work is None
+                or self.maximum_bayesian_work is None
+                or not 1
+                <= self.calculated_bayesian_work
+                <= self.maximum_bayesian_work
+                <= 500_000_000
+            ):
+                raise ValueError("grouped Bayesian work is invalid")
+            if self.bayesian_root_seed is not None and not (
+                0 <= self.bayesian_root_seed <= 2**64 - 1
+            ):
+                raise ValueError("grouped Bayesian root seed is invalid")
 
     def to_dict(self) -> dict[str, Any]:
         """Return a deterministic JSON-serializable representation."""
@@ -581,5 +617,11 @@ class GroupedResult:
                 "root_seed": self.resampling_root_seed,
                 "calculated_work": self.calculated_resample_work,
                 "maximum_resample_work": self.maximum_resample_work,
+            }
+        if self.calculated_bayesian_work is not None:
+            output["bayesian"] = {
+                "root_seed": self.bayesian_root_seed,
+                "calculated_work": self.calculated_bayesian_work,
+                "maximum_bayesian_work": self.maximum_bayesian_work,
             }
         return output

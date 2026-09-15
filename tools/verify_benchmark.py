@@ -14,6 +14,7 @@ M4_RESULT = ROOT / "benchmarks" / "results" / "m4-baseline.json"
 M5A_RESULT = ROOT / "benchmarks" / "results" / "m5a-baseline.json"
 M5B_RESULT = ROOT / "benchmarks" / "results" / "m5b-baseline.json"
 M6A_RESULT = ROOT / "benchmarks" / "results" / "m6a-baseline.json"
+M6B_RESULT = ROOT / "benchmarks" / "results" / "m6b-baseline.json"
 
 
 def _positive_int(value: Any, label: str) -> int:
@@ -309,6 +310,31 @@ def verify_benchmark() -> None:
         raise AssertionError("M6A 10-variable matrix should fit the hard ceiling")
     if matrix["25"].get("hard_ceiling_accepts") is not False:
         raise AssertionError("M6A 25-variable matrix should fail the hard ceiling")
+
+    m6b = json.loads(M6B_RESULT.read_text())
+    if m6b.get("schema_version") != 1:
+        raise AssertionError("unsupported M6B benchmark schema")
+    measurement = m6b.get("measurement", {})
+    if measurement.get("repeats") != 5:
+        raise AssertionError("M6B baseline must retain five samples")
+    expected_cases = {
+        "closed_form_one_sample_100000",
+        "quadrature_correlation_100",
+        "rqmc_comparison_10_by_20",
+        "rqmc_categorical_4_by_4",
+    }
+    cases = m6b.get("cases")
+    if not isinstance(cases, dict) or set(cases) != expected_cases:
+        raise AssertionError("M6B benchmark cases are incomplete")
+    for name, summary in cases.items():
+        _verify_summary(summary, f"M6B.{name}")
+    resource = m6b.get("resource_grid")
+    if not isinstance(resource, dict) or set(resource) != {"2", "10", "20"}:
+        raise AssertionError("M6B resource grid is incomplete")
+    if resource["10"].get("calculated_work") != 8 * 4096 * 11:
+        raise AssertionError("M6B 10-level scalar-coordinate work differs")
+    if resource["20"].get("calculated_work") != 8 * 4096 * 21:
+        raise AssertionError("M6B 20-level scalar-coordinate work differs")
 
 
 def main() -> None:

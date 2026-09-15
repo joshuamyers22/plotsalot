@@ -9,6 +9,14 @@ from typing import Literal, Protocol, cast
 import numpy as np
 import polars as pl
 
+from plotsalot.bayesian import (
+    DEFAULT_MAX_BAYESIAN_WORK,
+    one_sample_posterior,
+)
+from plotsalot.bayesian import (
+    method_result as bayesian_method_result,
+)
+from plotsalot.bayesian_result import BayesianOneSampleResult
 from plotsalot.data import (
     DEFAULT_MAX_ROWS,
     FloatArray,
@@ -37,6 +45,8 @@ OneSampleAnalysisIdentity = Literal[
     "ggdotplotstats_one_sample_parametric",
     "gghistostats_one_sample_robust",
     "ggdotplotstats_one_sample_robust",
+    "gghistostats_one_sample_bayesian",
+    "ggdotplotstats_one_sample_bayesian",
 ]
 
 
@@ -96,19 +106,40 @@ def analyze_gghistostats(
     conf_level: float = 0.95,
     type: str = "parametric",
     trim_fraction: float = TRIM_FRACTION,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     maximum_rows: int = DEFAULT_MAX_ROWS,
 ) -> HistogramAnalysis:
-    """Analyze an approved classical or robust one-sample histogram method."""
+    """Analyze an approved classical, robust, or Bayesian histogram method."""
 
-    if type not in {"parametric", "robust"}:
-        raise ValueError("type must be 'parametric' or 'robust'")
-    if type == "parametric" and trim_fraction != TRIM_FRACTION:
-        raise ValueError("trim_fraction is unused for parametric analysis")
+    if type not in {"parametric", "robust", "bayes"}:
+        raise ValueError("type must be 'parametric', 'robust', or 'bayes'")
+    if type == "parametric" and (
+        trim_fraction != TRIM_FRACTION
+        or prior_scale is not None
+        or credible_level != 0.95
+        or maximum_bayesian_work != DEFAULT_MAX_BAYESIAN_WORK
+    ):
+        raise ValueError("robust/Bayesian options are unused for parametric analysis")
+    if type == "robust" and (
+        prior_scale is not None
+        or credible_level != 0.95
+        or maximum_bayesian_work != DEFAULT_MAX_BAYESIAN_WORK
+    ):
+        raise ValueError("Bayesian options are unused for robust analysis")
+    if type == "bayes":
+        if trim_fraction != TRIM_FRACTION:
+            raise ValueError("trim_fraction is unused for Bayesian analysis")
+        if prior_scale is None:
+            raise ValueError("prior_scale is required for Bayesian analysis")
+        if alternative != "two-sided":
+            raise ValueError("Bayesian one-sample alternative must be 'two-sided'")
     sample = select_numeric_sample(
         data,
         x,
-        minimum_size=5 if type == "robust" else 2,
-        require_variation=True,
+        minimum_size=5 if type == "robust" else (3 if type == "bayes" else 2),
+        require_variation=type != "bayes",
         maximum_rows=maximum_rows,
     )
     return analyze_one_sample_sample(
@@ -116,12 +147,19 @@ def analyze_gghistostats(
         analysis=(
             "gghistostats_one_sample_robust"
             if type == "robust"
-            else "gghistostats_one_sample_parametric"
+            else (
+                "gghistostats_one_sample_bayesian"
+                if type == "bayes"
+                else "gghistostats_one_sample_parametric"
+            )
         ),
         test_value=test_value,
         alternative=alternative,
         conf_level=conf_level,
         trim_fraction=trim_fraction,
+        prior_scale=prior_scale,
+        credible_level=credible_level,
+        maximum_bayesian_work=maximum_bayesian_work,
         maximum_rows=maximum_rows,
     )
 
@@ -134,6 +172,9 @@ def analyze_one_sample_sample(
     alternative: Alternative = "two-sided",
     conf_level: float = 0.95,
     trim_fraction: float = TRIM_FRACTION,
+    prior_scale: float | None = None,
+    credible_level: float = 0.95,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     maximum_rows: int = DEFAULT_MAX_ROWS,
 ) -> HistogramAnalysis:
     """Apply the approved one-sample method to an already reconciled sample."""
@@ -144,6 +185,44 @@ def analyze_one_sample_sample(
         raise ValueError("alternative must be 'two-sided', 'less', or 'greater'")
     if not np.isfinite(test_value):
         raise ValueError("test_value must be finite")
+
+    if analysis.endswith("_bayesian"):
+        if prior_scale is None:
+            raise ValueError("prior_scale is required for Bayesian analysis")
+        if alternative != "two-sided":
+            raise ValueError("Bayesian one-sample alternative must be 'two-sided'")
+        if trim_fraction != TRIM_FRACTION:
+            raise ValueError("trim_fraction is unused for Bayesian analysis")
+        prior, location, effect, evidence, computation = one_sample_posterior(
+            sample.values,
+            test_value=float(test_value),
+            prior_scale=prior_scale,
+            credible_level=credible_level,
+            maximum_work=maximum_bayesian_work,
+        )
+        return HistogramAnalysis(
+            sample=sample,
+            result=cast(
+                AnalysisResult,
+                BayesianOneSampleResult(
+                    schema_version=3,
+                    analysis=analysis,
+                    mode="bayes",
+                    column=sample.column,
+                    sample=sample.audit,
+                    method=bayesian_method_result("conjugate_normal_location"),
+                    prior=prior,
+                    location=location,
+                    effect=effect,
+                    evidence=evidence,
+                    computation=computation,
+                    limits=ResourceLimits(maximum_rows=maximum_rows),
+                    warnings=(
+                        "numeric Bayes factor uses plotsalot's adapted proper prior",
+                    ),
+                ),
+            ),
+        )
 
     if analysis.endswith("_robust"):
         kernel, _ = trimmed_kernel(sample.values, trim_fraction=trim_fraction)
@@ -202,6 +281,8 @@ def analyze_one_sample_sample(
 
     if trim_fraction != TRIM_FRACTION:
         raise ValueError("trim_fraction is unused for parametric analysis")
+    if prior_scale is not None or maximum_bayesian_work != DEFAULT_MAX_BAYESIAN_WORK:
+        raise ValueError("Bayesian options are unused for parametric analysis")
 
     values = sample.values
     mean = float(np.mean(values))

@@ -1,7 +1,6 @@
 # Statistical Analysis Plan: Cross-Language Parity Program
 
-- Status: M0, M2, M3, M4, M5, and M6A R1–R3/G6 specifications approved; M6
-  R4 and Bayesian decisions pending
+- Status: M0–M5, M6A, and M6B complete; M6 R4/M6C pending
 - Version: 0.1.0
 - Date: 2026-09-13
 - Statistical owner/reviewer: Joshua Myers; M0 approval recorded 2026-09-14
@@ -154,12 +153,14 @@ formulas, deterministic PCG64DXSM association bootstrap streams, bounded work,
 semantic renderers, grouped execution, pinned-R/base-R evidence, and retained
 performance/resource evidence. Its technical gate passes; independent review
 and Joshua Myers's M6A acceptance were recorded on 2026-09-14, closing M6A. The
-remaining R4 and B1–B6
-decisions cover coefficient/meta robust estimands, likelihoods, priors,
-Bayes-factor orientation, posterior summaries, engine/RNG ownership,
-diagnostics, grouped seed/family behavior, optional dependencies, work limits,
-and evidence tolerances. The approval does not authorize R4, B1–B6, M6B/M6C,
-or final M6/`0.4` acceptance.
+remaining R4 decision covers coefficient/meta robust estimands. Joshua Myers
+approved the detailed B1–B6 contract in `docs/M6B_STATISTICAL_METHODS.md` on
+2026-09-15. The resulting schema-v3 technical candidate implements the approved
+exact, quadrature, and RQMC scalar, matrix, comparison, categorical, and grouped
+paths with retained priors, numeric BF10 orientation/sensitivity, target-level
+diagnostics, typed identity seeds, and preflighted work. Joshua Myers
+independently reviewed and accepted M6B on 2026-09-15. R4/M6C and final
+M6/`0.4` acceptance remain separate, unauthorized gates.
 
 ## Diagnostics and validation
 

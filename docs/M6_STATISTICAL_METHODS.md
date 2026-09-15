@@ -1,11 +1,12 @@
 # M6 Robust and Bayesian Method Specification
 
-- Status: M6A R1–R3/G6 implemented and accepted; R4 and B1–B6 pending
+- Status: M6A R1–R3/G6 and M6B B1–B6 implemented and accepted; R4 pending
 - Version: 0.1.0
 - Date: 2026-09-14
 - Statistical owner/reviewer: Joshua Myers
 - Applies to: approved M6A robust continuous-analysis track
-- Reserved for later review: R4 and B1–B6
+- Companion proposal: `M6B_STATISTICAL_METHODS.md`
+- Reserved for later review: R4
 
 ## Decision boundary
 
@@ -451,10 +452,11 @@ not required to contain the point estimate.
 
 ## Reserved later decisions
 
-R4 robust coefficient/meta-analysis and B1–B6 Bayesian methods are intentionally
-not proposed here. ADR-006 defines only the optional-engine boundary. M6C and
-M6B implementation remain blocked until their method records are prepared and
-approved separately.
+R4 robust coefficient/meta-analysis remains intentionally unprepared. B1–B6
+were approved on 2026-09-15 in `M6B_STATISTICAL_METHODS.md` and implemented in
+the M6B technical candidate. ADR-006 defines the accepted isolation boundary;
+independent review and release acceptance remain open. M6C remains blocked on
+its later R4/B5 record.
 
 ## M6A approval record
 

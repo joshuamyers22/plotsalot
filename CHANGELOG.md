@@ -109,3 +109,18 @@
 - Recorded Joshua Myers's independent review and acceptance of M6A after the
   complete technical gate, closing the robust continuous-analysis track while
   leaving R4, B1–B6, M6, and `0.4` open.
+- Prepared the approval-ready M6B B1–B6 proposal, pending accountable sign-off,
+  and pass-zero verification record for Bayesian reporting/evidence,
+  univariate/correlation/comparison/categorical models, explicit M6C deferrals,
+  and a bounded NumPy/SciPy closed-form, quadrature, and RQMC engine. Bayesian
+  implementation remains stopped at the required approval gate.
+- Recorded Joshua Myers's B1–B6 approval and implemented the M6B technical
+  candidate: schema-v3 Bayesian results, exact NIG/Dirichlet-multinomial
+  inference, exact correlation quadrature, deterministic bounded scrambled
+  Sobol comparison/categorical summaries, numeric BF10 sensitivity records,
+  semantic scalar/matrix/grouped rendering, mutation/fault tests, JSON schema,
+  and retained performance/work evidence. Independent review and release
+  acceptance remain open.
+- Recorded Joshua Myers's independent M6B review, acceptance of every finding
+  disposition, and accountable release acceptance, closing M6B while leaving
+  R4/M6C and final M6/`0.4` open.

@@ -6,6 +6,12 @@ from collections.abc import Mapping
 
 import polars as pl
 
+from plotsalot.bayesian import (
+    DEFAULT_MAX_BAYESIAN_WORK,
+    bayesian_child_seed,
+    validate_random_seed,
+    validate_work_limit,
+)
 from plotsalot.categorical import render_ggbarstats, render_ggpiestats
 from plotsalot.categorical_analysis import (
     DEFAULT_MAX_LABELS,
@@ -16,6 +22,7 @@ from plotsalot.categorical_data import (
     DEFAULT_MAX_CELLS,
     DEFAULT_MAX_LEVELS,
     DEFAULT_MAX_TOTAL_COUNT,
+    select_categorical_table,
 )
 from plotsalot.categorical_result import CategoricalResult
 from plotsalot.data import DEFAULT_MAX_ROWS
@@ -55,6 +62,10 @@ def analyze_grouped_categorical(
     maximum_cells: int = DEFAULT_MAX_CELLS,
     maximum_total_count: int = DEFAULT_MAX_TOTAL_COUNT,
     maximum_labels: int = DEFAULT_MAX_LABELS,
+    prior_cell_concentration: float = 1.0,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
 ) -> GroupedAnalysis[CategoricalAnalysis]:
     selected = tuple(column for column in (x, y, counts, group) if column is not None)
     if len(set(selected)) != len(selected):
@@ -64,6 +75,28 @@ def analyze_grouped_categorical(
     )
     analyses: list[GroupAnalysisItem[CategoricalAnalysis]] = []
     results: list[GroupResultItem] = []
+    root_seed = (
+        validate_random_seed(random_seed) if type == "bayes" and y is not None else 0
+    )
+    bayesian_work = 0
+    if type == "bayes":
+        for partition in partitions:
+            try:
+                retained = select_categorical_table(
+                    partition.data,
+                    x,
+                    y,
+                    counts=counts,
+                    maximum_rows=maximum_rows,
+                    maximum_levels=maximum_levels,
+                    maximum_cells=maximum_cells,
+                    maximum_total_count=maximum_total_count,
+                )
+            except (TypeError, ValueError) as error:
+                raise group_error(partition.group, error) from error
+            rows, columns = retained.observed.shape
+            bayesian_work += rows * 3 if y is None else 8 * 4096 * rows * columns
+        validate_work_limit(maximum_bayesian_work, bayesian_work)
     for partition in partitions:
         try:
             analysis = analyze_categorical(
@@ -85,6 +118,18 @@ def analyze_grouped_categorical(
                 maximum_cells=maximum_cells,
                 maximum_total_count=maximum_total_count,
                 maximum_labels=maximum_labels,
+                prior_cell_concentration=prior_cell_concentration,
+                credible_level=credible_level,
+                random_seed=(
+                    bayesian_child_seed(
+                        root_seed,
+                        "grouped_categorical_bayesian",
+                        (("group", partition.group),),
+                    )
+                    if type == "bayes" and y is not None
+                    else random_seed
+                ),
+                maximum_bayesian_work=maximum_bayesian_work,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
@@ -112,12 +157,21 @@ def analyze_grouped_categorical(
     return GroupedAnalysis(
         tuple(analyses),
         grouped_result(
-            analysis="grouped_categorical_classical",
+            analysis=(
+                "grouped_categorical_bayesian"
+                if type == "bayes"
+                else "grouped_categorical_classical"
+            ),
             group_column=group,
             sample=sample,
             correction_scope="within_each_categorical_result_none_across_outer_groups",
             items=tuple(results),
             limits=limits,
+            bayesian_root_seed=(
+                root_seed if type == "bayes" and y is not None else None
+            ),
+            calculated_bayesian_work=bayesian_work if type == "bayes" else None,
+            maximum_bayesian_work=(maximum_bayesian_work if type == "bayes" else None),
         ),
     )
 
@@ -219,6 +273,10 @@ def grouped_ggbarstats(
     maximum_cells: int = DEFAULT_MAX_CELLS,
     maximum_total_count: int = DEFAULT_MAX_TOTAL_COUNT,
     maximum_labels: int = DEFAULT_MAX_LABELS,
+    prior_cell_concentration: float = 1.0,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     title: str | None = None,
     results_subtitle: bool = True,
     theme: StatsTheme | None = None,
@@ -244,6 +302,10 @@ def grouped_ggbarstats(
         maximum_cells=maximum_cells,
         maximum_total_count=maximum_total_count,
         maximum_labels=maximum_labels,
+        prior_cell_concentration=prior_cell_concentration,
+        credible_level=credible_level,
+        random_seed=random_seed,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_grouped_ggbarstats(
         analysis,
@@ -277,6 +339,10 @@ def grouped_ggpiestats(
     maximum_cells: int = DEFAULT_MAX_CELLS,
     maximum_total_count: int = DEFAULT_MAX_TOTAL_COUNT,
     maximum_labels: int = DEFAULT_MAX_LABELS,
+    prior_cell_concentration: float = 1.0,
+    credible_level: float = 0.95,
+    random_seed: int | None = None,
+    maximum_bayesian_work: int = DEFAULT_MAX_BAYESIAN_WORK,
     title: str | None = None,
     results_subtitle: bool = True,
     theme: StatsTheme | None = None,
@@ -302,6 +368,10 @@ def grouped_ggpiestats(
         maximum_cells=maximum_cells,
         maximum_total_count=maximum_total_count,
         maximum_labels=maximum_labels,
+        prior_cell_concentration=prior_cell_concentration,
+        credible_level=credible_level,
+        random_seed=random_seed,
+        maximum_bayesian_work=maximum_bayesian_work,
     )
     return render_grouped_ggpiestats(
         analysis,

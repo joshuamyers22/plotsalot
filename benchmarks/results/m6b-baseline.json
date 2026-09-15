@@ -1,0 +1,174 @@
+{
+  "cases": {
+    "closed_form_one_sample_100000": {
+      "elapsed_ns": {
+        "max": 7569833,
+        "median": 7317166,
+        "min": 7224834
+      },
+      "python_peak_bytes": {
+        "max": 3206644,
+        "median": 3206424,
+        "min": 3206336
+      },
+      "samples": [
+        {
+          "elapsed_ns": 7224834,
+          "python_peak_bytes": 3206644
+        },
+        {
+          "elapsed_ns": 7569833,
+          "python_peak_bytes": 3206644
+        },
+        {
+          "elapsed_ns": 7338084,
+          "python_peak_bytes": 3206336
+        },
+        {
+          "elapsed_ns": 7255042,
+          "python_peak_bytes": 3206336
+        },
+        {
+          "elapsed_ns": 7317166,
+          "python_peak_bytes": 3206424
+        }
+      ]
+    },
+    "quadrature_correlation_100": {
+      "elapsed_ns": {
+        "max": 148518417,
+        "median": 147545333,
+        "min": 147112417
+      },
+      "python_peak_bytes": {
+        "max": 635078,
+        "median": 634982,
+        "min": 634830
+      },
+      "samples": [
+        {
+          "elapsed_ns": 147911375,
+          "python_peak_bytes": 635078
+        },
+        {
+          "elapsed_ns": 148518417,
+          "python_peak_bytes": 635030
+        },
+        {
+          "elapsed_ns": 147112417,
+          "python_peak_bytes": 634982
+        },
+        {
+          "elapsed_ns": 147453250,
+          "python_peak_bytes": 634830
+        },
+        {
+          "elapsed_ns": 147545333,
+          "python_peak_bytes": 634878
+        }
+      ]
+    },
+    "rqmc_categorical_4_by_4": {
+      "elapsed_ns": {
+        "max": 290235917,
+        "median": 286560583,
+        "min": 285761958
+      },
+      "python_peak_bytes": {
+        "max": 24216325,
+        "median": 24216061,
+        "min": 24215357
+      },
+      "samples": [
+        {
+          "elapsed_ns": 288169292,
+          "python_peak_bytes": 24215357
+        },
+        {
+          "elapsed_ns": 286289208,
+          "python_peak_bytes": 24215357
+        },
+        {
+          "elapsed_ns": 286560583,
+          "python_peak_bytes": 24216061
+        },
+        {
+          "elapsed_ns": 285761958,
+          "python_peak_bytes": 24216325
+        },
+        {
+          "elapsed_ns": 290235917,
+          "python_peak_bytes": 24216149
+        }
+      ]
+    },
+    "rqmc_comparison_10_by_20": {
+      "elapsed_ns": {
+        "max": 174767292,
+        "median": 173184250,
+        "min": 172283291
+      },
+      "python_peak_bytes": {
+        "max": 6176850,
+        "median": 6175523,
+        "min": 6175133
+      },
+      "samples": [
+        {
+          "elapsed_ns": 172867500,
+          "python_peak_bytes": 6176850
+        },
+        {
+          "elapsed_ns": 172283291,
+          "python_peak_bytes": 6176110
+        },
+        {
+          "elapsed_ns": 173184250,
+          "python_peak_bytes": 6175523
+        },
+        {
+          "elapsed_ns": 174767292,
+          "python_peak_bytes": 6175224
+        },
+        {
+          "elapsed_ns": 173899958,
+          "python_peak_bytes": 6175133
+        }
+      ]
+    }
+  },
+  "host": {
+    "machine": "arm64",
+    "platform": "macOS-15.1-arm64-arm-64bit",
+    "python": "3.12.14"
+  },
+  "measurement": {
+    "clock": "time.perf_counter_ns",
+    "input_frame_allocation": "outside measured phases",
+    "memory": "tracemalloc incremental Python allocation peak",
+    "repeats": 5
+  },
+  "resource_grid": {
+    "10": {
+      "calculated_work": 360448,
+      "levels": 10,
+      "rows": 200
+    },
+    "2": {
+      "calculated_work": 98304,
+      "levels": 2,
+      "rows": 40
+    },
+    "20": {
+      "calculated_work": 688128,
+      "levels": 20,
+      "rows": 400
+    }
+  },
+  "schema_version": 1,
+  "versions": {
+    "numpy": "2.5.3",
+    "polars": "1.44.2",
+    "scipy": "1.18.1"
+  }
+}

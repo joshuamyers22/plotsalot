@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plotsalot.dev/schemas/bayesian-result.schema.json",
+  "title": "plotsalot M6B Bayesian result",
+  "type": "object",
+  "required": ["schema_version", "analysis", "mode", "method", "prior", "warnings"],
+  "properties": {
+    "schema_version": {"const": 3},
+    "analysis": {
+      "enum": [
+        "gghistostats_one_sample_bayesian",
+        "ggdotplotstats_one_sample_bayesian",
+        "ggscatterstats_bayesian_pearson",
+        "ggcorrmat_bayesian_pearson",
+        "ggbetweenstats_bayesian_homoscedastic",
+        "ggwithinstats_bayesian_complete_block",
+        "categorical_bayesian_fixed_total",
+        "categorical_bayesian_fixed_rows"
+      ]
+    },
+    "mode": {"const": "bayes"},
+    "method": {"$ref": "#/$defs/method"},
+    "prior": {"$ref": "#/$defs/prior"},
+    "posterior": {"$ref": "#/$defs/posterior"},
+    "omnibus": {"$ref": "#/$defs/evidence"},
+    "evidence": {"$ref": "#/$defs/evidence"},
+    "computation": {"$ref": "#/$defs/computation"},
+    "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "method": {
+      "type": "object",
+      "required": ["name", "version", "compatibility", "numpy_version", "scipy_version"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "version": {"const": "m6b-1"},
+        "compatibility": {"const": "adapted"},
+        "numpy_version": {"type": "string", "minLength": 1},
+        "scipy_version": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "priorParameter": {
+      "type": "object",
+      "required": ["name", "value", "units"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "value": {"type": "number"},
+        "units": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "prior": {
+      "type": "object",
+      "required": ["family", "proper", "parameters"],
+      "properties": {
+        "family": {"type": "string", "minLength": 1},
+        "proper": {"const": true},
+        "parameters": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/priorParameter"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "interval": {
+      "type": "object",
+      "required": ["target", "method", "level", "low", "high"],
+      "properties": {
+        "target": {"type": "string", "minLength": 1},
+        "method": {"const": "bayesian_equal_tail"},
+        "level": {"type": "number", "minimum": 0.8, "maximum": 0.99},
+        "low": {"type": "number"},
+        "high": {"type": "number"}
+      },
+      "additionalProperties": false
+    },
+    "posterior": {
+      "type": "object",
+      "required": [
+        "target", "median", "null_value", "interval",
+        "probability_above_null", "probability_below_null", "probability_at_null"
+      ],
+      "properties": {
+        "target": {"type": "string", "minLength": 1},
+        "median": {"type": "number"},
+        "null_value": {"type": "number"},
+        "interval": {"$ref": "#/$defs/interval"},
+        "probability_above_null": {"type": "number", "minimum": 0, "maximum": 1},
+        "probability_below_null": {"type": "number", "minimum": 0, "maximum": 1},
+        "probability_at_null": {"type": "number", "minimum": 0, "maximum": 1}
+      },
+      "additionalProperties": false
+    },
+    "sensitivity": {
+      "type": "object",
+      "required": ["label", "prior_value", "log_bf10"],
+      "properties": {
+        "label": {"enum": ["half", "double"]},
+        "prior_value": {"type": "number", "exclusiveMinimum": 0},
+        "log_bf10": {"type": "number"}
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "null_hypothesis", "alternative_hypothesis", "sampling_plan",
+        "log_bf10", "display", "prior_model_odds", "sensitivity"
+      ],
+      "properties": {
+        "null_hypothesis": {"type": "string", "minLength": 1},
+        "alternative_hypothesis": {"type": "string", "minLength": 1},
+        "sampling_plan": {"type": "string", "minLength": 1},
+        "log_bf10": {"type": "number"},
+        "display": {"type": "string", "pattern": "^BF10 (=[^$]+|< 1e-6|> 1e6)$"},
+        "prior_model_odds": {"const": 1.0},
+        "sensitivity": {
+          "type": "array",
+          "prefixItems": [
+            {"allOf": [{"$ref": "#/$defs/sensitivity"}, {"properties": {"label": {"const": "half"}}}]},
+            {"allOf": [{"$ref": "#/$defs/sensitivity"}, {"properties": {"label": {"const": "double"}}}]}
+          ],
+          "items": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "computation": {
+      "type": "object",
+      "required": [
+        "algorithm", "evaluations", "calculated_work", "maximum_work",
+        "hard_maximum_work", "root_seed", "diagnostics"
+      ],
+      "properties": {
+        "algorithm": {
+          "enum": [
+            "closed_form_normal_inverse_gamma",
+            "adaptive_gauss_kronrod_correlation",
+            "closed_form_dirichlet_multinomial",
+            "scrambled_sobol_conjugate_posterior"
+          ]
+        },
+        "evaluations": {"type": "integer", "minimum": 0},
+        "calculated_work": {"type": "integer", "minimum": 1},
+        "maximum_work": {"type": "integer", "minimum": 1, "maximum": 500000000},
+        "hard_maximum_work": {"const": 500000000},
+        "root_seed": {"type": ["integer", "null"], "minimum": 0},
+        "diagnostics": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "qmc_dimension": {"type": ["integer", "null"], "minimum": 1},
+        "qmc_replicates": {"type": ["integer", "null"], "minimum": 1},
+        "qmc_points_per_replicate": {"type": ["integer", "null"], "minimum": 1},
+        "child_seeds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "integer", "minimum": 0}
+        },
+        "replicate_max_relative_se": {"type": ["number", "null"], "minimum": 0},
+        "nested_max_relative_shift": {"type": ["number", "null"], "minimum": 0},
+        "qmc_targets": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/qmcTarget"}
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "algorithm": {"const": "scrambled_sobol_conjugate_posterior"}
+            }
+          },
+          "then": {
+            "required": [
+              "qmc_dimension", "qmc_replicates", "qmc_points_per_replicate",
+              "child_seeds", "replicate_max_relative_se",
+              "nested_max_relative_shift", "qmc_targets"
+            ],
+            "properties": {
+              "evaluations": {"const": 32768},
+              "root_seed": {"type": "integer", "minimum": 0},
+              "qmc_replicates": {"const": 8},
+              "qmc_points_per_replicate": {"const": 4096},
+              "child_seeds": {"minItems": 8, "maxItems": 8},
+              "replicate_max_relative_se": {"type": "number", "minimum": 0},
+              "nested_max_relative_shift": {"type": "number", "minimum": 0},
+              "qmc_targets": {"minItems": 1}
+            }
+          },
+          "else": {
+            "properties": {
+              "qmc_dimension": {"const": null},
+              "qmc_replicates": {"const": null},
+              "qmc_points_per_replicate": {"const": null},
+              "child_seeds": {"maxItems": 0},
+              "replicate_max_relative_se": {"const": null},
+              "nested_max_relative_shift": {"const": null},
+              "qmc_targets": {"maxItems": 0}
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "qmcTarget": {
+      "type": "object",
+      "required": [
+        "target_identity", "replicate_medians", "replicate_probabilities_above",
+        "full_interval_low", "full_interval_high", "nested_interval_low",
+        "nested_interval_high", "median_relative_se", "probability_absolute_se",
+        "endpoint_relative_shift"
+      ],
+      "properties": {
+        "target_identity": {"type": "string", "minLength": 1},
+        "replicate_medians": {
+          "type": "array", "minItems": 8, "maxItems": 8,
+          "items": {"type": "number"}
+        },
+        "replicate_probabilities_above": {
+          "type": "array", "minItems": 8, "maxItems": 8,
+          "items": {"type": "number", "minimum": 0, "maximum": 1}
+        },
+        "full_interval_low": {"type": "number"},
+        "full_interval_high": {"type": "number"},
+        "nested_interval_low": {"type": "number"},
+        "nested_interval_high": {"type": "number"},
+        "median_relative_se": {"type": "number", "minimum": 0, "maximum": 0.005},
+        "probability_absolute_se": {"type": "number", "minimum": 0},
+        "endpoint_relative_shift": {"type": "number", "minimum": 0, "maximum": 0.01}
+      },
+      "additionalProperties": false
+    }
+  }
+}
