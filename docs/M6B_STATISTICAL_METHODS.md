@@ -326,6 +326,11 @@ Approval of this B5 boundary approves only the deferral. It does not authorize
 M6C, and it prevents M6B results or quasi-Monte Carlo points from being passed
 off as general fitted-model posterior draws.
 
+The required separate R4/B5 record was subsequently prepared in
+`M6C_STATISTICAL_METHODS.md` and approved by Joshua Myers on 2026-09-15. That
+later approval authorizes M6C under its own contract; it does not retroactively
+expand M6B or alter this accepted deferral boundary.
+
 ## B6: native engine, numerical work, and reproducibility
 
 ### Engine decision

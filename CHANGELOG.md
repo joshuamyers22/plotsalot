@@ -124,3 +124,14 @@
 - Recorded Joshua Myers's independent M6B review, acceptance of every finding
   disposition, and accountable release acceptance, closing M6B while leaving
   R4/M6C and final M6/`0.4` open.
+- Prepared the approval-ready M6C R4/B5 coefficient/meta proposal, entry audit,
+  pending sign-off ledger, and pass-zero verification loop. The proposal fixes
+  strict caller-reported robust/posterior coefficient profiles, a fixed-
+  Student-t4 robust aggregate sensitivity model, a proper-prior Bayesian
+  normal-normal aggregate model with deterministic quadrature, explicit
+  prediction/diagnostic boundaries, bounded work, and no new runtime dependency
+  or fallback. Implementation remains stopped at the accountable approval gate.
+- Recorded Joshua Myers's approval of every R4/B5 M6C entry decision without
+  revision on 2026-09-15, authorizing coefficient/meta implementation and
+  acceptance-fixture construction while leaving technical verification,
+  independent candidate acceptance, and final M6/`0.4` approval open.

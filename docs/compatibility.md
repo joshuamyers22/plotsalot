@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M0–M5, M6A, and M6B complete; M6C pending
+- Status: M0–M5, M6A, and M6B complete; M6C methods approved for implementation
 
 Definitions:
 
@@ -192,3 +192,21 @@ H1/H0 orientation; upstream qualitative evidence labels are not reproduced.
 The native engine uses locked NumPy/SciPy exact expressions, adaptive
 Gauss–Kronrod quadrature, or eight independently scrambled 4,096-point Sobol
 replicates. Bayesian coefficient and meta-analysis remain deferred to M6C.
+
+## Approved M6C coefficient/meta disposition
+
+The approved R4/B5 contract in `M6C_STATISTICAL_METHODS.md` keeps
+`ggcoefstats` behind strict Polars boundaries and adds no fitted robust/Bayesian
+model adapter or posterior-draw input.
+
+| Surface | Approved M6C behavior | Upstream/adaptation disposition |
+|---|---|---|
+| robust coefficients | caller-reported point/confidence interval plus explicit unverified method/tuning/interval provenance; no reconstructed test | Adapted strict summary profile; fitted robust objects remain deferred |
+| posterior coefficients | caller-reported median/equal-tail credible interval/directional probability partition plus explicit unverified model/prior/computation provenance | Adapted estimation-only profile; draws, fitted objects, and reconstructed BF remain deferred |
+| robust aggregate meta-analysis | fixed-Student-t4 independent-study hierarchy; deterministic multistart ML and profile-likelihood inference; latent weights retained; no automatic outlier flag or prediction interval | Adapted sensitivity model; automatic selection/deletion and hidden tuning are rejected |
+| Bayesian aggregate meta-analysis | normal-normal hierarchy; caller-supplied proper normal/half-normal scales; numeric BF10, posterior heterogeneity, true-effect prediction, four sensitivity fits, bounded quadrature | Adapted proper-prior native model; universal/data-derived priors and MCMC are rejected |
+
+Joshua Myers approved these entry classifications without revision on
+2026-09-15. Implementation is authorized; the resulting behavior remains
+unimplemented until verified, and the candidate will require independent review
+before any row becomes implemented/accepted compatibility behavior.

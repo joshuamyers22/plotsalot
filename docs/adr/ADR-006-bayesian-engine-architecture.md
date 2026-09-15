@@ -63,9 +63,10 @@ and all Bayesian statistical methods to B1–B6 approval.
 - Supporting both analytic and sampled paths increases schema and testing work;
   their result variants must share semantics without implying identical
   algorithms or evidence.
-- Exact engine/version selection remains intentionally blocked until M6B method
-  design. This decision does not approve PyMC, ArviZ, a sampler, a prior, or a
-  Bayes factor.
+- At adoption, exact engine/version selection remained blocked until M6B method
+  design. The later approved M6B and M6C clarifications select the locked core
+  for their bounded methods; this ADR still does not approve PyMC, ArviZ, or a
+  general sampler.
 - General Bayesian regression/model execution remains outside plotsalot.
 
 ## Approved M6B clarification
@@ -82,6 +83,17 @@ replicates, approximation diagnostics, work ceilings, and no-retry/no-fallback
 behavior. Joshua Myers approved this clarification with B6 on 2026-09-15. A
 future M6C MCMC or general posterior-sampling path would still require the
 isolated optional extra.
+
+## Approved M6C clarification
+
+The B5 record in `../M6C_STATISTICAL_METHODS.md` requires no sampler. Reported
+posterior coefficient summaries accept neither fitted models nor draws, and the
+Bayesian aggregate normal-normal hierarchy integrates its Gaussian mean
+analytically and its single heterogeneity coordinate by bounded adaptive
+Gauss-Kronrod quadrature. M6C therefore uses the locked NumPy/SciPy core, adds
+no optional Bayesian dependency or RNG, and retains the accepted diagnostic,
+work, atomic-failure, and no-fallback boundaries. Joshua Myers approved this
+clarification with B5 on 2026-09-15.
 
 ## Verification
 

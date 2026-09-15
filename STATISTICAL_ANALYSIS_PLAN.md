@@ -1,6 +1,6 @@
 # Statistical Analysis Plan: Cross-Language Parity Program
 
-- Status: M0–M5, M6A, and M6B complete; M6 R4/M6C pending
+- Status: M0–M5, M6A, and M6B complete; M6C implementation authorized
 - Version: 0.1.0
 - Date: 2026-09-13
 - Statistical owner/reviewer: Joshua Myers; M0 approval recorded 2026-09-14
@@ -159,8 +159,14 @@ approved the detailed B1–B6 contract in `docs/M6B_STATISTICAL_METHODS.md` on
 exact, quadrature, and RQMC scalar, matrix, comparison, categorical, and grouped
 paths with retained priors, numeric BF10 orientation/sensitivity, target-level
 diagnostics, typed identity seeds, and preflighted work. Joshua Myers
-independently reviewed and accepted M6B on 2026-09-15. R4/M6C and final
-M6/`0.4` acceptance remain separate, unauthorized gates.
+independently reviewed and accepted M6B on 2026-09-15. The detailed R4/B5 M6C
+proposal in `docs/M6C_STATISTICAL_METHODS.md` now defines strict reported robust
+and posterior coefficient profiles, fixed-Student-t4 robust aggregate
+meta-analysis, and proper-prior Bayesian normal-normal meta-analysis with
+bounded deterministic quadrature. Joshua Myers approved every R4/B5 M6C entry
+decision without revision on 2026-09-15, authorizing implementation and fixture
+construction. Implementation verification, independent candidate review, and
+final M6/`0.4` acceptance remain separate open gates.
 
 ## Diagnostics and validation
 

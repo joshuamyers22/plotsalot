@@ -1,12 +1,13 @@
 # M6 Robust and Bayesian Method Specification
 
-- Status: M6A R1–R3/G6 and M6B B1–B6 implemented and accepted; R4 pending
+- Status: M6A/M6B accepted; R4/B5 M6C approved for implementation
 - Version: 0.1.0
 - Date: 2026-09-14
 - Statistical owner/reviewer: Joshua Myers
 - Applies to: approved M6A robust continuous-analysis track
-- Companion proposal: `M6B_STATISTICAL_METHODS.md`
-- Reserved for later review: R4
+- Companion specifications: `M6B_STATISTICAL_METHODS.md` and
+  `M6C_STATISTICAL_METHODS.md`
+- Approved later-track record: R4/B5 M6C proposal, 2026-09-15
 
 ## Decision boundary
 
@@ -450,13 +451,16 @@ not required to contain the point estimate.
   replicates, or external compute; and
 - arbitrary upstream/R arguments or plot-layer forwarding.
 
-## Reserved later decisions
+## Later-track decision status
 
-R4 robust coefficient/meta-analysis remains intentionally unprepared. B1–B6
-were approved on 2026-09-15 in `M6B_STATISTICAL_METHODS.md` and implemented in
-the M6B technical candidate. ADR-006 defines the accepted isolation boundary;
-independent review and release acceptance remain open. M6C remains blocked on
-its later R4/B5 record.
+R4 robust coefficient/meta-analysis and the B5 posterior/Bayesian extensions
+are proposed in `M6C_STATISTICAL_METHODS.md`. That proposal fixes strict
+reported-summary tables, a fixed-Student-t4 robust aggregate model, a
+proper-prior normal-normal Bayesian aggregate model, deterministic native
+computation, and no-fallback boundaries. Joshua Myers approved all of those
+entry decisions without revision on 2026-09-15, authorizing M6C implementation
+and fixture construction. B1–B6 were approved, implemented, independently
+reviewed, and accepted on 2026-09-15 under `M6B_STATISTICAL_METHODS.md`.
 
 ## M6A approval record
 
@@ -478,7 +482,9 @@ Joshua Myers approved without revision on 2026-09-14:
 7. the numerical, independent/oracle, calibration, compatibility, resource,
    and explicit-deferral policies exactly as written.
 
-The approval authorizes M6A implementation and acceptance-fixture construction for
-R1–R3/G6 only. It does not approve R4, any B1–B6 Bayesian method or dependency,
-the later M6A release candidate, M6B/M6C, or final M6/`0.4` acceptance. Those
-remain separate gates.
+This historical approval authorized M6A implementation and acceptance-fixture
+construction for R1–R3/G6 only. It did not itself approve R4, B1–B6, the later
+M6A candidate, M6B/M6C, or final M6/`0.4` acceptance. B1–B6 and the M6B
+candidate subsequently passed their separate gates. The R4/B5 M6C proposal
+subsequently passed its entry gate; implementation review and final gates remain
+separate.

@@ -5,9 +5,12 @@ workflows in [`ggstatsplot`](https://github.com/IndrajeetPatil/ggstatsplot).
 
 M0 through M5 are complete, including the accepted `0.3` product gate. The
 M6 robust/Bayesian work is active. The M6A robust continuous-analysis track is
-implemented, independently reviewed, and accepted. M6B Bayesian method
-decisions remain pending. The project remains pre-release and is not yet ready
-for production analytical use.
+implemented, independently reviewed, and accepted. M6B Bayesian data analysis
+is also implemented, independently reviewed, and accepted. The detailed
+R4/B5 M6C coefficient/meta method contract is approved, authorizing the next
+implementation pass. No M6C implementation or candidate acceptance has yet
+been recorded. The project remains pre-release and is not yet ready for
+production analytical use.
 
 ## Development
 
@@ -268,8 +271,8 @@ discordant counts. Pearson paths fail on inadequate expected counts rather than
 switching methods. Pairwise and per-`y` stratum Holm families are retained
 separately, and `pairwise_display` changes annotations only.
 
-The approved classical and M6A robust continuous modes are supported.
-Classical mode includes one-sample Student tests,
+The approved classical, M6A robust-continuous, and M6B Bayesian data-analysis
+modes are supported. Classical mode includes one-sample Student tests,
 per-label mean intervals, two-sided Pearson correlations with Fisher intervals,
 Welch independent comparisons, paired tests, and Greenhouse–Geisser-corrected
 repeated-measures ANOVA, categorical Pearson tests, and exact binary paired
@@ -280,9 +283,12 @@ blocks only. Inputs are limited by default to 1,000,000 rows, 200 dot labels,
 observations, 10,000 subject paths, 20 composed panels, 20 categorical levels
 per axis, 400 categorical cells/labels, 190 categorical pairwise hypotheses,
 and a weighted categorical total of 1,000,000,000. Robust association adds a
-default 100,000,000 and hard 500,000,000 resample-work ceiling. Unsupported
-upstream arguments, nonparametric modes, robust categorical/coefficient/meta
-paths, and every Bayesian mode remain deferred. See
+default 100,000,000 and hard 500,000,000 resample-work ceiling. Bayesian paths
+use approved proper priors and bounded exact, quadrature, or RQMC calculations;
+see `docs/M6B_STATISTICAL_METHODS.md` for their family-specific contracts.
+Unsupported upstream arguments, nonparametric modes, and robust categorical
+analysis remain deferred. The approved M6C coefficient/meta paths are not yet
+implemented or available. See
 [`docs/MILESTONE_0.md`](docs/MILESTONE_0.md),
 [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md),
 [`docs/MILESTONE_2.md`](docs/MILESTONE_2.md),
@@ -290,6 +296,9 @@ paths, and every Bayesian mode remain deferred. See
 [`docs/MILESTONE_4.md`](docs/MILESTONE_4.md),
 [`docs/MILESTONE_5.md`](docs/MILESTONE_5.md),
 [`docs/MILESTONE_6.md`](docs/MILESTONE_6.md),
+[`docs/M6_STATISTICAL_METHODS.md`](docs/M6_STATISTICAL_METHODS.md),
+[`docs/M6B_STATISTICAL_METHODS.md`](docs/M6B_STATISTICAL_METHODS.md),
+[`docs/M6C_STATISTICAL_METHODS.md`](docs/M6C_STATISTICAL_METHODS.md),
 [`docs/CONTRACTS.md`](docs/CONTRACTS.md),
 [`docs/compatibility.md`](docs/compatibility.md), and
 [`STATISTICAL_ANALYSIS_PLAN.md`](STATISTICAL_ANALYSIS_PLAN.md) for scope and

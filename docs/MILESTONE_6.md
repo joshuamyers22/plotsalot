@@ -1,6 +1,6 @@
 # Milestone M6: Robust and Bayesian Methods
 
-- Status: M6A and M6B complete and accepted; M6C entry decisions pending
+- Status: M6A and M6B complete and accepted; M6C implementation authorized
 - Contract date: 2026-09-14
 - Target duration: 8–13 weeks
 - Product and statistical owner: Joshua Myers
@@ -24,8 +24,9 @@ This document fixes product scope, decision gates, and acceptance evidence. The
 M6A R1–R3/G6 methods and ADR-005/ADR-006 boundaries were approved by Joshua
 Myers on 2026-09-14. Joshua Myers approved B1–B6 without revision on
 2026-09-15; he subsequently independently reviewed and accepted the completed
-M6B candidate on that date. R4 remains unprepared, and no M6C robust method is
-authorized by this state.
+M6B candidate on that date. The detailed R4/B5 M6C proposal was prepared on
+2026-09-15 in `M6C_STATISTICAL_METHODS.md`; Joshua Myers approved it without
+revision on that date, authorizing M6C implementation and fixture construction.
 
 ## Entry gate and inherited contracts
 
@@ -124,17 +125,17 @@ function.
 | Pinned-surface audit | Exact applicable signatures, backend calls, result fields, dependency versions, and deliberate adaptations recorded | All | Complete for M6A entry |
 | ADR-005 robust architecture | Approved estimator/resampling/dependency/fallback policy | M6A/M6C | Accepted 2026-09-14 |
 | ADR-006 Bayesian architecture | Approved engine/optional-extra/RNG/artifact/diagnostic policy | M6B/M6C | Accepted 2026-09-14; M6B engine fixed by approved B6 on 2026-09-15 |
-| M6 statistical method specification | Approved R1–R4, B1–B6, and G6 decisions with estimands and failure behavior | All | R1–R3/G6 approved 2026-09-14; B1–B6 approved 2026-09-15; R4 pending |
+| M6 statistical method specification | Approved R1–R4, B1–B6, and G6 decisions with estimands and failure behavior | All | R1–R3/G6 approved 2026-09-14; B1–B6 and R4/B5 M6C approved 2026-09-15 |
 | Robust analysis contracts | Typed, immutable robust analyses for every M6A family with analytic/independent evidence | M6A | Technical candidate verified |
 | Bayesian analysis contracts | Typed Bayesian analyses for every M6B family with prior/computation provenance and calibration evidence | M6B | Complete and accepted 2026-09-15 |
-| Coefficient/meta extensions | Strict robust/posterior coefficient summaries plus approved robust/Bayesian aggregate meta-analysis | M6C | Planned |
-| Result schemas | Versioned JSON-safe robust, posterior, evidence, diagnostic, warning, audit, and limit records | All | M6A schema v2 verified; M6B schema v3 candidate implemented |
+| Coefficient/meta extensions | Strict robust/posterior coefficient summaries plus approved robust/Bayesian aggregate meta-analysis | M6C | Entry contract approved; implementation not started |
+| Result schemas | Versioned JSON-safe robust, posterior, evidence, diagnostic, warning, audit, and limit records | All | M6A schema v2 and M6B schema v3 verified; M6C mode-version extension approved for implementation |
 | Semantic renderers | Layer/injection tests prove every displayed estimate, interval, evidence label, diagnostic, and centrality value comes from the result | All | M6A and M6B verified |
-| Grouping/extraction/composition | Atomic grouped execution and exact result identity across classical/robust/Bayesian mixed dashboards | All | M6A verified; M6B grouped result preservation implemented |
-| Oracle and independent evidence | Raw pinned-R objects, normalized fields, independent calculations, simulation/calibration summaries, and hashed manifest | All | M6A pinned-R/base-R formula evidence verified; later tracks planned |
-| Performance and work baselines | Phase-separated robust and Bayesian grids with time, memory, draws/evaluations, and ceilings | All | M6A and M6B candidate baselines verified |
-| Compatibility disposition | Every touched `type`, tuning, prior, evidence, model, and meta argument classified and tested | All | M6A complete; M6B candidate disposition recorded |
-| Public documentation | Supported modes, assumptions, priors, diagnostics, reproducibility, limits, errors, adaptations, and examples match implementation | All | M6A complete; M6B candidate documented |
+| Grouping/extraction/composition | Atomic grouped execution and exact result identity across classical/robust/Bayesian mixed dashboards | All | M6A/M6B verified; M6C has no grouped coefficient surface |
+| Oracle and independent evidence | Raw pinned-R objects, normalized fields, independent calculations, simulation/calibration summaries, and hashed manifest | All | M6A/M6B verified; M6C entry audit prepared and implementation evidence planned |
+| Performance and work baselines | Phase-separated robust and Bayesian grids with time, memory, draws/evaluations, and ceilings | All | M6A/M6B verified; M6C planned |
+| Compatibility disposition | Every touched `type`, tuning, prior, evidence, model, and meta argument classified and tested | All | M6A/M6B complete; M6C entry disposition approved |
+| Public documentation | Supported modes, assumptions, priors, diagnostics, reproducibility, limits, errors, adaptations, and examples match implementation | All | M6A/M6B complete; M6C entry contract documented |
 | Production gate | Check, audit, build, isolated-wheel/core-import and Bayesian-extra smoke, oracle, benchmark, and reproducibility verification pass | All | M6A and M6B verified |
 | Review and sign-off | Verification loops, adversarial findings, independent review, Joshua Myers track acceptance, and final M6/`0.4` approval | All | M6A accepted 2026-09-14; M6B accepted 2026-09-15; M6C/final gate blocking |
 
@@ -506,6 +507,7 @@ are never accepted and ignored.
 - `docs/adr/ADR-005-robust-method-architecture.md`;
 - `docs/adr/ADR-006-bayesian-engine-architecture.md`;
 - `docs/M6_STATISTICAL_METHODS.md`;
+- `docs/M6C_STATISTICAL_METHODS.md`;
 - `docs/evidence/M6A_VERIFICATION_LOOP.md`;
 - `docs/evidence/M6A_ADVERSARIAL_REVIEW.md`;
 - `docs/evidence/M6A_VERIFICATION.md`;
@@ -514,6 +516,7 @@ are never accepted and ignored.
 - `docs/evidence/M6B_ADVERSARIAL_REVIEW.md`;
 - `docs/evidence/M6B_VERIFICATION.md`;
 - `docs/evidence/M6B_SIGNOFF.md`;
+- `docs/evidence/M6C_METHOD_AUDIT.md`;
 - `docs/evidence/M6C_VERIFICATION_LOOP.md`;
 - `docs/evidence/M6C_ADVERSARIAL_REVIEW.md`;
 - `docs/evidence/M6C_VERIFICATION.md`;
@@ -563,6 +566,8 @@ was accepted by Joshua Myers on 2026-09-14. Joshua Myers approved B1–B6,
 independently reviewed the three-pass M6B candidate, and accepted M6B on
 2026-09-15. Its evidence is recorded in
 `M6B_STATISTICAL_METHODS.md`, `evidence/M6B_METHOD_AUDIT.md`,
-`evidence/M6B_SIGNOFF.md`, and `evidence/M6B_VERIFICATION_LOOP.md`. R4 is the
-next gate and remains unprepared, blocking the M6C robust coefficient/meta
-track and final M6/`0.4` acceptance.
+`evidence/M6B_SIGNOFF.md`, and `evidence/M6B_VERIFICATION_LOOP.md`. The R4/B5
+M6C proposal, entry audit, sign-off ledger, and pass-zero verification
+loop are now prepared. Joshua Myers approved every R4/B5 entry decision without
+revision on 2026-09-15. M6C implementation pass 1 is the next gate; candidate
+acceptance and final M6/`0.4` acceptance remain open.

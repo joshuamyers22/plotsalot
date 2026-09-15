@@ -86,11 +86,22 @@ Adopt option 3 for M6A under the approved R1–R3 and G6 decisions in
   replace a native kernel through a later ADR while preserving public result
   semantics and evidence fixtures.
 
+## Approved M6C clarification
+
+The R4 record in `../M6C_STATISTICAL_METHODS.md` extends the same native,
+bounded, no-fallback architecture to M6C. Caller-reported robust coefficient
+intervals perform no fitting. Robust aggregate meta-analysis uses the approved
+fixed-Student-t4 hierarchy, deterministic multistart maximum likelihood,
+profile-likelihood inference, retained latent weights, and explicit work and
+convergence records. It adds no robust-statistics runtime dependency, RNG, or
+automatic study deletion. Joshua Myers approved this clarification with R4 on
+2026-09-15.
+
 ## Verification
 
 Acceptance requires:
 
-- Joshua Myers's approval of this ADR and applicable R1–R3/G6 decisions;
+- Joshua Myers's approval of this ADR and applicable R1–R4/G6 decisions;
 - direct unit tests for every trimmed/Winsorized formula and boundary;
 - analytic or separately implemented reference calculations;
 - raw and normalized pinned WRS2/statsExpressions fixtures;
