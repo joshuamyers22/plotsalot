@@ -104,5 +104,5 @@
 
 | Question | Decision deadline | Owner | ADR |
 |---|---|---|---|
-| Select the final M6C robust-meta disposition after the locked mapping, confirmation, and independent review | M7B close | Joshua Myers | M7-D2 / ADR-005 |
+| Select replace or reclassify for M6C robust meta after the mapping fit-failure blocker, locked confirmation, and independent review | M7B close | Joshua Myers | M7-D2 / ADR-005 |
 | Accept the exact hardened candidate as plotsalot 1.0 | M7 exit | Joshua Myers | M7 contract |

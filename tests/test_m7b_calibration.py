@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import tempfile
 import unittest
 from collections import Counter
@@ -30,6 +31,8 @@ from tools.calibrate_m7b import (
     mapping_scenarios,
     summarize_cell,
 )
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class M7BScenarioTests(unittest.TestCase):
@@ -184,6 +187,61 @@ class M7BSummaryTests(unittest.TestCase):
             self.assertRaisesRegex(ValueError, "must stay under .work"),
         ):
             _preflight("smoke", 1, Path(directory) / "retained.json")
+
+
+class M7BMappingEvidenceTests(unittest.TestCase):
+    def test_locked_mapping_artifact_retains_every_cell_and_failure(self) -> None:
+        artifact = ROOT / "docs" / "evidence" / "m7b-robust-meta-mapping.json"
+        payload = json.loads(artifact.read_text())
+
+        self.assertEqual(payload["schema_version"], 1)
+        self.assertEqual(payload["plan_version"], 1)
+        self.assertEqual(payload["run"], "mapping")
+        self.assertEqual(payload["status"], "completed_with_reaffirmation_blocker")
+        self.assertEqual(payload["decision_disposition"], "not_decided")
+        self.assertEqual(
+            payload["source_commit"], "d272aea402b77144d2ce2ef9cdaf52743e53916f"
+        )
+        self.assertTrue(payload["source_tree_clean"])
+        self.assertEqual(payload["seed_root"], MAPPING_SEED)
+        self.assertEqual(payload["cases_per_cell"], MAPPING_CASES)
+        self.assertEqual(payload["scenario_count"], 38)
+        self.assertEqual(payload["total_fits"], 76_000)
+        self.assertEqual(len(payload["cells"]), 38)
+        self.assertFalse(any(cell["undercoverage"] for cell in payload["cells"]))
+
+        failed = [cell for cell in payload["cells"] if cell["failures"]]
+        self.assertEqual(len(failed), 1)
+        self.assertEqual(
+            failed[0]["scenario"]["scenario_id"],
+            "primary-k010-tau-0p0250-mu-0p0000-linear",
+        )
+        self.assertEqual(
+            failed[0]["failure_counts"], {"robust_meta_ambiguous_optimum": 1}
+        )
+        self.assertEqual(sum(cell["failures"] for cell in payload["cells"]), 1)
+        self.assertEqual(
+            {
+                cell["scenario"]["scenario_id"]
+                for cell in payload["cells"]
+                if cell["conservative"]
+            },
+            {
+                "primary-k010-tau-0p0000-mu-0p0000-linear",
+                "primary-k010-tau-0p0250-mu-0p0000-linear",
+                "primary-k030-tau-0p0000-mu-0p0000-linear",
+                "primary-k030-tau-0p0250-mu-0p0000-linear",
+                "translation-k050-tau-0p0625-mu-0p3000-linear",
+            },
+        )
+
+        digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        sealed_digest, sealed_name = (
+            artifact.with_suffix(".json.sha256").read_text().split()
+        )
+        self.assertEqual(sealed_digest, digest)
+        self.assertEqual(sealed_name, artifact.name)
+        self.assertLessEqual(artifact.stat().st_size, 5 * 1024 * 1024)
 
 
 if __name__ == "__main__":

@@ -16,6 +16,9 @@ versioning for published package releases.
 - Added the locked M7B robust-meta boundary-calibration driver with immutable
   scenario/seed identities, failure-inclusive summaries, sealed artifacts, and
   a passing disposable 760-fit harness smoke.
+- Retained the one-time 76,000-fit M7B mapping artifact unchanged; its single
+  ambiguous-optimum failure blocks reaffirmation under the approved plan, while
+  no cell triggered the predeclared undercoverage flag.
 
 ## 0.1.1 - 2026-09-15
 

@@ -1,6 +1,7 @@
 # M7 Robust Meta-analysis Calibration Plan
 
-- Status: approved as plan version 1; execution authorized by M7-D2
+- Status: approved version 1; locked mapping retained with a reaffirmation
+  blocker, confirmation pending
 - Date: 2026-09-15
 - Applies to: fixed-Student-t4 aggregate robust meta-analysis only
 - Prior evidence: `evidence/M6C_PASS2_VERIFICATION.md` and retained JSON artifacts
