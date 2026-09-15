@@ -107,6 +107,16 @@ class RepositoryPolicyTests(unittest.TestCase):
             "theme_ggstatsplot",
         }
         exports = ledger["exports"]
+        self.assertEqual(ledger["status"], "accepted")
+        self.assertEqual(
+            ledger["approval"],
+            {
+                "decision": "M7-D1",
+                "owner": "Joshua Myers",
+                "approved_at": "2026-09-15",
+                "scope": "stabilize_existing_adapted_surface",
+            },
+        )
         names = [item["upstream_export"] for item in exports]
         self.assertEqual(len(names), len(set(names)))
         self.assertEqual(set(names), expected)
@@ -136,6 +146,14 @@ class RepositoryPolicyTests(unittest.TestCase):
         allowed = set(ledger["proposal"]["gap_dispositions"])
         self.assertTrue(gaps)
         self.assertTrue(all(gap["proposal"] in allowed for gap in gaps))
+        self.assertEqual(
+            sum(gap["proposal"] == "post_1_0" for gap in gaps),
+            29,
+        )
+        self.assertEqual(
+            sum(gap["proposal"] == "rejected" for gap in gaps),
+            19,
+        )
 
 
 if __name__ == "__main__":

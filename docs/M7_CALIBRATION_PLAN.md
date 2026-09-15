@@ -1,6 +1,6 @@
 # M7 Robust Meta-analysis Calibration Plan
 
-- Status: proposed; M7-D2 statistical-owner approval required before execution
+- Status: approved as plan version 1; execution authorized by M7-D2
 - Date: 2026-09-15
 - Applies to: fixed-Student-t4 aggregate robust meta-analysis only
 - Prior evidence: `evidence/M6C_PASS2_VERIFICATION.md` and retained JSON artifacts
@@ -168,9 +168,14 @@ validate coverage of this different fixed-Student-t4 model.
 - Do not add cases after inspecting results. More precision requires a versioned,
   owner-approved follow-up plan with new seeds and an explicit rationale.
 
-## Required approval record
+## Approval record
 
-M7-D2 approval must name the accepted plan version, seeds, grid, case counts,
-summaries, blockers, resource ceiling, and independent reviewer before the
-mapping or confirmation evidence is generated. Final owner disposition is
-recorded only after both locked artifacts and the independent review exist.
+Joshua Myers approved M7-D2 without revision on 2026-09-15. The accepted plan
+is version 1: the exact primary and audit grids above; seed roots `2026091530`,
+`2026091531`, and `2026091532`; 20-case smoke, 2,000-case mapping, and
+5,000-case confirmation counts; the predeclared summaries and blockers; a
+ceiling of 80,000 mapping fits, 40,000 confirmation fits, 2,000 development
+fits, 16 workers, 36 aggregate runner-hours, and 5 MiB per retained summary;
+and Joshua Myers as independent reviewer of the Codex-authored driver and
+evidence. Final owner disposition is recorded only after both locked artifacts
+and the independent review exist.

@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "status": "proposed",
-  "approval_required": "M7-D1",
+  "status": "accepted",
+  "approval": {
+    "decision": "M7-D1",
+    "owner": "Joshua Myers",
+    "approved_at": "2026-09-15",
+    "scope": "stabilize_existing_adapted_surface"
+  },
   "upstream": {
     "name": "ggstatsplot",
     "revision": "7a724cd0ab55668b9d0b2e84b12c711c5be68ac8",

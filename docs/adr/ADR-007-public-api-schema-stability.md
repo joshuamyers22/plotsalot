@@ -1,6 +1,6 @@
 # ADR-007: Public API and Schema Stability for 1.x
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-15
 - Owner: Joshua Myers
 - Decision gate: M7-D3
@@ -18,7 +18,7 @@ estimand, interval, prior, correction, randomness, result units, warning, or
 refusal behavior. Conversely, pixel-level rendering changes need not be breaking
 when semantic axes, layers, annotations, and result identity remain stable.
 
-## Proposed decision
+## Decision
 
 Adopt [`../API_STABILITY.md`](../API_STABILITY.md) as the normative 1.x policy,
 subject to the exact public manifest, schema fixtures, error inventory, and
@@ -31,10 +31,11 @@ migrations, and a normal deprecation window of at least one minor release and
 90 days. Statistical meaning is part of compatibility. Pixel output, exact
 message prose, undocumented internals, and arbitrary artist mutation are not.
 
-This ADR remains proposed until Joshua Myers approves M7-D3. Drafting it does
-not freeze the current pre-1.0 surface or authorize a 1.0 release.
+Joshua Myers approved M7-D3 without revision on 2026-09-15. This decision adopts
+the policy for M7 hardening; it does not freeze the current pre-1.0 surface or
+authorize a 1.0 release before the required inventories and evidence pass.
 
-## Consequences if accepted
+## Consequences
 
 - M7 must generate and review a public-name/signature/CLI manifest.
 - Every emitted serialized variant needs a retained golden fixture and matching
@@ -58,7 +59,6 @@ not freeze the current pre-1.0 surface or authorize a 1.0 release.
 
 ## Approval and verification
 
-Acceptance requires M7-D3 owner approval plus the evidence listed in
-`API_STABILITY.md`. The final ADR status and exact accepted policy revision must
-be updated in the same reviewed change; implementation completion and final 1.0
-release acceptance remain separate gates.
+M7-D3 owner approval is recorded above. The implementation evidence listed in
+`API_STABILITY.md`, implementation completion, and final 1.0 release acceptance
+remain separate gates.

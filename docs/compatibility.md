@@ -1,17 +1,17 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M0–M6 complete; combined 0.4 product gate accepted; proposed M7
-  closure ledger awaiting owner approval
+- Status: M0–M6 complete; combined 0.4 product gate accepted; M7 closure
+  ledger approved 2026-09-15
 
-The proposed machine-readable M7 disposition ledger is
+The approved machine-readable M7 disposition ledger is
 [`m7/compatibility-disposition.json`](m7/compatibility-disposition.json). It
-stabilizes the existing adapted surface for all 22 exports, proposes explicit
+stabilizes the existing adapted surface for all 22 exports, records explicit
 post-1.0 or rejected dispositions for remaining capability clusters, and is
-validated against the pinned upstream revision and public Python exports. It is
-not an accepted 1.0 scope until M7-D1 approval. Milestone-era sections below are
-historical: later M6 implementation supersedes earlier text that called an
-implemented robust or Bayesian mode deferred.
+validated against the pinned upstream revision and public Python exports.
+Joshua Myers approved this 1.0 scope through M7-D1 on 2026-09-15. Milestone-era
+sections below are historical: later M6 implementation supersedes earlier text
+that called an implemented robust or Bayesian mode deferred.
 
 Definitions:
 

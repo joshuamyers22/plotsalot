@@ -31,13 +31,13 @@ rules, uncertainty, failure behavior, and adaptation decisions.
 ## Development and evidence
 
 - [Project plan](PROJECT_PLAN.md)
-- [M7 proposed contract](MILESTONE_7.md)
-- [Proposed 1.x API and schema stability policy](API_STABILITY.md)
+- [M7 active contract](MILESTONE_7.md)
+- [1.x API and schema stability policy](API_STABILITY.md)
 - [M7 robust meta-analysis calibration plan](M7_CALIBRATION_PLAN.md)
 - [Release procedure](RELEASING.md)
 - [Milestone records](MILESTONE_0.md)
 - [Architecture decisions](adr/ADR-001-project-identity.md)
-- [Proposed 1.x stability decision](adr/ADR-007-public-api-schema-stability.md)
+- [Accepted 1.x stability decision](adr/ADR-007-public-api-schema-stability.md)
 - [Verification and sign-off records](evidence/M6_RELEASE_VERIFICATION.md)
 - [Pinned upstream manifest](upstream/README.md)
 - [Parquet dataset contract](PARQUET_DATASETS.md)

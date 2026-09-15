@@ -13,11 +13,11 @@
   inferred subjects, partial grouped output, and generic Bayesian/model-fitting
   frameworks.
 - Risk class: high-risk statistical and public-compatibility boundary.
-- Implementation owner: Codex (proposed; confirm at M7 entry approval).
+- Implementation owner: Codex.
 - Accountable approver: Joshua Myers for product/statistical and final release
-  decisions; Joshua Myers is the proposed independent reviewer and must confirm
-  that role at entry.
-- Starting revision: first commit containing the proposed M7 entry artifacts.
+  decisions; Joshua Myers is the confirmed independent reviewer.
+- Starting revision: `f65629d`, the first commit containing the M7 entry
+  artifacts; entry decisions were approved on 2026-09-15.
 
 ## Rubric
 
@@ -51,7 +51,7 @@
 
 | # | Implemented slice | New evidence/context | Required finding treatment | Focused/full gates |
 |---:|---|---|---|---|
-| 1 | M7A inventory and contract | 22-export machine ledger, current public names/signatures, schema and CLI inventory | Correct omissions/duplicates/stale milestone claims; obtain M7-D1/D3 entry approval | Ledger policy tests, docs links, lint/type/test |
+| 1 | M7A inventory and contract | 22-export machine ledger, current public names/signatures, schema and CLI inventory | Correct omissions/duplicates/stale milestone claims against approved M7-D1/D3 boundaries | Ledger policy tests, docs links, lint/type/test |
 | 2 | M7B statistical boundary | Locked mapping and confirmation artifacts plus independent likelihood/coverage review | Retain every cell and failure; owner chooses reaffirm/replace/reclassify | Focused calibration verifier, M6C tests, oracle checks |
 | 3 | M7C adversarial stability | Golden schema mutations, invalid/degenerate/resource/group faults, old-call compatibility, migration replay | Close silent breaks and unstable message-only contracts | Full `make check`, audit, schema/API manifest checks |
 | 4 | M7D release candidate | Clean source build, sdist/wheel contents, isolated 3.11/3.12 installs, public smoke, benchmarks, docs and independent review | No blocker or unowned major risk; separate statistical and release sign-off | Full production/reproducibility and release-readiness gates |
@@ -60,19 +60,20 @@
 
 | ID | Location and evidence | Consequence | Severity | Current disposition | Acceptance check | Owner |
 |---|---|---|---|---|---|---|
-| M7-F001 | `docs/evidence/M6C_PASS2_VERIFICATION.md`; exact-zero-heterogeneity conservative coverage | Current provisional rule depends on unknowable generating `tau` | Blocking | Open; execute only after M7-D2 approval | Locked M7 artifacts and final owner disposition | Joshua Myers |
+| M7-F001 | `docs/evidence/M6C_PASS2_VERIFICATION.md`; exact-zero-heterogeneity conservative coverage | Current provisional rule depends on unknowable generating `tau` | Blocking | Open; M7-D2 plan approved, locked execution not started | Locked M7 artifacts and final owner disposition | Joshua Myers |
 | M7-F002 | `PROJECT_BRIEF.md` previously retained resolved 0.1.1/security questions | Planning state could misdirect M7 work | Major | Correct in M7 entry slice | Brief names only current decisions | Implementation owner |
-| M7-F003 | No accepted 1.x API/schema policy or generated public manifest | Downstream compatibility promise is undefined | Blocking | Proposed policy; inventory not started | M7-D3 approval and manifest/golden tests | Joshua Myers |
-| M7-F004 | Deferred capability prose spans several milestone-era sections | Older text can call an implemented M6 mode deferred | Major | Machine ledger is proposed authority; reconciliation pending | Reviewed ledger plus compatibility-doc reconciliation | Product owner |
+| M7-F003 | No generated public manifest or retained stability fixtures | Downstream compatibility promise cannot yet be enforced | Blocking | M7-D3 policy accepted; inventory not started | Manifest and golden contract tests | Joshua Myers |
+| M7-F004 | Deferred capability prose spans several milestone-era sections | Older text can call an implemented M6 mode deferred | Major | Machine ledger accepted as authority; reconciliation pending | Reviewed ledger plus compatibility-doc reconciliation | Product owner |
 
 ## Exit
 
-- Stop reason: active after M7 entry approval; currently awaiting authority.
-- Current rubric result: planning artifacts exist; all three entry decisions and
-  the named independent reviewer remain blocking.
+- Stop reason: M7 is active; begin M7A public-contract inventory.
+- Current rubric result: all three entry decisions and the independent reviewer
+  are confirmed; implementation evidence remains open.
 - Full quality gate: required after this entry slice and after every accepted
   implementation boundary.
-- Remaining uncertainty: exact M7-D1 scope, M7-D2 experiment approval/final
-  disposition, M7-D3 policy approval, and independent-review ownership.
-- Durable facts are promoted only after approval and evidence; proposals remain
-  labeled proposed in project memory and maintained documentation.
+- Remaining uncertainty: the M7-D2 evidence-backed final disposition, exact
+  public manifest and fixtures, compatibility prose reconciliation, and final
+  1.0 candidate acceptance.
+- Approved entry facts are promoted to project memory; implementation and final
+  release claims remain evidence-gated.

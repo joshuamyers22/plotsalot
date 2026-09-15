@@ -1,6 +1,6 @@
-# Proposed 1.x API and Schema Stability Policy
+# 1.x API and Schema Stability Policy
 
-- Status: proposed; M7-D3 owner approval required
+- Status: accepted by M7-D3 on 2026-09-15
 - Applies from: the first accepted 1.0 release
 - Owner: Joshua Myers
 
@@ -9,7 +9,7 @@
 This policy defines what downstream users may rely on during the 1.x series and
 what remains implementation detail. It does not retroactively declare every
 pre-1.0 behavior stable. M7 must inventory the exact 1.0 candidate and publish
-any migration required from `0.1.1` before this policy becomes accepted.
+any migration required from `0.1.1` before the first 1.0 release is accepted.
 
 ## Versioning rules
 
@@ -145,9 +145,9 @@ window. The exception requires an accountable decision record, affected-version
 notice, recovery guidance, and a patch/minor release chosen according to the
 smallest safe response.
 
-## M7 acceptance evidence
+## M7 implementation evidence
 
-Before this policy is accepted, M7 must produce:
+Before the first 1.0 release is accepted, M7 must produce:
 
 - a generated public-name/signature manifest reviewed against documentation;
 - a console-script and exit-contract inventory;
@@ -158,4 +158,4 @@ Before this policy is accepted, M7 must produce:
 - an error/refusal inventory that separates stable types/codes from prose;
 - a `0.1.1` to 1.0 migration document, including an explicit “no change” entry
   for every reviewed boundary that remains compatible; and
-- owner approval recorded in M7-D3.
+- the M7-D3 owner approval recorded in the milestone and ADR.

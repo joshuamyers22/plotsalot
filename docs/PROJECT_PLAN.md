@@ -12,7 +12,7 @@ on 2026-09-13. This repository executes that plan through the following gates.
 | M4 | Categorical bar/pie families ([detail](MILESTONE_4.md)) | 3–4 weeks |
 | M5 | Coefficients and approved frequentist meta-analysis ([detail](MILESTONE_5.md)) | 4–6 weeks |
 | M6 | Robust and Bayesian methods ([detail](MILESTONE_6.md)) | 8–13 weeks |
-| M7 | Compatibility closure, hardening, documentation, 1.0 ([proposed contract](MILESTONE_7.md)) | 4–6 weeks |
+| M7 | Compatibility closure, hardening, documentation, 1.0 ([active contract](MILESTONE_7.md)) | 4–6 weeks |
 
 M0 through M6 are complete. Joshua Myers approved each method family and the
 final combined M6/`0.4` candidate by 2026-09-15 after the retained technical,
@@ -23,9 +23,9 @@ current-state summary.
 M7 compatibility closure and 1.0 hardening are next. It must revisit the
 provisional M6C conservative-coverage disposition for `k<20` or generating
 `tau=0`, finish every deferred compatibility classification required for 1.0,
-and establish the public API/schema stability boundary. The proposed M7 entry
-contract, compatibility ledger, calibration experiment, and stability policy
-await owner approval before implementation. Version `0.1.1` was published to
+and establish the public API/schema stability boundary. Joshua Myers approved
+the M7 entry contract, compatibility ledger, locked calibration experiment, and
+stability policy without revision on 2026-09-15. Version `0.1.1` was published to
 PyPI through the protected GitHub trusted-publishing workflow on 2026-09-15.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months

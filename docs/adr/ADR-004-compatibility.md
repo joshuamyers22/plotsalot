@@ -27,8 +27,9 @@ Visual equivalence requires semantic layers and annotations, not pixels.
 
 ## Verification
 
-`tests/test_repository_policy.py` compares the proposed M7 machine ledger with
+`tests/test_repository_policy.py` compares the accepted M7 machine ledger with
 the pinned upstream name, revision, export count, exact 22-export inventory, and
 exported Python surfaces. It also rejects duplicate exports/gap identifiers and
-unknown disposition values. Passing that structural test does not approve a
-proposed product disposition; M7-D1 remains an accountable owner gate.
+unknown disposition values. Joshua Myers approved the product dispositions
+through M7-D1 on 2026-09-15; passing the structural test guards that accepted
+boundary against drift.

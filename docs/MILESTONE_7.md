@@ -1,11 +1,11 @@
 # Milestone M7: Compatibility Closure and 1.0 Hardening
 
-- Status: proposed; M7 entry approval required
+- Status: active; M7-D1 through M7-D3 approved 2026-09-15
 - Contract date: 2026-09-15
 - Target duration: 4–6 weeks after entry approval
 - Product and statistical owner: Joshua Myers
-- Implementation owner: Codex (proposed; confirm at entry approval)
-- Independent-review owner: Joshua Myers (proposed; confirm at entry approval)
+- Implementation owner: Codex
+- Independent-review owner: Joshua Myers
 
 ## Objective
 
@@ -16,10 +16,10 @@ API and serialized-result guarantees, hardens the supported workflows, and
 produces reviewable 1.0 release evidence.
 
 M7 is not a mandate to reproduce every `ggstatsplot` argument or R model class.
-The proposed 1.0 product boundary stabilizes the 22 already dispositioned
+The approved 1.0 product boundary stabilizes the 22 already dispositioned
 upstream exports and their implemented Python surfaces. Deferred capabilities
 remain visible as approved post-1.0 candidates or explicit non-goals unless the
-product/statistical owner changes that proposal at the entry gate.
+product/statistical owner approves a later scope change.
 
 ## Entry state and inherited contracts
 
@@ -44,16 +44,15 @@ The pinned compatibility baseline remains
 `ggstatsplot@7a724cd0ab55668b9d0b2e84b12c711c5be68ac8`. Updating that revision is a
 separate scope decision because upstream drift cannot silently redefine 1.0.
 
-## Required entry decisions
+## Approved entry decisions
 
-Implementation beyond inventory and planning may begin only after the owner
-records all three decisions:
+Joshua Myers approved all three entry decisions without revision on 2026-09-15:
 
-| ID | Decision | Proposed disposition | Approval state |
+| ID | Decision | Approved disposition | Approval state |
 |---|---|---|---|
-| M7-D1 | Exact 1.0 compatibility scope | Stabilize the existing adapted surface for all 22 upstream exports; add no new statistical family solely for 1.0 | Pending |
-| M7-D2 | M6C robust-meta calibration experiment and decision options | Run the locked boundary experiment in `M7_CALIBRATION_PLAN.md`, then reaffirm, replace, or reclassify the method from retained evidence | Pending |
-| M7-D3 | Public API, schema, deprecation, and migration promise | Adopt `API_STABILITY.md` as the 1.x compatibility contract | Pending |
+| M7-D1 | Exact 1.0 compatibility scope | Stabilize the existing adapted surface for all 22 upstream exports; add no new statistical family solely for 1.0 | Approved 2026-09-15 |
+| M7-D2 | M6C robust-meta calibration experiment and decision options | Run the locked boundary experiment in `M7_CALIBRATION_PLAN.md`, then reaffirm, replace, or reclassify the method from retained evidence | Approved 2026-09-15 |
+| M7-D3 | Public API, schema, deprecation, and migration promise | Adopt `API_STABILITY.md` as the 1.x compatibility contract | Approved 2026-09-15 |
 
 Approval authorizes the planned work and acceptance fixtures. It does not
 accept an implementation, a calibration result, a release candidate, or 1.0.
@@ -71,15 +70,15 @@ M7A is the entry gate. M7B and M7C may proceed independently after their
 applicable decisions are approved. M7D begins only after M7A–M7C have no open
 blocking finding.
 
-## Proposed 1.0 compatibility boundary
+## Approved 1.0 compatibility boundary
 
-The source of truth for the proposal is
+The source of truth for the approved boundary is
 [`m7/compatibility-disposition.json`](m7/compatibility-disposition.json). It
 must contain exactly the 22 exports in the pinned upstream inventory, exactly
-one proposal for each export, unique gap identifiers, and only declared
+one disposition for each export, unique gap identifiers, and only declared
 disposition values.
 
-The proposal follows these rules:
+The boundary follows these rules:
 
 - Existing supported classical, robust, Bayesian, grouped, extraction,
   composition, and theme behavior is in the 1.0 stabilization boundary.
@@ -96,7 +95,7 @@ The proposal follows these rules:
 
 ## API and schema hardening boundary
 
-The proposed stability rules are specified in [`API_STABILITY.md`](API_STABILITY.md).
+The approved stability rules are specified in [`API_STABILITY.md`](API_STABILITY.md).
 M7C must inventory and test at least:
 
 - every name in `plotsalot.__all__` and every installed console script;
@@ -130,9 +129,9 @@ under a new threshold.
 
 | Deliverable | Required evidence | Initial state |
 |---|---|---|
-| M7 contract and decision ledger | Owner-approved M7-D1 through M7-D3 | Proposed |
-| Machine-readable compatibility closure | Exact 22-export inventory test and unique disposition coverage | Proposed ledger added; approval pending |
-| Robust-meta boundary resolution | Locked experiment artifact, independent calculation/review, and owner disposition | Experiment proposed; no M7 run authorized |
+| M7 contract and decision ledger | Owner-approved M7-D1 through M7-D3 | Accepted 2026-09-15 |
+| Machine-readable compatibility closure | Exact 22-export inventory test and unique disposition coverage | Scope approved; implementation reconciliation active |
+| Robust-meta boundary resolution | Locked experiment artifact, independent calculation/review, and owner disposition | Experiment authorized; no M7 evidence run completed |
 | Public API manifest | Generated/retained names and signatures compared in CI with reviewed exceptions | Not started |
 | Schema stability fixtures | Golden serialized variants, schema validation, version/migration tests, and mutation rejection | Not started |
 | Error and refusal contract | Typed error/code inventory plus invalid, degenerate, ceiling, and atomic-group fault tests | Not started |
