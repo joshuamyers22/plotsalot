@@ -3,7 +3,7 @@
 Notable user-visible changes are recorded here. Plotsalot follows semantic
 versioning for published package releases.
 
-## 0.1.1 - Unreleased
+## 0.1.1 - 2026-09-15
 
 - Reorganized the package documentation around installation, getting started,
   task-oriented workflows, interpretation boundaries, and maintained evidence.
