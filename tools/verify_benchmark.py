@@ -13,6 +13,7 @@ M3_RESULT = ROOT / "benchmarks" / "results" / "m3-baseline.json"
 M4_RESULT = ROOT / "benchmarks" / "results" / "m4-baseline.json"
 M5A_RESULT = ROOT / "benchmarks" / "results" / "m5a-baseline.json"
 M5B_RESULT = ROOT / "benchmarks" / "results" / "m5b-baseline.json"
+M6A_RESULT = ROOT / "benchmarks" / "results" / "m6a-baseline.json"
 
 
 def _positive_int(value: Any, label: str) -> int:
@@ -244,6 +245,70 @@ def verify_benchmark() -> None:
                 raise AssertionError(f"M5B {studies}.{case}: invalid phases")
             for phase in ("selection", "analysis", "render"):
                 _verify_summary(phases.get(phase), f"M5B.{studies}.{case}.{phase}")
+
+    m6a = json.loads(M6A_RESULT.read_text())
+    if m6a.get("schema_version") != 1:
+        raise AssertionError("unsupported M6A benchmark schema")
+    measurement = m6a.get("measurement", {})
+    if measurement.get("repeats") != 5:
+        raise AssertionError("M6A baseline must retain five samples")
+    if measurement.get("input_frame_allocation") != "outside measured phases":
+        raise AssertionError("M6A input allocation boundary must be explicit")
+
+    histogram = m6a.get("histogram_results")
+    if not isinstance(histogram, dict) or set(histogram) != {
+        "10000",
+        "100000",
+        "1000000",
+    }:
+        raise AssertionError("M6A robust univariate row grid is incomplete")
+    for rows, phases in histogram.items():
+        if not isinstance(phases, dict):
+            raise AssertionError(f"M6A histogram {rows}: invalid phases")
+        for phase in ("analysis", "render"):
+            _verify_summary(phases.get(phase), f"M6A.histogram.{rows}.{phase}")
+
+    resampling = m6a.get("representative_resampling")
+    if not isinstance(resampling, dict):
+        raise AssertionError("M6A representative resampling baseline is absent")
+    if resampling.get("calculated_work") != 999_000:
+        raise AssertionError("M6A representative resampling work differs")
+    for phase in ("resampling_analysis", "render"):
+        _verify_summary(resampling.get(phase), f"M6A.resampling.{phase}")
+
+    comparisons = m6a.get("comparison_results")
+    if not isinstance(comparisons, dict) or set(comparisons) != {
+        "between_20_levels",
+        "within_100_by_10",
+    }:
+        raise AssertionError("M6A comparison workload grid is incomplete")
+    for case, phases in comparisons.items():
+        if not isinstance(phases, dict):
+            raise AssertionError(f"M6A comparison {case}: invalid phases")
+        for phase in ("analysis", "render"):
+            _verify_summary(phases.get(phase), f"M6A.comparison.{case}.{phase}")
+
+    resource = m6a.get("resource_grid")
+    if not isinstance(resource, dict):
+        raise AssertionError("M6A resource grid is absent")
+    scatter = resource.get("scatter")
+    matrix = resource.get("matrix")
+    if not isinstance(scatter, dict) or set(scatter) != {
+        "10000",
+        "100000",
+        "1000000",
+    }:
+        raise AssertionError("M6A scatter resource grid is incomplete")
+    if not isinstance(matrix, dict) or set(matrix) != {"10", "25", "50"}:
+        raise AssertionError("M6A matrix resource grid is incomplete")
+    if scatter["10000"].get("default_ceiling_accepts") is not True:
+        raise AssertionError("M6A 10K scatter should fit the default work ceiling")
+    if scatter["1000000"].get("hard_ceiling_accepts") is not False:
+        raise AssertionError("M6A 1M scatter should fail the hard work ceiling")
+    if matrix["10"].get("hard_ceiling_accepts") is not True:
+        raise AssertionError("M6A 10-variable matrix should fit the hard ceiling")
+    if matrix["25"].get("hard_ceiling_accepts") is not False:
+        raise AssertionError("M6A 25-variable matrix should fail the hard ceiling")
 
 
 def main() -> None:

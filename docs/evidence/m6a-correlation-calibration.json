@@ -1,0 +1,57 @@
+{
+  "bit_generator": "PCG64DXSM",
+  "bootstrap_resamples": 999,
+  "bootstrap_root_seed": 2026091403,
+  "cases_per_scenario": 100,
+  "data_seed": 2026091402,
+  "interval_level": 0.95,
+  "method": "paired_percentile_bootstrap_type7_for_20pct_winsorized_r",
+  "population_reference_sample_size": 2000000,
+  "population_reference_seed": 2026091401,
+  "predeclared_coverage_band": [
+    0.86,
+    1.0
+  ],
+  "sample_size": 40,
+  "scenarios": [
+    {
+      "coverage": 0.94,
+      "covered_cases": 94,
+      "failed_replicates": 0,
+      "generating_pearson_rho": -0.5,
+      "maximum_interval_width": 0.7214130223012369,
+      "mean_interval_width": 0.5646747982383113,
+      "minimum_interval_width": 0.29585779346273655,
+      "passes_predeclared_coverage_band": true,
+      "population_winsorized_target": -0.4491989503037545,
+      "valid_replicates": 99900
+    },
+    {
+      "coverage": 0.99,
+      "covered_cases": 99,
+      "failed_replicates": 0,
+      "generating_pearson_rho": 0.0,
+      "maximum_interval_width": 0.8412394340239409,
+      "mean_interval_width": 0.6590921741268712,
+      "minimum_interval_width": 0.37584759572670123,
+      "passes_predeclared_coverage_band": true,
+      "population_winsorized_target": 0.0,
+      "valid_replicates": 99900
+    },
+    {
+      "coverage": 0.95,
+      "covered_cases": 95,
+      "failed_replicates": 0,
+      "generating_pearson_rho": 0.5,
+      "maximum_interval_width": 0.7281194315901515,
+      "mean_interval_width": 0.5536404829748575,
+      "minimum_interval_width": 0.3047635615002604,
+      "passes_predeclared_coverage_band": true,
+      "population_winsorized_target": 0.44824129467496016,
+      "valid_replicates": 99900
+    }
+  ],
+  "schema_version": 1,
+  "status": "locked_validation",
+  "total_resample_work": 11988000
+}

@@ -24,6 +24,7 @@ from plotsalot.grouped import (
 )
 from plotsalot.plot import GroupedStatsPlot
 from plotsalot.result import GroupResultItem, ResourceLimits
+from plotsalot.robust import TRIM_FRACTION
 from plotsalot.theme import StatsTheme
 
 
@@ -43,6 +44,7 @@ def analyze_grouped_ggbetweenstats(
     maximum_groups: int = DEFAULT_MAX_GROUPS,
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
+    trim_fraction: float = TRIM_FRACTION,
 ) -> GroupedAnalysis[ComparisonAnalysis]:
     """Apply the approved independent comparison atomically by outer group."""
 
@@ -69,6 +71,7 @@ def analyze_grouped_ggbetweenstats(
                 maximum_rows=maximum_rows,
                 maximum_levels=maximum_levels,
                 maximum_rendered_observations=maximum_rendered_observations,
+                trim_fraction=trim_fraction,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
@@ -77,7 +80,11 @@ def analyze_grouped_ggbetweenstats(
     return GroupedAnalysis(
         groups=tuple(groups),
         result=grouped_result(
-            analysis="grouped_ggbetweenstats_welch",
+            analysis=(
+                "grouped_ggbetweenstats_robust"
+                if type == "robust"
+                else "grouped_ggbetweenstats_welch"
+            ),
             group_column=group,
             sample=sample,
             correction_scope=("within_each_comparison_result_none_across_outer_groups"),
@@ -113,6 +120,7 @@ def analyze_grouped_ggwithinstats(
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     maximum_subject_paths: int = DEFAULT_MAX_SUBJECT_PATHS,
+    trim_fraction: float = TRIM_FRACTION,
 ) -> GroupedAnalysis[ComparisonAnalysis]:
     """Apply the approved repeated comparison atomically by outer group."""
 
@@ -141,6 +149,7 @@ def analyze_grouped_ggwithinstats(
                 maximum_levels=maximum_levels,
                 maximum_rendered_observations=maximum_rendered_observations,
                 maximum_subject_paths=maximum_subject_paths,
+                trim_fraction=trim_fraction,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
@@ -149,7 +158,11 @@ def analyze_grouped_ggwithinstats(
     return GroupedAnalysis(
         groups=tuple(groups),
         result=grouped_result(
-            analysis="grouped_ggwithinstats_parametric",
+            analysis=(
+                "grouped_ggwithinstats_robust"
+                if type == "robust"
+                else "grouped_ggwithinstats_parametric"
+            ),
             group_column=group,
             sample=sample,
             correction_scope=("within_each_repeated_result_none_across_outer_groups"),
@@ -242,6 +255,7 @@ def grouped_ggbetweenstats(
     maximum_groups: int = DEFAULT_MAX_GROUPS,
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
+    trim_fraction: float = TRIM_FRACTION,
     title: str | None = None,
     results_subtitle: bool = True,
     theme: StatsTheme | None = None,
@@ -263,6 +277,7 @@ def grouped_ggbetweenstats(
         maximum_groups=maximum_groups,
         maximum_levels=maximum_levels,
         maximum_rendered_observations=maximum_rendered_observations,
+        trim_fraction=trim_fraction,
     )
     return render_grouped_ggbetweenstats(
         analysis,
@@ -290,6 +305,7 @@ def grouped_ggwithinstats(
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     maximum_subject_paths: int = DEFAULT_MAX_SUBJECT_PATHS,
+    trim_fraction: float = TRIM_FRACTION,
     title: str | None = None,
     results_subtitle: bool = True,
     show_subject_paths: bool = True,
@@ -314,6 +330,7 @@ def grouped_ggwithinstats(
         maximum_levels=maximum_levels,
         maximum_rendered_observations=maximum_rendered_observations,
         maximum_subject_paths=maximum_subject_paths,
+        trim_fraction=trim_fraction,
     )
     return render_grouped_ggwithinstats(
         analysis,

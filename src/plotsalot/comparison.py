@@ -24,6 +24,11 @@ from plotsalot.comparison_result import (
 from plotsalot.data import DEFAULT_MAX_ROWS, FloatArray
 from plotsalot.plot import PlotAnnotations, StatsPlot
 from plotsalot.result import SampleAudit
+from plotsalot.robust import TRIM_FRACTION
+from plotsalot.robust_result import (
+    RobustComparisonResult,
+    RobustPairwiseComparisonResult,
+)
 from plotsalot.theme import StatsTheme, theme_ggstatsplot
 
 
@@ -130,8 +135,8 @@ def _p_value_text(p_value: float) -> str:
 
 
 def _displayed_pairwise(
-    result: ComparisonResult,
-) -> tuple[PairwiseComparisonResult, ...]:
+    result: ComparisonResult | RobustComparisonResult,
+) -> tuple[PairwiseComparisonResult | RobustPairwiseComparisonResult, ...]:
     if result.pairwise_display == "none":
         return ()
     if result.pairwise_display == "all":
@@ -141,17 +146,33 @@ def _displayed_pairwise(
     return tuple(item for item in result.pairwise if not item.significant)
 
 
-def _subtitle(result: ComparisonResult) -> str:
+def _subtitle(result: ComparisonResult | RobustComparisonResult) -> str:
     test = result.omnibus
     effect = result.effect_size
+    robust = isinstance(result, RobustComparisonResult)
     if test.df1 is None:
+        if robust:
+            if effect.value is None:
+                raise ValueError("robust t result requires a raw difference")
+            return (
+                f"{test.name}: t({test.df2:.2f}) = {test.statistic:.2f}, "
+                f"{_p_value_text(test.p_value)}; raw difference = "
+                f"{effect.value:.2f}; standardized effect unavailable"
+            )
         return (
             f"{test.name}: t({test.df2:.2f}) = {test.statistic:.2f}, "
             f"{_p_value_text(test.p_value)}; {effect.name} = {effect.value:.2f}"
         )
     correction = ""
     if result.correction is not None:
-        correction = f"; GG epsilon = {result.correction.epsilon:.3f}"
+        correction_name = "robust epsilon" if robust else "GG epsilon"
+        correction = f"; {correction_name} = {result.correction.epsilon:.3f}"
+    if robust:
+        return (
+            f"{test.name}: F({test.df1:.2f}, {test.df2:.2f}) = "
+            f"{test.statistic:.2f}, {_p_value_text(test.p_value)}; "
+            f"standardized effect unavailable{correction}"
+        )
     return (
         f"{test.name}: F({test.df1:.2f}, {test.df2:.2f}) = {test.statistic:.2f}, "
         f"{_p_value_text(test.p_value)}; {effect.name} = {effect.value:.2f}"
@@ -159,19 +180,23 @@ def _subtitle(result: ComparisonResult) -> str:
     )
 
 
-def _caption(result: ComparisonResult) -> str:
+def _caption(result: ComparisonResult | RobustComparisonResult) -> str:
     sample = result.sample
     if isinstance(sample, SampleAudit):
-        return (
+        caption = (
             f"n = {sample.analyzed_rows}; "
             f"{sample.dropped_null_rows} null row(s) excluded; "
             f"pairwise p adjustment: {result.p_adjust}"
         )
-    return (
-        f"n = {sample.analyzed_subjects} complete subject(s); "
-        f"{sample.excluded_incomplete_subjects} incomplete subject(s) excluded; "
-        f"pairwise p adjustment: {result.p_adjust}"
-    )
+    else:
+        caption = (
+            f"n = {sample.analyzed_subjects} complete subject(s); "
+            f"{sample.excluded_incomplete_subjects} incomplete subject(s) excluded; "
+            f"pairwise p adjustment: {result.p_adjust}"
+        )
+    if isinstance(result, RobustComparisonResult):
+        caption += "; 20% trimmed locations; pairwise CIs are pointwise"
+    return caption
 
 
 def _draw_distributions(
@@ -241,7 +266,7 @@ def _draw_means(
 
 def _draw_pairwise(
     axes: _ComparisonAxes,
-    result: ComparisonResult,
+    result: ComparisonResult | RobustComparisonResult,
     values: tuple[FloatArray, ...],
 ) -> None:
     displayed = _displayed_pairwise(result)
@@ -281,7 +306,7 @@ def render_comparison(
 ) -> StatsPlot[ComparisonResult]:
     """Render an approved comparison without recomputing its statistics."""
 
-    result = analysis.result
+    result = cast(ComparisonResult | RobustComparisonResult, analysis.result)
     if result.sample.analyzed_rows > cast(
         int, result.limits.maximum_rendered_observations
     ):
@@ -350,7 +375,7 @@ def render_comparison(
     return StatsPlot(
         figure=figure,
         axes={"main": axes},
-        result=result,
+        result=cast(ComparisonResult, result),
         annotations=PlotAnnotations(
             title=rendered_title,
             subtitle=subtitle,
@@ -393,6 +418,7 @@ def ggbetweenstats(
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
+    trim_fraction: float = TRIM_FRACTION,
     title: str | None = None,
     results_subtitle: bool = True,
     theme: StatsTheme | None = None,
@@ -412,6 +438,7 @@ def ggbetweenstats(
         maximum_rows=maximum_rows,
         maximum_levels=maximum_levels,
         maximum_rendered_observations=maximum_rendered_observations,
+        trim_fraction=trim_fraction,
     )
     return render_ggbetweenstats(
         analysis,
@@ -458,6 +485,7 @@ def ggwithinstats(
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     maximum_subject_paths: int = DEFAULT_MAX_SUBJECT_PATHS,
+    trim_fraction: float = TRIM_FRACTION,
     title: str | None = None,
     results_subtitle: bool = True,
     show_subject_paths: bool = True,
@@ -480,6 +508,7 @@ def ggwithinstats(
         maximum_levels=maximum_levels,
         maximum_rendered_observations=maximum_rendered_observations,
         maximum_subject_paths=maximum_subject_paths,
+        trim_fraction=trim_fraction,
     )
     return render_ggwithinstats(
         analysis,

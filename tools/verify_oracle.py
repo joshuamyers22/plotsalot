@@ -23,6 +23,7 @@ from plotsalot import (
     analyze_ggcorrmat,
     analyze_ggdotplotstats,
     analyze_gghistostats,
+    analyze_ggscatterstats,
     analyze_ggwithinstats,
     analyze_grouped_ggbarstats,
 )
@@ -60,6 +61,18 @@ M4_RAW_FIXTURES = tuple(
 )
 M5B_INPUT_FIXTURES = ("m5b-meta",)
 M5B_RAW_FIXTURES = ("m5b-meta-ggstatsplot.R",)
+M6A_INPUT_FIXTURES = (
+    "m6a-hist",
+    "m6a-correlation",
+    "m6a-between",
+    "m6a-within",
+)
+M6A_RAW_FIXTURES = (
+    "m6a-hist-ggstatsplot.R",
+    "m6a-scatter-ggstatsplot.R",
+    "m6a-between-ggstatsplot.R",
+    "m6a-within-ggstatsplot.R",
+)
 M5A_INPUT_FIXTURES = ("m5a-coefficients", "m5a-ols")
 M5A_RAW_FIXTURES = (
     "m5a-coefficients-ggstatsplot.R",
@@ -655,6 +668,185 @@ def _verify_m5b_results() -> None:
             _close_m5b(actual, row[field], f"m5b-meta.{term.term}.{field}")
 
 
+def _close_m6a(actual: float, expected: str, label: str) -> None:
+    reference = float(expected)
+    if not math.isclose(actual, reference, rel_tol=1e-10, abs_tol=1e-12):
+        raise AssertionError(f"{label}: Python={actual:.17g}, R={reference:.17g}")
+
+
+def _verify_m6a_results() -> None:
+    """Verify approved M6A formulas against independent base-R calculations."""
+
+    for filename in M6A_RAW_FIXTURES:
+        path = OUTPUT / filename
+        if not path.is_file() or path.stat().st_size == 0:
+            raise AssertionError(f"missing raw ggstatsplot M6A result: {path}")
+
+    hist_data = pl.read_csv(INPUT / "m6a-hist.csv")
+    hist = analyze_gghistostats(
+        hist_data,
+        "value",
+        type="robust",
+        test_value=3.0,
+    ).result
+    with (OUTPUT / "m6a-hist-results.csv").open(newline="") as handle:
+        hist_reference = next(csv.DictReader(handle))
+    hist_integer = {
+        "n": hist.estimate.kernel.n,
+        "g": hist.estimate.kernel.g,
+        "h": hist.estimate.kernel.h,
+    }
+    for field, actual in hist_integer.items():
+        if actual != int(hist_reference[field]):
+            raise AssertionError(f"m6a-hist.{field} differs from base R")
+    for field, actual in {
+        "lower_bound": hist.estimate.kernel.lower_bound,
+        "upper_bound": hist.estimate.kernel.upper_bound,
+        "trimmed_mean": hist.estimate.value,
+        "winsorized_variance": hist.estimate.kernel.winsorized_variance,
+        "q": hist.estimate.kernel.q,
+        "statistic": hist.test.statistic,
+        "df": hist.test.df,
+        "p_value": hist.test.p_value,
+        "interval_low": hist.interval.low,
+        "interval_high": hist.interval.high,
+        "raw_effect": hist.effect_size.value,
+    }.items():
+        if actual is None:
+            raise AssertionError(f"m6a-hist.{field} is absent")
+        _close_m6a(float(actual), hist_reference[field], f"m6a-hist.{field}")
+
+    correlation_data = pl.read_csv(INPUT / "m6a-correlation.csv")
+    correlation = analyze_ggscatterstats(
+        correlation_data,
+        "x",
+        "y",
+        type="robust",
+        random_seed=2026,
+        bootstrap_resamples=999,
+    ).result
+    with (OUTPUT / "m6a-correlation-results.csv").open(newline="") as handle:
+        correlation_reference = next(csv.DictReader(handle))
+    for field, actual in {
+        "n": correlation.x_kernel.n,
+        "g": correlation.x_kernel.g,
+        "h": correlation.x_kernel.h,
+    }.items():
+        if actual != int(correlation_reference[field]):
+            raise AssertionError(f"m6a-correlation.{field} differs from base R")
+    for field, actual in {
+        "x_lower_bound": correlation.x_kernel.lower_bound,
+        "x_upper_bound": correlation.x_kernel.upper_bound,
+        "y_lower_bound": correlation.y_kernel.lower_bound,
+        "y_upper_bound": correlation.y_kernel.upper_bound,
+        "x_winsorized_variance": correlation.x_kernel.winsorized_variance,
+        "y_winsorized_variance": correlation.y_kernel.winsorized_variance,
+        "winsorized_covariance": correlation.winsorized_covariance,
+        "estimate": correlation.estimate,
+        "statistic": correlation.test.statistic,
+        "df": correlation.test.df,
+        "p_value": correlation.test.p_value,
+    }.items():
+        if actual is None:
+            raise AssertionError(f"m6a-correlation.{field} is absent")
+        _close_m6a(
+            float(actual),
+            correlation_reference[field],
+            f"m6a-correlation.{field}",
+        )
+    if correlation.test.df != correlation.x_kernel.h - 2:
+        raise AssertionError("M6A correlation lost its approved WRS2-style df")
+
+    between_data = pl.read_csv(INPUT / "m6a-between.csv")
+    between = analyze_ggbetweenstats(
+        between_data,
+        "group",
+        "value",
+        type="robust",
+        pairwise_display="all",
+    ).result
+    with (OUTPUT / "m6a-between-results.csv").open(newline="") as handle:
+        between_reference = list(csv.DictReader(handle))
+    omnibus_reference = next(
+        row for row in between_reference if row["record"] == "omnibus"
+    )
+    for field, actual in {
+        "statistic": between.omnibus.statistic,
+        "df": between.omnibus.df2,
+        "p_value": between.omnibus.p_value,
+    }.items():
+        if actual is None:
+            raise AssertionError(f"m6a-between.{field} is absent")
+        _close_m6a(float(actual), omnibus_reference[field], f"m6a-between.{field}")
+    between_pairs = {
+        (str(item.left), str(item.right)): item for item in between.pairwise
+    }
+    for row in (item for item in between_reference if item["record"] == "pairwise"):
+        identity = (row["left"], row["right"])
+        pair = between_pairs[identity]
+        for field, actual in {
+            "estimate": pair.estimate,
+            "standard_error": pair.standard_error,
+            "statistic": pair.test.statistic,
+            "df": pair.test.df,
+            "p_value": pair.test.p_value,
+            "interval_low": pair.interval.low,
+            "interval_high": pair.interval.high,
+            "adjusted_p_value": pair.adjusted_p_value,
+        }.items():
+            if actual is None:
+                raise AssertionError(f"m6a-between.{identity}.{field} is absent")
+            _close_m6a(float(actual), row[field], f"m6a-between.{identity}.{field}")
+
+    within_data = pl.read_csv(INPUT / "m6a-within.csv")
+    within = analyze_ggwithinstats(
+        within_data,
+        "condition",
+        "value",
+        subject_id="subject",
+        type="robust",
+        pairwise_display="all",
+    ).result
+    with (OUTPUT / "m6a-within-results.csv").open(newline="") as handle:
+        within_reference = list(csv.DictReader(handle))
+    within_omnibus = next(row for row in within_reference if row["record"] == "omnibus")
+    if within.correction is None:
+        raise AssertionError("m6a-within correction is absent")
+    for field, actual in {
+        "statistic": within.omnibus.statistic,
+        "df1": within.omnibus.df1,
+        "df2": within.omnibus.df2,
+        "p_value": within.omnibus.p_value,
+        "epsilon": within.correction.epsilon,
+        "epsilon_hat": within.correction.epsilon_hat,
+        "epsilon_raw": within.correction.epsilon_raw,
+        "covariance_a": within.correction.covariance_a,
+        "covariance_b": within.correction.covariance_b,
+        "qc": within.correction.qc,
+        "qe": within.correction.qe,
+    }.items():
+        if actual is None:
+            raise AssertionError(f"m6a-within.{field} is absent")
+        _close_m6a(float(actual), within_omnibus[field], f"m6a-within.{field}")
+    within_pairs = {(str(item.left), str(item.right)): item for item in within.pairwise}
+    for row in (item for item in within_reference if item["record"] == "pairwise"):
+        identity = (row["left"], row["right"])
+        pair = within_pairs[identity]
+        for field, actual in {
+            "estimate": pair.estimate,
+            "standard_error": pair.standard_error,
+            "statistic": pair.test.statistic,
+            "df2": pair.test.df,
+            "p_value": pair.test.p_value,
+            "interval_low": pair.interval.low,
+            "interval_high": pair.interval.high,
+            "adjusted_p_value": pair.adjusted_p_value,
+        }.items():
+            if actual is None:
+                raise AssertionError(f"m6a-within.{identity}.{field} is absent")
+            _close_m6a(float(actual), row[field], f"m6a-within.{identity}.{field}")
+
+
 def _artifact_paths() -> list[Path]:
     paths = [ORACLE / "Dockerfile", ORACLE / "DESCRIPTION", ORACLE / "generate.R"]
     paths.extend(sorted(INPUT.glob("*.csv")))
@@ -688,6 +880,8 @@ def _manifest_payload() -> dict[str, Any]:
         "m5a_raw_fixtures": list(M5A_RAW_FIXTURES),
         "m5b_input_fixtures": list(M5B_INPUT_FIXTURES),
         "m5b_raw_fixtures": list(M5B_RAW_FIXTURES),
+        "m6a_input_fixtures": list(M6A_INPUT_FIXTURES),
+        "m6a_raw_fixtures": list(M6A_RAW_FIXTURES),
         "sha256": _hashes(),
     }
 
@@ -701,6 +895,7 @@ def verify_oracle() -> None:
     _verify_m4_results()
     _verify_m5a_results()
     _verify_m5b_results()
+    _verify_m6a_results()
     retained = json.loads(MANIFEST.read_text())
     if retained != _manifest_payload():
         raise AssertionError("oracle artifact hashes differ from manifest")
@@ -717,6 +912,7 @@ def main() -> None:
         _verify_m4_results()
         _verify_m5a_results()
         _verify_m5b_results()
+        _verify_m6a_results()
         payload = _manifest_payload()
         MANIFEST.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     else:

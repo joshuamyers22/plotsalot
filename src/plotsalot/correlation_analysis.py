@@ -25,6 +25,22 @@ from plotsalot.result import (
     IntervalResult,
     ResourceLimits,
 )
+from plotsalot.robust import (
+    DEFAULT_BOOTSTRAP_RESAMPLES,
+    DEFAULT_MAX_RESAMPLE_WORK,
+    TRIM_FRACTION,
+    bootstrap_winsorized_correlation,
+    child_seed,
+    method_result,
+    validate_resampling,
+    winsorized_correlation,
+)
+from plotsalot.robust_result import (
+    RobustCorrelationMatrixCell,
+    RobustCorrelationMatrixResult,
+    RobustCorrelationResult,
+    RobustTestResult,
+)
 
 
 class _PearsonResult(Protocol):
@@ -36,8 +52,13 @@ class _NormalDistribution(Protocol):
     def ppf(self, probability: float) -> float: ...
 
 
+class _TDistribution(Protocol):
+    def sf(self, value: float, df: float) -> float: ...
+
+
 class _ScipyStats(Protocol):
     norm: _NormalDistribution
+    t: _TDistribution
 
     def pearsonr(self, x: FloatArray, y: FloatArray) -> _PearsonResult: ...
 
@@ -75,6 +96,81 @@ class CorrelationMatrixAnalysis:
     result: CorrelationMatrixResult
 
 
+def _robust_pair(
+    sample: PairedNumericSample,
+    *,
+    conf_level: float,
+    bootstrap_resamples: int,
+    root_seed: int,
+    derived_seed: int,
+    seed_identity: str,
+    maximum_rows: int,
+    maximum_resample_work: int,
+) -> RobustCorrelationResult:
+    estimate, covariance, x_kernel, y_kernel = winsorized_correlation(
+        sample.x_values, sample.y_values
+    )
+    if x_kernel.h < 4:
+        raise ValueError("robust association requires effective count h>=4")
+    df = float(x_kernel.h - 2)
+    warnings: tuple[str, ...] = (
+        "marginal Winsorization is not a high-breakdown bivariate estimator",
+    )
+    if abs(estimate) == 1.0:
+        statistic = None
+        p_value = 0.0
+        warnings += ("perfect_winsorized_correlation",)
+    else:
+        statistic = estimate * sqrt(
+            (sample.audit.analyzed_rows - 2) / (1.0 - (estimate * estimate))
+        )
+        p_value = min(1.0, 2.0 * float(scipy_stats.t.sf(abs(statistic), df)))
+    low, high, resampling = bootstrap_winsorized_correlation(
+        sample.x_values,
+        sample.y_values,
+        conf_level=conf_level,
+        bootstrap_resamples=bootstrap_resamples,
+        root_seed=root_seed,
+        derived_seed=derived_seed,
+        child_identity=seed_identity,
+        maximum_resample_work=maximum_resample_work,
+    )
+    return RobustCorrelationResult(
+        schema_version=2,
+        analysis="ggscatterstats_winsorized",
+        mode="robust",
+        x=sample.x,
+        y=sample.y,
+        sample=sample.audit,
+        method=method_result("marginal_twenty_percent_winsorized_pearson"),
+        x_kernel=x_kernel,
+        y_kernel=y_kernel,
+        winsorized_covariance=covariance,
+        estimate=estimate,
+        test=RobustTestResult(
+            name="winsorized_correlation_t",
+            target="population_winsorized_pearson_r",
+            null_value=0.0,
+            alternative="two-sided",
+            statistic=statistic,
+            df1=None,
+            df2=df,
+            p_value=p_value,
+            reference_distribution="student_t",
+        ),
+        interval=IntervalResult(
+            target="population_winsorized_pearson_r",
+            method="paired_percentile_bootstrap_type7_pointwise",
+            level=conf_level,
+            low=low,
+            high=high,
+        ),
+        resampling=resampling,
+        limits=ResourceLimits(maximum_rows=maximum_rows),
+        warnings=warnings,
+    )
+
+
 def analyze_ggscatterstats(
     data: pl.DataFrame,
     x: str,
@@ -82,19 +178,56 @@ def analyze_ggscatterstats(
     *,
     conf_level: float = 0.95,
     maximum_rows: int = DEFAULT_MAX_ROWS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
+    bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
+    random_seed: int | None = None,
+    maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
 ) -> CorrelationAnalysis:
-    """Analyze a two-sided Pearson correlation without rendering."""
+    """Analyze an approved Pearson or Winsorized correlation."""
 
     if not 0.0 < conf_level < 1.0:
         raise ValueError("conf_level must be strictly between 0 and 1")
+    if type not in {"parametric", "robust"}:
+        raise ValueError("type must be 'parametric' or 'robust'")
+    if type == "parametric" and (
+        trim_fraction != TRIM_FRACTION
+        or bootstrap_resamples != DEFAULT_BOOTSTRAP_RESAMPLES
+        or random_seed is not None
+        or maximum_resample_work != DEFAULT_MAX_RESAMPLE_WORK
+    ):
+        raise ValueError("robust resampling options are unused for parametric analysis")
     sample = select_numeric_pair(
         data,
         x,
         y,
-        minimum_size=4,
+        minimum_size=8 if type == "robust" else 4,
         require_variation=True,
         maximum_rows=maximum_rows,
     )
+    if type == "robust":
+        if trim_fraction != TRIM_FRACTION:
+            raise ValueError("trim_fraction must equal 0.20 for M6A robust methods")
+        work = sample.audit.analyzed_rows * bootstrap_resamples
+        root_seed = validate_resampling(
+            bootstrap_resamples=bootstrap_resamples,
+            random_seed=random_seed,
+            maximum_resample_work=maximum_resample_work,
+            calculated_work=work,
+        )
+        result = _robust_pair(
+            sample,
+            conf_level=conf_level,
+            bootstrap_resamples=bootstrap_resamples,
+            root_seed=root_seed,
+            derived_seed=root_seed,
+            seed_identity=f"direct:{x}|{y}",
+            maximum_rows=maximum_rows,
+            maximum_resample_work=maximum_resample_work,
+        )
+        return CorrelationAnalysis(
+            sample=sample, result=cast(CorrelationResult, result)
+        )
     with catch_warnings():
         simplefilter("error")
         try:
@@ -170,8 +303,13 @@ def analyze_ggcorrmat(
     sig_level: float = 0.05,
     p_adjust: str = "holm",
     maximum_rows: int = DEFAULT_MAX_ROWS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
+    bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
+    random_seed: int | None = None,
+    maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
 ) -> CorrelationMatrixAnalysis:
-    """Analyze a pairwise-complete Pearson correlation matrix."""
+    """Analyze a pairwise-complete Pearson or Winsorized matrix."""
 
     if not isinstance(columns, (list, tuple)):
         raise TypeError("columns must be a list or tuple of column names")
@@ -184,6 +322,15 @@ def analyze_ggcorrmat(
         raise ValueError("columns must contain 2-50 unique names")
     if p_adjust not in {"holm", "none"}:
         raise ValueError("p_adjust must be 'holm' or 'none'")
+    if type not in {"parametric", "robust"}:
+        raise ValueError("type must be 'parametric' or 'robust'")
+    if type == "parametric" and (
+        trim_fraction != TRIM_FRACTION
+        or bootstrap_resamples != DEFAULT_BOOTSTRAP_RESAMPLES
+        or random_seed is not None
+        or maximum_resample_work != DEFAULT_MAX_RESAMPLE_WORK
+    ):
+        raise ValueError("robust resampling options are unused for parametric analysis")
     if not 0.0 < sig_level < 1.0:
         raise ValueError("sig_level must be strictly between 0 and 1")
     if not isinstance(data, pl.DataFrame):
@@ -200,19 +347,71 @@ def analyze_ggcorrmat(
         if not bool(np.isfinite(finite_values).all()):
             raise ValueError(f"column {column!r} contains NaN or infinite values")
 
-    pair_results: dict[tuple[str, str], CorrelationResult] = {}
+    if type == "robust" and trim_fraction != TRIM_FRACTION:
+        raise ValueError("trim_fraction must equal 0.20 for M6A robust methods")
+    pair_samples: dict[tuple[str, str], PairedNumericSample] = {}
+    if type == "robust":
+        total_work = 0
+        for left_index, x in enumerate(selected):
+            for y in selected[left_index + 1 :]:
+                try:
+                    pair_sample = select_numeric_pair(
+                        data,
+                        x,
+                        y,
+                        minimum_size=8,
+                        require_variation=True,
+                        maximum_rows=maximum_rows,
+                    )
+                    winsorized_correlation(pair_sample.x_values, pair_sample.y_values)
+                except (TypeError, ValueError) as error:
+                    raise ValueError(
+                        f"correlation pair ({x!r}, {y!r}) failed: {error}"
+                    ) from error
+                pair_samples[(x, y)] = pair_sample
+                total_work += pair_sample.audit.analyzed_rows * bootstrap_resamples
+        root_seed = validate_resampling(
+            bootstrap_resamples=bootstrap_resamples,
+            random_seed=random_seed,
+            maximum_resample_work=maximum_resample_work,
+            calculated_work=total_work,
+        )
+    else:
+        total_work = 0
+        root_seed = 0
+
+    pair_results: dict[
+        tuple[str, str], CorrelationResult | RobustCorrelationResult
+    ] = {}
     pair_order: list[tuple[str, str]] = []
     raw_p_values: list[float] = []
     for left_index, x in enumerate(selected):
         for y in selected[left_index + 1 :]:
             try:
-                pair_result = analyze_ggscatterstats(
-                    data,
-                    x,
-                    y,
-                    conf_level=conf_level,
-                    maximum_rows=maximum_rows,
-                ).result
+                if type == "robust":
+                    derived, identity = child_seed(
+                        root_seed,
+                        "ggcorrmat_winsorized",
+                        tuple(sorted((x, y))),
+                    )
+                    pair_result = _robust_pair(
+                        pair_samples[(x, y)],
+                        conf_level=conf_level,
+                        bootstrap_resamples=bootstrap_resamples,
+                        root_seed=root_seed,
+                        derived_seed=derived,
+                        seed_identity=identity,
+                        maximum_rows=maximum_rows,
+                        maximum_resample_work=maximum_resample_work,
+                    )
+                else:
+                    pair_result = analyze_ggscatterstats(
+                        data,
+                        x,
+                        y,
+                        conf_level=conf_level,
+                        maximum_rows=maximum_rows,
+                    ).result
             except (TypeError, ValueError) as error:
                 raise ValueError(
                     f"correlation pair ({x!r}, {y!r}) failed: {error}"
@@ -238,6 +437,82 @@ def analyze_ggcorrmat(
         adjusted_values = list(raw_p_values)
     adjusted_by_pair = dict(zip(pair_order, adjusted_values, strict=True))
 
+    if type == "robust":
+        robust_cells: list[RobustCorrelationMatrixCell] = []
+        for x in selected:
+            for y in selected:
+                if x == y:
+                    n_obs = data.get_column(x).drop_nulls().len()
+                    robust_cells.append(
+                        RobustCorrelationMatrixCell(
+                            x=x,
+                            y=y,
+                            n_obs=n_obs,
+                            estimate=1.0,
+                            interval=None,
+                            statistic=None,
+                            df=None,
+                            p_value=None,
+                            adjusted_p_value=None,
+                            significant=None,
+                            x_kernel=None,
+                            y_kernel=None,
+                            winsorized_covariance=None,
+                            resampling=None,
+                        )
+                    )
+                    continue
+                pair = (x, y) if (x, y) in pair_results else (y, x)
+                pair_result = pair_results[pair]
+                if not isinstance(pair_result, RobustCorrelationResult):
+                    raise RuntimeError(
+                        "robust matrix pair construction is inconsistent"
+                    )
+                adjusted = adjusted_by_pair[pair]
+                forward = pair == (x, y)
+                robust_cells.append(
+                    RobustCorrelationMatrixCell(
+                        x=x,
+                        y=y,
+                        n_obs=pair_result.sample.analyzed_rows,
+                        estimate=pair_result.estimate,
+                        interval=pair_result.interval,
+                        statistic=pair_result.test.statistic,
+                        df=pair_result.test.df,
+                        p_value=pair_result.test.p_value,
+                        adjusted_p_value=adjusted,
+                        significant=adjusted <= sig_level,
+                        x_kernel=(
+                            pair_result.x_kernel if forward else pair_result.y_kernel
+                        ),
+                        y_kernel=(
+                            pair_result.y_kernel if forward else pair_result.x_kernel
+                        ),
+                        winsorized_covariance=pair_result.winsorized_covariance,
+                        resampling=pair_result.resampling,
+                    )
+                )
+        robust_matrix = RobustCorrelationMatrixResult(
+            schema_version=2,
+            analysis="ggcorrmat_winsorized",
+            mode="robust",
+            columns=selected,
+            method=method_result("marginal_twenty_percent_winsorized_pearson"),
+            p_adjust=p_adjust,
+            sig_level=float(sig_level),
+            cells=tuple(robust_cells),
+            limits=ResourceLimits(maximum_rows=maximum_rows, maximum_variables=50),
+            maximum_resample_work=maximum_resample_work,
+            calculated_resample_work=total_work,
+            warnings=(
+                "intervals are pointwise and unadjusted",
+                "marginal Winsorization is not a high-breakdown bivariate estimator",
+            ),
+        )
+        return CorrelationMatrixAnalysis(
+            result=cast(CorrelationMatrixResult, robust_matrix)
+        )
+
     cells: list[CorrelationMatrixCell] = []
     for x in selected:
         for y in selected:
@@ -260,6 +535,10 @@ def analyze_ggcorrmat(
                 continue
             pair = (x, y) if (x, y) in pair_results else (y, x)
             pair_result = pair_results[pair]
+            if not isinstance(pair_result, CorrelationResult):
+                raise RuntimeError(
+                    "parametric matrix pair construction is inconsistent"
+                )
             adjusted = adjusted_by_pair[pair]
             cells.append(
                 CorrelationMatrixCell(

@@ -998,6 +998,382 @@ utils::write.csv(
   na = "NA"
 )
 
+# M6A approved robust-method fixtures ----------------------------------------
+
+# These normalized calculations independently implement the approved M6A
+# formulas in base R. The retained ggstatsplot objects are compatibility
+# evidence only: M6A deliberately adapts upstream interval, reference-df, and
+# repeated-comparison behavior documented in docs/M6_STATISTICAL_METHODS.md.
+
+m6a_kernel <- function(values, trim = 0.2) {
+  ordered <- sort(values)
+  n <- length(ordered)
+  g <- floor(trim * n)
+  h <- n - (2L * g)
+  lower <- ordered[[g + 1L]]
+  upper <- ordered[[n - g]]
+  winsorized <- pmin(pmax(values, lower), upper)
+  winsorized_variance <- stats::var(winsorized)
+  list(
+    n = n,
+    g = g,
+    h = h,
+    lower = lower,
+    upper = upper,
+    theta = mean(ordered[(g + 1L):(n - g)]),
+    winsorized = winsorized,
+    winsorized_variance = winsorized_variance,
+    q = (n - 1) * winsorized_variance / (h * (h - 1))
+  )
+}
+
+m6a_dump_upstream <- function(filename, expression) {
+  set.seed(20260914)
+  value <- tryCatch(
+    expression,
+    error = function(condition) structure(
+      list(message = conditionMessage(condition)),
+      class = "plotsalot_upstream_error"
+    )
+  )
+  dput(
+    value,
+    file = file.path(output_dir, filename),
+    control = c("keepNA", "keepInteger", "niceNames")
+  )
+}
+
+m6a_hist <- utils::read.csv(file.path(input_dir, "m6a-hist.csv"))
+m6a_dump_upstream(
+  "m6a-hist-ggstatsplot.R",
+  ggstatsplot::extract_stats(ggstatsplot::gghistostats(
+    data = m6a_hist,
+    x = value,
+    type = "robust",
+    test.value = 3,
+    conf.level = 0.95,
+    tr = 0.2,
+    bf.message = FALSE,
+    centrality.plotting = FALSE
+  ))
+)
+m6a_hist_kernel <- m6a_kernel(m6a_hist$value)
+m6a_hist_se <- sqrt(m6a_hist_kernel$q)
+m6a_hist_statistic <- (m6a_hist_kernel$theta - 3) / m6a_hist_se
+m6a_hist_critical <- stats::qt(0.975, m6a_hist_kernel$h - 1L)
+utils::write.csv(
+  data.frame(
+    n = m6a_hist_kernel$n,
+    g = m6a_hist_kernel$g,
+    h = m6a_hist_kernel$h,
+    lower_bound = m6a_hist_kernel$lower,
+    upper_bound = m6a_hist_kernel$upper,
+    trimmed_mean = m6a_hist_kernel$theta,
+    winsorized_variance = m6a_hist_kernel$winsorized_variance,
+    q = m6a_hist_kernel$q,
+    statistic = m6a_hist_statistic,
+    df = m6a_hist_kernel$h - 1L,
+    p_value = 2 * stats::pt(abs(m6a_hist_statistic), m6a_hist_kernel$h - 1L, lower.tail = FALSE),
+    interval_low = m6a_hist_kernel$theta - m6a_hist_critical * m6a_hist_se,
+    interval_high = m6a_hist_kernel$theta + m6a_hist_critical * m6a_hist_se,
+    raw_effect = m6a_hist_kernel$theta - 3
+  ),
+  file.path(output_dir, "m6a-hist-results.csv"),
+  row.names = FALSE
+)
+
+m6a_correlation <- utils::read.csv(file.path(input_dir, "m6a-correlation.csv"))
+m6a_dump_upstream(
+  "m6a-scatter-ggstatsplot.R",
+  ggstatsplot::extract_stats(ggstatsplot::ggscatterstats(
+    data = m6a_correlation,
+    x = x,
+    y = y,
+    type = "robust",
+    conf.level = 0.95,
+    tr = 0.2,
+    bf.message = FALSE,
+    marginal = FALSE
+  ))
+)
+m6a_x <- m6a_kernel(m6a_correlation$x)
+m6a_y <- m6a_kernel(m6a_correlation$y)
+m6a_covariance <- stats::cov(m6a_x$winsorized, m6a_y$winsorized)
+m6a_r <- m6a_covariance / sqrt(
+  m6a_x$winsorized_variance * m6a_y$winsorized_variance
+)
+m6a_r_statistic <- m6a_r * sqrt((m6a_x$n - 2) / (1 - m6a_r^2))
+utils::write.csv(
+  data.frame(
+    n = m6a_x$n,
+    g = m6a_x$g,
+    h = m6a_x$h,
+    x_lower_bound = m6a_x$lower,
+    x_upper_bound = m6a_x$upper,
+    y_lower_bound = m6a_y$lower,
+    y_upper_bound = m6a_y$upper,
+    x_winsorized_variance = m6a_x$winsorized_variance,
+    y_winsorized_variance = m6a_y$winsorized_variance,
+    winsorized_covariance = m6a_covariance,
+    estimate = m6a_r,
+    statistic = m6a_r_statistic,
+    df = m6a_x$h - 2L,
+    p_value = 2 * stats::pt(abs(m6a_r_statistic), m6a_x$h - 2L, lower.tail = FALSE)
+  ),
+  file.path(output_dir, "m6a-correlation-results.csv"),
+  row.names = FALSE
+)
+
+m6a_yuen <- function(left, right) {
+  left_kernel <- m6a_kernel(left)
+  right_kernel <- m6a_kernel(right)
+  estimate <- left_kernel$theta - right_kernel$theta
+  standard_error <- sqrt(left_kernel$q + right_kernel$q)
+  df <- (left_kernel$q + right_kernel$q)^2 / (
+    left_kernel$q^2 / (left_kernel$h - 1L) +
+      right_kernel$q^2 / (right_kernel$h - 1L)
+  )
+  statistic <- estimate / standard_error
+  critical <- stats::qt(0.975, df)
+  data.frame(
+    estimate = estimate,
+    standard_error = standard_error,
+    statistic = statistic,
+    df = df,
+    p_value = 2 * stats::pt(abs(statistic), df, lower.tail = FALSE),
+    interval_low = estimate - critical * standard_error,
+    interval_high = estimate + critical * standard_error
+  )
+}
+
+m6a_between <- utils::read.csv(file.path(input_dir, "m6a-between.csv"))
+m6a_between$group <- factor(m6a_between$group, levels = c("a", "b", "c"))
+m6a_dump_upstream(
+  "m6a-between-ggstatsplot.R",
+  ggstatsplot::extract_stats(ggstatsplot::ggbetweenstats(
+    data = m6a_between,
+    x = group,
+    y = value,
+    type = "robust",
+    pairwise.display = "all",
+    p.adjust.method = "holm",
+    conf.level = 0.95,
+    tr = 0.2,
+    bf.message = FALSE,
+    centrality.plotting = FALSE
+  ))
+)
+m6a_between_levels <- levels(m6a_between$group)
+m6a_between_kernels <- lapply(m6a_between_levels, function(level) {
+  m6a_kernel(m6a_between$value[m6a_between$group == level])
+})
+m6a_between_q <- vapply(m6a_between_kernels, function(kernel) kernel$q, numeric(1L))
+m6a_between_theta <- vapply(
+  m6a_between_kernels,
+  function(kernel) kernel$theta,
+  numeric(1L)
+)
+m6a_between_h <- vapply(m6a_between_kernels, function(kernel) kernel$h, numeric(1L))
+m6a_between_w <- 1 / m6a_between_q
+m6a_between_u <- sum(m6a_between_w)
+m6a_between_center <- sum(m6a_between_w * m6a_between_theta) / m6a_between_u
+m6a_between_j <- length(m6a_between_levels)
+m6a_between_a <- sum(
+  m6a_between_w * (m6a_between_theta - m6a_between_center)^2
+) / (m6a_between_j - 1L)
+m6a_between_c <- sum(
+  (1 - (m6a_between_w / m6a_between_u))^2 / (m6a_between_h - 1L)
+) / (m6a_between_j^2 - 1L)
+m6a_between_f <- m6a_between_a / (
+  1 + 2 * (m6a_between_j - 2L) * m6a_between_c
+)
+m6a_between_df2 <- 1 / (3 * m6a_between_c)
+m6a_between_pairs <- utils::combn(m6a_between_levels, 2L, simplify = FALSE)
+m6a_between_rows <- lapply(m6a_between_pairs, function(pair) {
+  result <- m6a_yuen(
+    m6a_between$value[m6a_between$group == pair[[1L]]],
+    m6a_between$value[m6a_between$group == pair[[2L]]]
+  )
+  cbind(record = "pairwise", left = pair[[1L]], right = pair[[2L]], result)
+})
+m6a_between_rows <- do.call(rbind, m6a_between_rows)
+m6a_between_rows$adjusted_p_value <- stats::p.adjust(
+  m6a_between_rows$p_value,
+  method = "holm"
+)
+m6a_between_omnibus <- data.frame(
+  record = "omnibus",
+  left = NA_character_,
+  right = NA_character_,
+  estimate = NA_real_,
+  standard_error = NA_real_,
+  statistic = m6a_between_f,
+  df = m6a_between_df2,
+  p_value = stats::pf(
+    m6a_between_f,
+    m6a_between_j - 1L,
+    m6a_between_df2,
+    lower.tail = FALSE
+  ),
+  interval_low = NA_real_,
+  interval_high = NA_real_,
+  adjusted_p_value = NA_real_
+)
+utils::write.csv(
+  rbind(m6a_between_omnibus, m6a_between_rows),
+  file.path(output_dir, "m6a-between-results.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+
+m6a_within <- utils::read.csv(file.path(input_dir, "m6a-within.csv"))
+m6a_within$condition <- factor(m6a_within$condition, levels = c("a", "b", "c"))
+m6a_dump_upstream(
+  "m6a-within-ggstatsplot.R",
+  ggstatsplot::extract_stats(ggstatsplot::ggwithinstats(
+    data = m6a_within,
+    x = condition,
+    y = value,
+    type = "robust",
+    subject.id = subject,
+    pairwise.display = "all",
+    p.adjust.method = "holm",
+    conf.level = 0.95,
+    tr = 0.2,
+    bf.message = FALSE,
+    centrality.plotting = FALSE,
+    centrality.path = FALSE,
+    point.path = FALSE
+  ))
+)
+m6a_within_wide <- reshape(
+  m6a_within,
+  idvar = "subject",
+  timevar = "condition",
+  direction = "wide"
+)
+m6a_within_wide <- m6a_within_wide[order(m6a_within_wide$subject), ]
+m6a_within_matrix <- as.matrix(m6a_within_wide[, paste0("value.", c("a", "b", "c"))])
+m6a_within_n <- nrow(m6a_within_matrix)
+m6a_within_j <- ncol(m6a_within_matrix)
+m6a_within_kernels <- lapply(seq_len(m6a_within_j), function(index) {
+  m6a_kernel(m6a_within_matrix[, index])
+})
+m6a_within_h <- m6a_within_kernels[[1L]]$h
+m6a_within_theta <- vapply(
+  m6a_within_kernels,
+  function(kernel) kernel$theta,
+  numeric(1L)
+)
+m6a_within_winsorized <- do.call(
+  cbind,
+  lapply(m6a_within_kernels, function(kernel) kernel$winsorized)
+)
+m6a_within_qc <- m6a_within_h * sum(
+  (m6a_within_theta - mean(m6a_within_theta))^2
+)
+m6a_within_residual <- sweep(
+  m6a_within_winsorized,
+  1L,
+  rowMeans(m6a_within_winsorized),
+  "-"
+)
+m6a_within_residual <- sweep(
+  m6a_within_residual,
+  2L,
+  colMeans(m6a_within_residual),
+  "-"
+)
+m6a_within_qe <- sum(m6a_within_residual^2)
+m6a_within_f <- m6a_within_qc / (m6a_within_qe / (m6a_within_h - 1L))
+m6a_within_v <- stats::cov(m6a_within_winsorized)
+m6a_within_v_bar <- mean(m6a_within_v)
+m6a_within_v_diag <- mean(diag(m6a_within_v))
+m6a_within_v_j <- rowMeans(m6a_within_v)
+m6a_within_a <- m6a_within_j^2 * (
+  m6a_within_v_diag - m6a_within_v_bar
+)^2 / (m6a_within_j - 1L)
+m6a_within_b <- sum(m6a_within_v^2) -
+  2 * m6a_within_j * sum(m6a_within_v_j^2) +
+  m6a_within_j^2 * m6a_within_v_bar^2
+m6a_within_e_hat <- m6a_within_a / m6a_within_b
+m6a_within_e_raw <- (
+  m6a_within_n * (m6a_within_j - 1L) * m6a_within_e_hat - 2
+) / (
+  (m6a_within_j - 1L) *
+    (m6a_within_n - 1L - (m6a_within_j - 1L) * m6a_within_e_hat)
+)
+m6a_within_epsilon <- max(
+  1 / (m6a_within_j - 1L),
+  min(1, m6a_within_e_raw)
+)
+m6a_within_df1 <- (m6a_within_j - 1L) * m6a_within_epsilon
+m6a_within_df2 <- (m6a_within_j - 1L) * m6a_within_epsilon *
+  (m6a_within_h - 1L)
+m6a_within_omnibus <- data.frame(
+  record = "omnibus",
+  left = NA_character_,
+  right = NA_character_,
+  estimate = NA_real_,
+  standard_error = NA_real_,
+  statistic = m6a_within_f,
+  df1 = m6a_within_df1,
+  df2 = m6a_within_df2,
+  p_value = stats::pf(m6a_within_f, m6a_within_df1, m6a_within_df2, lower.tail = FALSE),
+  interval_low = NA_real_,
+  interval_high = NA_real_,
+  adjusted_p_value = NA_real_,
+  epsilon = m6a_within_epsilon,
+  epsilon_hat = m6a_within_e_hat,
+  epsilon_raw = m6a_within_e_raw,
+  covariance_a = m6a_within_a,
+  covariance_b = m6a_within_b,
+  qc = m6a_within_qc,
+  qe = m6a_within_qe
+)
+m6a_within_pairs <- utils::combn(c("a", "b", "c"), 2L, simplify = FALSE)
+m6a_within_rows <- lapply(m6a_within_pairs, function(pair) {
+  difference <- m6a_within_matrix[, match(pair[[1L]], c("a", "b", "c"))] -
+    m6a_within_matrix[, match(pair[[2L]], c("a", "b", "c"))]
+  kernel <- m6a_kernel(difference)
+  standard_error <- sqrt(kernel$q)
+  statistic <- kernel$theta / standard_error
+  df <- kernel$h - 1L
+  critical <- stats::qt(0.975, df)
+  data.frame(
+    record = "pairwise",
+    left = pair[[1L]],
+    right = pair[[2L]],
+    estimate = kernel$theta,
+    standard_error = standard_error,
+    statistic = statistic,
+    df1 = NA_real_,
+    df2 = df,
+    p_value = 2 * stats::pt(abs(statistic), df, lower.tail = FALSE),
+    interval_low = kernel$theta - critical * standard_error,
+    interval_high = kernel$theta + critical * standard_error,
+    adjusted_p_value = NA_real_,
+    epsilon = NA_real_,
+    epsilon_hat = NA_real_,
+    epsilon_raw = NA_real_,
+    covariance_a = NA_real_,
+    covariance_b = NA_real_,
+    qc = NA_real_,
+    qe = NA_real_
+  )
+})
+m6a_within_rows <- do.call(rbind, m6a_within_rows)
+m6a_within_rows$adjusted_p_value <- stats::p.adjust(
+  m6a_within_rows$p_value,
+  method = "holm"
+)
+utils::write.csv(
+  rbind(m6a_within_omnibus, m6a_within_rows),
+  file.path(output_dir, "m6a-within-results.csv"),
+  row.names = FALSE,
+  na = "NA"
+)
+
 installed <- as.data.frame(utils::installed.packages()[, c("Package", "Version")])
 installed <- installed[order(installed$Package), , drop = FALSE]
 utils::write.csv(

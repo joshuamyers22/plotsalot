@@ -497,17 +497,26 @@ class GroupedResult:
     groups: tuple[GroupResultItem, ...]
     limits: ResourceLimits
     warnings: tuple[str, ...]
+    resampling_root_seed: int | None = None
+    calculated_resample_work: int | None = None
+    maximum_resample_work: int | None = None
 
     def __post_init__(self) -> None:
         if self.schema_version != 1:
             raise ValueError("grouped result schema_version must be 1")
         if self.analysis not in {
             "grouped_gghistostats_one_sample_parametric",
+            "grouped_gghistostats_one_sample_robust",
             "grouped_ggdotplotstats_one_sample_parametric",
+            "grouped_ggdotplotstats_one_sample_robust",
             "grouped_ggscatterstats_pearson",
+            "grouped_ggscatterstats_winsorized",
             "grouped_ggcorrmat_pearson",
+            "grouped_ggcorrmat_winsorized",
             "grouped_ggbetweenstats_welch",
+            "grouped_ggbetweenstats_robust",
             "grouped_ggwithinstats_parametric",
+            "grouped_ggwithinstats_robust",
             "grouped_categorical_classical",
         }:
             raise ValueError("grouped analysis identity is unsupported")
@@ -526,11 +535,35 @@ class GroupedResult:
             raise ValueError("grouped correction scope is unsupported")
         if any(not warning for warning in self.warnings):
             raise ValueError("grouped warnings must not contain empty strings")
+        robust_resampling = self.analysis in {
+            "grouped_ggscatterstats_winsorized",
+            "grouped_ggcorrmat_winsorized",
+        }
+        resampling = (
+            self.resampling_root_seed,
+            self.calculated_resample_work,
+            self.maximum_resample_work,
+        )
+        if robust_resampling and any(value is None for value in resampling):
+            raise ValueError("grouped robust association must retain resampling work")
+        if not robust_resampling and any(value is not None for value in resampling):
+            raise ValueError("non-resampled grouped results cannot retain RNG metadata")
+        if robust_resampling:
+            if self.resampling_root_seed is None or not (
+                0 <= self.resampling_root_seed <= (2**64) - 1
+            ):
+                raise ValueError("grouped robust root seed is invalid")
+            if (
+                self.calculated_resample_work is None
+                or self.maximum_resample_work is None
+                or self.calculated_resample_work > self.maximum_resample_work
+            ):
+                raise ValueError("grouped robust work is invalid")
 
     def to_dict(self) -> dict[str, Any]:
         """Return a deterministic JSON-serializable representation."""
 
-        return {
+        output: dict[str, Any] = {
             "schema_version": self.schema_version,
             "analysis": self.analysis,
             "group_column": self.group_column,
@@ -543,3 +576,10 @@ class GroupedResult:
             "limits": asdict(self.limits),
             "warnings": list(self.warnings),
         }
+        if self.resampling_root_seed is not None:
+            output["resampling"] = {
+                "root_seed": self.resampling_root_seed,
+                "calculated_work": self.calculated_resample_work,
+                "maximum_resample_work": self.maximum_resample_work,
+            }
+        return output

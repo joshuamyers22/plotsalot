@@ -48,5 +48,14 @@ and heterogeneity values. Pinned metafor 5.0-1 supplies separate normal and
 and `1e-8` absolute tolerance, while the independently solved values use
 `1e-10` relative and `1e-12` absolute tolerance.
 
+M6A adds raw robust ggstatsplot objects for one-sample, association,
+between-group, and repeated-group workflows. Because the approved M6A methods
+deliberately adapt upstream intervals, association reference df, effects, and
+two-condition repeated targets, base R separately implements the approved
+fixed-trim, Winsorized, Yuen/Welch–Yuen, and repeated-omnibus formulas. The
+Python verifier compares those normalized fields at `1e-10` relative and
+`1e-12` absolute tolerance and treats the raw upstream objects as explicit
+compatibility evidence rather than the acceptance target.
+
 Do not publish the oracle image. Its development-only dependency graph has
 licenses distinct from the eventual plotsalot distribution decision.

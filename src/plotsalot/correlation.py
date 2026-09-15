@@ -17,6 +17,15 @@ from plotsalot.correlation_analysis import (
 from plotsalot.data import DEFAULT_MAX_ROWS, FloatArray
 from plotsalot.plot import PlotAnnotations, StatsPlot
 from plotsalot.result import CorrelationMatrixResult, CorrelationResult
+from plotsalot.robust import (
+    DEFAULT_BOOTSTRAP_RESAMPLES,
+    DEFAULT_MAX_RESAMPLE_WORK,
+    TRIM_FRACTION,
+)
+from plotsalot.robust_result import (
+    RobustCorrelationMatrixResult,
+    RobustCorrelationResult,
+)
 
 
 class _ScatterAxes(Protocol):
@@ -96,9 +105,9 @@ def render_ggscatterstats(
     *,
     title: str | None = None,
 ) -> StatsPlot[CorrelationResult]:
-    """Render retained pairs and their typed Pearson result."""
+    """Render retained pairs and their typed correlation result."""
 
-    result = analysis.result
+    result = cast(CorrelationResult | RobustCorrelationResult, analysis.result)
     figure = Figure(layout="constrained")
     axes = figure.subplots()
     renderer = cast(_ScatterAxes, axes)
@@ -111,16 +120,31 @@ def render_ggscatterstats(
         statistic_text = "perfect correlation"
     else:
         statistic_text = f"t({result.test.df}) = {result.test.statistic:.2f}"
-    subtitle = (
-        f"{statistic_text}, {_p_value_text(result.test.p_value)}, "
-        f"Pearson r = {result.estimate:.2f}"
-    )
-    caption = (
-        f"n = {result.sample.analyzed_rows} pairs; "
-        f"{result.sample.dropped_null_rows} null row(s) excluded; "
-        f"{result.interval.level:.0%} Fisher CI "
-        f"[{result.interval.low:.2f}, {result.interval.high:.2f}]"
-    )
+    robust = isinstance(result, RobustCorrelationResult)
+    if robust:
+        subtitle = (
+            f"{statistic_text}, {_p_value_text(result.test.p_value)}, "
+            f"20% Winsorized r = {result.estimate:.2f}; h = {result.x_kernel.h}"
+        )
+        caption = (
+            f"n = {result.sample.analyzed_rows} pairs; "
+            f"{result.sample.dropped_null_rows} null row(s) excluded; pointwise "
+            f"{result.interval.level:.0%} percentile CI "
+            f"[{result.interval.low:.2f}, {result.interval.high:.2f}]; "
+            f"B = {result.resampling.valid_replicates}/"
+            f"{result.resampling.requested_replicates}"
+        )
+    else:
+        subtitle = (
+            f"{statistic_text}, {_p_value_text(result.test.p_value)}, "
+            f"Pearson r = {result.estimate:.2f}"
+        )
+        caption = (
+            f"n = {result.sample.analyzed_rows} pairs; "
+            f"{result.sample.dropped_null_rows} null row(s) excluded; "
+            f"{result.interval.level:.0%} Fisher CI "
+            f"[{result.interval.low:.2f}, {result.interval.high:.2f}]"
+        )
     renderer.text(
         0.5,
         1.01,
@@ -135,7 +159,7 @@ def render_ggscatterstats(
     return StatsPlot(
         figure=figure,
         axes={"main": axes},
-        result=result,
+        result=cast(CorrelationResult, result),
         annotations=PlotAnnotations(
             title=rendered_title,
             subtitle=subtitle,
@@ -151,9 +175,14 @@ def ggscatterstats(
     *,
     conf_level: float = 0.95,
     maximum_rows: int = DEFAULT_MAX_ROWS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
+    bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
+    random_seed: int | None = None,
+    maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
     title: str | None = None,
 ) -> StatsPlot[CorrelationResult]:
-    """Analyze and render the approved Pearson scatter method."""
+    """Analyze and render an approved Pearson or Winsorized scatter method."""
 
     analysis = analyze_ggscatterstats(
         data,
@@ -161,6 +190,11 @@ def ggscatterstats(
         y,
         conf_level=conf_level,
         maximum_rows=maximum_rows,
+        type=type,
+        trim_fraction=trim_fraction,
+        bootstrap_resamples=bootstrap_resamples,
+        random_seed=random_seed,
+        maximum_resample_work=maximum_resample_work,
     )
     return render_ggscatterstats(analysis, title=title)
 
@@ -172,7 +206,9 @@ def render_ggcorrmat(
 ) -> StatsPlot[CorrelationMatrixResult]:
     """Render a semantic heatmap from a typed correlation-matrix result."""
 
-    result = analysis.result
+    result = cast(
+        CorrelationMatrixResult | RobustCorrelationMatrixResult, analysis.result
+    )
     index = {column: position for position, column in enumerate(result.columns)}
     estimates = np.empty((len(result.columns), len(result.columns)))
     for cell in result.cells:
@@ -182,7 +218,9 @@ def render_ggcorrmat(
     axes = figure.subplots()
     renderer = cast(_MatrixAxes, axes)
     image = renderer.imshow(estimates, vmin=-1.0, vmax=1.0, cmap="coolwarm")
-    cast(_FigureRenderer, figure).colorbar(image, ax=axes, label="Pearson r")
+    robust = isinstance(result, RobustCorrelationMatrixResult)
+    correlation_label = "20% Winsorized r" if robust else "Pearson r"
+    cast(_FigureRenderer, figure).colorbar(image, ax=axes, label=correlation_label)
     ticks = np.arange(len(result.columns), dtype=np.float64)
     renderer.set_xticks(ticks, result.columns, rotation=45, ha="right")
     renderer.set_yticks(ticks, result.columns)
@@ -199,16 +237,20 @@ def render_ggcorrmat(
             color="black",
         )
 
-    rendered_title = title or "Pearson correlation matrix"
+    rendered_title = title or (
+        "20% Winsorized correlation matrix" if robust else "Pearson correlation matrix"
+    )
     renderer.set_title(rendered_title)
     unique_pairs = len(result.columns) * (len(result.columns) - 1) // 2
     subtitle = f"{unique_pairs} pair(s); p adjustment: {result.p_adjust}"
     p_label = "Holm-adjusted p" if result.p_adjust == "holm" else "p"
     caption = f"× = {p_label} > {result.sig_level:g}; pairwise-complete samples"
+    if robust:
+        caption += "; pointwise percentile intervals; deterministic PCG64DXSM"
     return StatsPlot(
         figure=figure,
         axes={"main": axes},
-        result=result,
+        result=cast(CorrelationMatrixResult, result),
         annotations=PlotAnnotations(
             title=rendered_title,
             subtitle=subtitle,
@@ -225,9 +267,14 @@ def ggcorrmat(
     sig_level: float = 0.05,
     p_adjust: str = "holm",
     maximum_rows: int = DEFAULT_MAX_ROWS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
+    bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
+    random_seed: int | None = None,
+    maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
     title: str | None = None,
 ) -> StatsPlot[CorrelationMatrixResult]:
-    """Analyze and render the approved Pearson correlation matrix."""
+    """Analyze and render an approved Pearson or Winsorized matrix."""
 
     analysis = analyze_ggcorrmat(
         data,
@@ -236,5 +283,10 @@ def ggcorrmat(
         sig_level=sig_level,
         p_adjust=p_adjust,
         maximum_rows=maximum_rows,
+        type=type,
+        trim_fraction=trim_fraction,
+        bootstrap_resamples=bootstrap_resamples,
+        random_seed=random_seed,
+        maximum_resample_work=maximum_resample_work,
     )
     return render_ggcorrmat(analysis, title=title)

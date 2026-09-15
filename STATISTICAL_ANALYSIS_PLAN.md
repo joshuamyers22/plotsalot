@@ -1,6 +1,7 @@
 # Statistical Analysis Plan: Cross-Language Parity Program
 
-- Status: M0, M2, M3, M4, and M5 classical specifications approved
+- Status: M0, M2, M3, M4, M5, and M6A R1–R3/G6 specifications approved; M6
+  R4 and Bayesian decisions pending
 - Version: 0.1.0
 - Date: 2026-09-13
 - Statistical owner/reviewer: Joshua Myers; M0 approval recorded 2026-09-14
@@ -141,6 +142,25 @@ likelihood/analytic fixtures, pinned-R oracle, and Python production gates pass;
 Joshua Myers independently reviewed and accepted the M5B technical candidate on
 2026-09-14 and accepted the final combined M5/`0.3` candidate on that date.
 
+## M6 robust and Bayesian contract
+
+`docs/MILESTONE_6.md` defines three tracks: M6A robust continuous analysis, M6B
+Bayesian data analysis, and M6C coefficient/meta-analysis extensions plus the
+`0.4` closeout. ADR-005, ADR-006, and R1–R3/G6 in
+`docs/M6_STATISTICAL_METHODS.md` were approved by Joshua Myers without revision
+on 2026-09-14, authorizing M6A implementation. The approved R1–R3/G6 technical
+candidate is now implemented with schema-v2 robust results, fixed-trim native
+formulas, deterministic PCG64DXSM association bootstrap streams, bounded work,
+semantic renderers, grouped execution, pinned-R/base-R evidence, and retained
+performance/resource evidence. Its technical gate passes; independent review
+and Joshua Myers's M6A acceptance were recorded on 2026-09-14, closing M6A. The
+remaining R4 and B1–B6
+decisions cover coefficient/meta robust estimands, likelihoods, priors,
+Bayes-factor orientation, posterior summaries, engine/RNG ownership,
+diagnostics, grouped seed/family behavior, optional dependencies, work limits,
+and evidence tolerances. The approval does not authorize R4, B1–B6, M6B/M6C,
+or final M6/`0.4` acceptance.
+
 ## Diagnostics and validation
 
 - Identification/rank/residual diagnostics: method-specific; not applicable to
@@ -174,5 +194,6 @@ Joshua Myers independently reviewed and accepted the M5B technical candidate on
   upstream adaptations on 2026-09-14 and approved the M2 classical
   specification on the same date. Joshua Myers approved the M3 classical
   comparison specification and the M4 classical categorical specification on
-  2026-09-14, and approved M5 K1–K4/MA1–MA4 on that date. Later method families
-  require separate approvals under this plan.
+  2026-09-14, and approved M5 K1–K4/MA1–MA4 on that date. M6 robust and Bayesian
+  methods require separate R1–R4/B1–B6/G6 and ADR-005/ADR-006 approvals under
+  this plan.

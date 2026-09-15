@@ -90,3 +90,22 @@
   a retained 10/100/500-term plus model-adapter benchmark.
 - Recorded Joshua Myers's independent M5A review, M5A acceptance, and final
   combined M5/`0.3` approval after the complete production gate, closing M5.
+- Added the detailed M6 contract with separate robust, Bayesian, and
+  coefficient/meta closeout tracks; explicit ADR/method-approval gates;
+  stochastic reproducibility, diagnostic, optional-dependency, resource,
+  oracle/calibration, performance, and `0.4` acceptance requirements.
+- Prepared the M6A ADR-005/ADR-006 architecture proposals and R1–R3/G6 robust
+  method proposal, accountable sign-off, entry findings, and verification loop;
+  Joshua Myers approved the entry decisions without revision on 2026-09-14,
+  authorizing M6A implementation while R4/B1–B6 and release acceptance remain
+  separate gates.
+- Implemented the M6A robust continuous-analysis candidate across histogram,
+  labeled-dot, scatter, correlation-matrix, independent/repeated comparison,
+  and existing grouped surfaces with fixed 20% trimming/Winsorization,
+  deterministic bounded bootstrap streams, raw effects, and no fallback.
+- Added immutable schema-v2 robust result variants, semantic renderers,
+  mutation/fault/replay/resource tests, independent base-R formula fixtures and
+  retained upstream objects, and a phase-separated M6A performance/work baseline.
+- Recorded Joshua Myers's independent review and acceptance of M6A after the
+  complete technical gate, closing the robust continuous-analysis track while
+  leaving R4, B1–B6, M6, and `0.4` open.

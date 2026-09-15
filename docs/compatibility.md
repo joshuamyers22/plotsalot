@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M0–M5 complete; `0.3` product gate accepted
+- Status: M0–M5 and M6A complete; M6B method decisions pending
 
 Definitions:
 
@@ -20,22 +20,22 @@ Definitions:
 | `extract_stats` | `extract_stats` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `extract_subtitle` | `extract_subtitle` | 0.1 | Adapted; implemented for individual and grouped containers |
 | `ggbarstats` | `ggbarstats` | 0.2 | Adapted; shared classical categorical analysis and normalized bars implemented |
-| `ggbetweenstats` | `ggbetweenstats` | 0.1 | Adapted; Welch parametric/Holm mode implemented |
+| `ggbetweenstats` | `ggbetweenstats` | 0.1/M6A | Adapted; Welch parametric and Yuen/Welch–Yuen robust modes implemented |
 | `ggcoefstats` | `ggcoefstats` | 0.3 | Adapted M5A strict table/OLS and M5B REML/Hartung–Knapp modes implemented and accepted |
-| `ggcorrmat` | `ggcorrmat` | 0.1 | Adapted; Pearson/Holm mode implemented |
-| `ggdotplotstats` | `ggdotplotstats` | 0.1 | Adapted; labeled parametric mode implemented |
-| `gghistostats` | `gghistostats` | M0/0.1 | Adapted; one-sample parametric mode implemented |
+| `ggcorrmat` | `ggcorrmat` | 0.1/M6A | Adapted; Pearson and bounded Winsorized/Holm modes implemented |
+| `ggdotplotstats` | `ggdotplotstats` | 0.1/M6A | Adapted; labeled parametric and fixed-trim robust modes implemented |
+| `gghistostats` | `gghistostats` | M0/0.1/M6A | Adapted; one-sample parametric and analytic fixed-trim robust modes implemented |
 | `ggpiestats` | `ggpiestats` | 0.2 | Adapted; shared classical categorical analysis and faceted pies implemented |
-| `ggscatterstats` | `ggscatterstats` | 0.1 | Adapted; Pearson mode implemented |
-| `ggwithinstats` | `ggwithinstats` | 0.2 | Adapted; explicit-subject complete-block parametric mode implemented |
+| `ggscatterstats` | `ggscatterstats` | 0.1/M6A | Adapted; Pearson and seeded marginal-Winsorized modes implemented |
+| `ggwithinstats` | `ggwithinstats` | 0.2/M6A | Adapted; explicit-subject complete-block parametric and robust modes implemented |
 | `grouped_ggbarstats` | same name | 0.2 | Adapted; atomic grouped categorical bars implemented |
-| `grouped_ggbetweenstats` | same name | 0.1 | Adapted; atomic per-group Welch container implemented |
-| `grouped_ggcorrmat` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
-| `grouped_ggdotplotstats` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
-| `grouped_gghistostats` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
+| `grouped_ggbetweenstats` | same name | 0.1/M6A | Adapted; atomic per-group Welch and robust containers implemented |
+| `grouped_ggcorrmat` | same name | 0.1/M6A | Adapted; atomic classical/robust containers with stable streams implemented |
+| `grouped_ggdotplotstats` | same name | 0.1/M6A | Adapted; atomic classical/robust containers implemented |
+| `grouped_gghistostats` | same name | 0.1/M6A | Adapted; atomic classical/robust containers implemented |
 | `grouped_ggpiestats` | same name | 0.2 | Adapted; atomic grouped categorical pies implemented |
-| `grouped_ggscatterstats` | same name | 0.1 | Adapted; atomic per-group plot container implemented |
-| `grouped_ggwithinstats` | same name | 0.2 | Adapted; atomic per-group complete-block container implemented |
+| `grouped_ggscatterstats` | same name | 0.1/M6A | Adapted; atomic classical/robust containers with stable streams implemented |
+| `grouped_ggwithinstats` | same name | 0.2/M6A | Adapted; atomic classical/robust complete-block containers implemented |
 | `theme_ggstatsplot` | `theme_ggstatsplot` | 0.1 | Adapted; immutable local Matplotlib theme implemented |
 
 ## Known adaptation rules
@@ -147,3 +147,30 @@ heuristic duplicate-term concatenation, arbitrary model dispatch, ANOVA effect
 sizes, exponentiated/transformed parameters, ellipsis forwarding, and dynamic R
 plotting objects are deferred beyond M5. These classifications passed M5
 implementation evidence and accountable review.
+
+## M6A robust-method disposition
+
+M6A adds only `type="robust"` on the continuous M2/M3 families and their
+existing grouped variants. These paths are classified as adapted because the
+approved estimands, intervals, degree-of-freedom rules, RNG, and failure policy
+are explicit plotsalot contracts rather than an unqualified copy of upstream
+defaults.
+
+| Surface | Implemented M6A behavior | Upstream/adaptation disposition |
+|---|---|---|
+| `gghistostats`, `ggdotplotstats` | fixed `trim_fraction=0.20`; analytic trimmed-mean t test and two-sided interval; raw difference; per-label trimmed centrality | Adapted from upstream bootstrap-t one-sample intervals; standardized robust effect is deliberately absent |
+| `ggscatterstats` | marginal 20% Winsorized Pearson estimate/test; WRS2-style `h-2` reference df; required unsigned-64-bit seed; paired type-7 percentile bootstrap interval | Adapted from upstream ordinary `n-2` test reference and normal interval; marginal Winsorization is explicitly not described as high-breakdown bivariate robustness |
+| `ggcorrmat` | every pair retained; pairwise completeness; identity-derived deterministic streams; Holm or none; pointwise bootstrap intervals | Adapted with owned RNG/work accounting; partial correlations and other robust estimators remain deferred |
+| `ggbetweenstats` | two-level Yuen; 3–20-level Welch–Yuen omnibus; complete Yuen pairwise family; raw trimmed-location effects | Adapted; stochastic/standardized upstream robust effects are not emitted, and intervals remain pointwise |
+| `ggwithinstats` | explicit-subject complete blocks; two-level trimmed subject differences; WRS2-style Winsorized repeated omnibus; matching subject-difference pairwise family | Adapted from upstream marginal two-level comparison; inferred subjects, alternative missingness populations, and fallback corrections are rejected/deferred |
+| grouped M6A surfaces | atomic preflight/execution; stable typed identity streams; per-group hypothesis families; retained root work | Adapted; partial success, pooled cross-group corrections, hidden RNG, and automatic work reduction are rejected |
+
+`bootstrap_resamples` is restricted to odd values from 999 through 9,999.
+Default and hard resample-work ceilings are 100,000,000 and 500,000,000 sampled
+pairs. The full request is rejected before drawing if it exceeds its selected
+ceiling; rows, pairs, variables, or groups are never silently reduced. Invalid
+effective counts, non-finite input, degenerate Winsorized scale/covariance,
+insufficient valid bootstrap replicates, and robust repeated-matrix degeneracy
+fail without returning a classical result. Bayesian modes, robust categorical
+methods, and robust coefficient/meta-analysis remain deferred to approved M6B
+or M6C contracts.

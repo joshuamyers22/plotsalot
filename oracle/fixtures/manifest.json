@@ -54,6 +54,18 @@
   "m5b_raw_fixtures": [
     "m5b-meta-ggstatsplot.R"
   ],
+  "m6a_input_fixtures": [
+    "m6a-hist",
+    "m6a-correlation",
+    "m6a-between",
+    "m6a-within"
+  ],
+  "m6a_raw_fixtures": [
+    "m6a-hist-ggstatsplot.R",
+    "m6a-scatter-ggstatsplot.R",
+    "m6a-between-ggstatsplot.R",
+    "m6a-within-ggstatsplot.R"
+  ],
   "normal_fixtures": [
     "normal",
     "null-containing",
@@ -76,6 +88,10 @@
     "oracle/fixtures/input/m5a-coefficients.csv": "231d6ee796fc8cddc440e28d7e6e687b86ab283d96d3930ed4b5e7d55b8f771c",
     "oracle/fixtures/input/m5a-ols.csv": "11e17f8586f9ef9463279c42230884f11c0b3be48937150a27d3761ca0b75368",
     "oracle/fixtures/input/m5b-meta.csv": "8a62cb1ffb9009fc366ce2face90bb5476229885649ff128f362f01401254939",
+    "oracle/fixtures/input/m6a-between.csv": "eda40b6a90890af3ce8c7f6f66bf5651a49b25e852a857ebc144f86f52022c53",
+    "oracle/fixtures/input/m6a-correlation.csv": "0b97153523d6e0c7c21e6cd3e300b9d5a5c21fa66fc520473135d5bb943d492f",
+    "oracle/fixtures/input/m6a-hist.csv": "bfa614f2627b6bff7ac47bf132b5db5b9f93c63c4a4a292bfc99c97b08a2925c",
+    "oracle/fixtures/input/m6a-within.csv": "8b00fc28fbcc315fc893c5dff43e118f47e7a802c85a7c8016d6ef5265a07f53",
     "oracle/fixtures/input/non-finite.csv": "71ed24d8df1e292eb4594a82d529af7888f78f2f8dd8aa2495d5a5864f3cc89d",
     "oracle/fixtures/input/normal.csv": "49a2bb5c9701a38d80ffef0e137313225d42dd385248eef984ea2d0f9cef6772",
     "oracle/fixtures/input/null-containing.csv": "c8720e565328654fefe825c85b502ed744c721336be7ce10cf64fb2cf83c6c89",
@@ -109,12 +125,20 @@
     "oracle/fixtures/r-output/m5b-meta-ggstatsplot.R": "10040b30680f0fcae3298fc6336fb7936316d2231b5185c66123ed7a5c57708d",
     "oracle/fixtures/r-output/m5b-meta-results.csv": "6e75e5e0181de7c64d7dd50715690b288cf1a2c1a5f06a85115d8c027c136ab9",
     "oracle/fixtures/r-output/m5b-meta-study-results.csv": "43b7bab28552bf87901d5043df35e78712ab9869d6898f9e5c3faa2f674ee73e",
+    "oracle/fixtures/r-output/m6a-between-ggstatsplot.R": "8d344182aeeac2f2506d98b936a3e0a2581d28864f8e4449cd189aadd5dbe8b0",
+    "oracle/fixtures/r-output/m6a-between-results.csv": "7f33f6668478cdd58815cccd9aa46dfb94cac8c02a19689c0bb5cc9df65ba74c",
+    "oracle/fixtures/r-output/m6a-correlation-results.csv": "4d5b999c4b230c98f379fac9a53c8b92ce5ed40106ec57ebd0adf2d0cd13eccd",
+    "oracle/fixtures/r-output/m6a-hist-ggstatsplot.R": "7543039c176679eca80a264a9d654383212273a666b6a6fbb1fc6e35be382cd7",
+    "oracle/fixtures/r-output/m6a-hist-results.csv": "59124ce53c72d93427f864b58724b9b41dbfa53515babe4bdbf61bfead08b0ea",
+    "oracle/fixtures/r-output/m6a-scatter-ggstatsplot.R": "5a374397421c8f6caefe14c7b26636f533037f8e3e12372a4e8d3cf796193a05",
+    "oracle/fixtures/r-output/m6a-within-ggstatsplot.R": "1576c68099fecf79c65dd88f328809c0157c2d61816d6ada764ff1c89f97d76a",
+    "oracle/fixtures/r-output/m6a-within-results.csv": "6bec70ce7e51c08c22709352771043b2c6a799bdb0c1abd75d189afcd943bc83",
     "oracle/fixtures/r-output/normal-ggstatsplot.R": "3e8db78ec38d05c372731e375ec3fabe67151050e6b80f9772f3ec7ced868119",
     "oracle/fixtures/r-output/normalized-results.csv": "456b0661f9d5a563d9727df6ca3061ecf10474eee3ab7d60e4738a6a8b9e019b",
     "oracle/fixtures/r-output/null-containing-ggstatsplot.R": "b55c612d2bd3586f84b79c0d35a2dfb0591311318ec03becb761d2afc25c16be",
-    "oracle/fixtures/r-output/session-info.txt": "93749e41334e37e4d7b3b2c5bfd55d865c5802ec827137b9e4038a0aa3014e79",
+    "oracle/fixtures/r-output/session-info.txt": "a9ba5781d73b0a93876b4ea26bb21d288a42e4282dd4c16d8da3fb585bd2793e",
     "oracle/fixtures/r-output/small-sample-ggstatsplot.R": "c265d30ba4f5628f8505d0b2f5e95e250cb90e657cc87ee7db823ad0b2f783ab",
-    "oracle/generate.R": "44c5431d153d02d192fc49c1b400b9b0706fd35c0f898959973b8bc03b638abc",
+    "oracle/generate.R": "a8602b3b82b3633b243e9598abece6dfdc7c403bc9dc0241c6ef306cd38311b0",
     "oracle/renv.lock": "4af8da5d828f96671001b5d477aa8252630d355746dee07ae21ecd5fee40aa7d"
   }
 }

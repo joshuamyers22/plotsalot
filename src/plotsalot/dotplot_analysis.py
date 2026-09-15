@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import isfinite
+from typing import cast
 
 import numpy as np
 import polars as pl
@@ -21,6 +22,12 @@ from plotsalot.result import (
     ResourceLimits,
     SampleAudit,
     ScalarIdentity,
+)
+from plotsalot.robust import TRIM_FRACTION, method_result, trimmed_kernel
+from plotsalot.robust_result import (
+    RobustDotEstimateResult,
+    RobustDotPlotResult,
+    RobustOneSampleResult,
 )
 
 DEFAULT_MAX_LABELS = 200
@@ -60,10 +67,12 @@ def analyze_ggdotplotstats(
     test_value: float = 0.0,
     alternative: Alternative = "two-sided",
     conf_level: float = 0.95,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_labels: int = DEFAULT_MAX_LABELS,
 ) -> DotPlotAnalysis:
-    """Analyze the approved parametric labeled dot-plot method."""
+    """Analyze an approved classical or robust labeled dot-plot method."""
 
     if not isinstance(data, pl.DataFrame):
         raise TypeError("data must be a polars.DataFrame")
@@ -73,6 +82,10 @@ def analyze_ggdotplotstats(
         raise ValueError("alternative must be 'two-sided', 'less', or 'greater'")
     if not np.isfinite(test_value):
         raise ValueError("test_value must be finite")
+    if type not in {"parametric", "robust"}:
+        raise ValueError("type must be 'parametric' or 'robust'")
+    if type == "robust" and trim_fraction != TRIM_FRACTION:
+        raise ValueError("trim_fraction must equal 0.20 for M6A robust methods")
     if maximum_rows < 2:
         raise ValueError("maximum_rows must be at least two")
     if maximum_labels < 1:
@@ -94,11 +107,11 @@ def analyze_ggdotplotstats(
     if len(partitions) > maximum_labels:
         raise ValueError(f"label count exceeds maximum_labels={maximum_labels}")
 
-    estimates: list[DotEstimateResult] = []
+    estimates: list[DotEstimateResult | RobustDotEstimateResult] = []
     seen_labels: set[tuple[type[object], ScalarIdentity]] = set()
     for partition in partitions:
         label = _label_identity(partition.get_column(y)[0])
-        label_key = (type(label), label)
+        label_key = (label.__class__, label)
         if label_key in seen_labels:
             raise ValueError(f"dot plot label is not unique after encoding: {label!r}")
         seen_labels.add(label_key)
@@ -106,13 +119,41 @@ def analyze_ggdotplotstats(
             label_sample = select_numeric_sample(
                 partition,
                 x,
-                minimum_size=1,
+                minimum_size=5 if type == "robust" else 1,
                 maximum_rows=maximum_rows,
             )
         except (TypeError, ValueError) as error:
             raise ValueError(f"dot plot label {label!r} is invalid: {error}") from error
 
         values = label_sample.values
+        if type == "robust":
+            try:
+                kernel, _ = trimmed_kernel(values, trim_fraction=trim_fraction)
+            except ValueError as error:
+                raise ValueError(
+                    f"dot plot label {label!r} is invalid: {error}"
+                ) from error
+            df = float(kernel.h - 1)
+            critical = float(scipy_stats.t.ppf(0.5 + (conf_level / 2.0), df))
+            margin = critical * float(np.sqrt(kernel.q))
+            estimates.append(
+                RobustDotEstimateResult(
+                    label=label,
+                    sample=label_sample.audit,
+                    value=kernel.trimmed_mean,
+                    standard_deviation=float(np.sqrt(kernel.winsorized_variance)),
+                    interval=IntervalResult(
+                        target="population_20pct_trimmed_location",
+                        method="trimmed_mean_student_t_two_sided",
+                        level=conf_level,
+                        low=kernel.trimmed_mean - margin,
+                        high=kernel.trimmed_mean + margin,
+                    ),
+                    kernel=kernel,
+                    warnings=(),
+                )
+            )
+            continue
         mean = float(np.mean(values))
         warnings: tuple[str, ...] = ()
         deviation: float | None = None
@@ -151,7 +192,7 @@ def analyze_ggdotplotstats(
     overall_selected = select_numeric_sample(
         complete,
         x,
-        minimum_size=2,
+        minimum_size=5 if type == "robust" else 2,
         require_variation=True,
         maximum_rows=maximum_rows,
     )
@@ -166,10 +207,16 @@ def analyze_ggdotplotstats(
     )
     one_sample = analyze_one_sample_sample(
         overall_sample,
-        analysis="ggdotplotstats_one_sample_parametric",
+        analysis=(
+            "ggdotplotstats_one_sample_robust"
+            if type == "robust"
+            else "ggdotplotstats_one_sample_parametric"
+        ),
         test_value=test_value,
         alternative=alternative,
         conf_level=conf_level,
+        trim_fraction=trim_fraction,
+        maximum_rows=maximum_rows,
     ).result
     ordered_estimates = tuple(sorted(estimates, key=lambda estimate: estimate.value))
     warnings = tuple(
@@ -177,6 +224,39 @@ def analyze_ggdotplotstats(
         for estimate in ordered_estimates
         for warning in estimate.warnings
     )
+    if type == "robust":
+        if not isinstance(one_sample, RobustOneSampleResult) or any(
+            not isinstance(estimate, RobustDotEstimateResult)
+            for estimate in ordered_estimates
+        ):
+            raise RuntimeError("robust dot result construction is inconsistent")
+        robust_result = RobustDotPlotResult(
+            schema_version=2,
+            analysis="ggdotplotstats_one_sample_robust",
+            mode="robust",
+            x=x,
+            label_column=y,
+            sample=overall_sample.audit,
+            method=method_result("twenty_percent_trimmed_labeled_location"),
+            one_sample=one_sample,
+            estimates=tuple(
+                estimate
+                for estimate in ordered_estimates
+                if isinstance(estimate, RobustDotEstimateResult)
+            ),
+            limits=ResourceLimits(
+                maximum_rows=maximum_rows,
+                maximum_labels=maximum_labels,
+            ),
+            warnings=warnings,
+        )
+        return DotPlotAnalysis(
+            sample=overall_sample, result=cast(DotPlotResult, robust_result)
+        )
+    if not all(
+        isinstance(estimate, DotEstimateResult) for estimate in ordered_estimates
+    ):
+        raise RuntimeError("parametric dot result construction is inconsistent")
     result = DotPlotResult(
         schema_version=1,
         analysis="ggdotplotstats_one_sample_parametric",
@@ -184,7 +264,11 @@ def analyze_ggdotplotstats(
         label_column=y,
         sample=overall_sample.audit,
         one_sample=one_sample,
-        estimates=ordered_estimates,
+        estimates=tuple(
+            estimate
+            for estimate in ordered_estimates
+            if isinstance(estimate, DotEstimateResult)
+        ),
         limits=ResourceLimits(
             maximum_rows=maximum_rows,
             maximum_labels=maximum_labels,

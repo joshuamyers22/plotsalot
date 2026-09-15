@@ -11,12 +11,15 @@ on 2026-09-13. This repository executes that plan through the following gates.
 | M3 | Between- and within-group comparisons and pairwise tests ([detail](MILESTONE_3.md)) | 5–7 weeks |
 | M4 | Categorical bar/pie families ([detail](MILESTONE_4.md)) | 3–4 weeks |
 | M5 | Coefficients and approved frequentist meta-analysis ([detail](MILESTONE_5.md)) | 4–6 weeks |
-| M6 | Robust and Bayesian methods | 8–13 weeks |
+| M6 | Robust and Bayesian methods ([detail](MILESTONE_6.md)) | 8–13 weeks |
 | M7 | Compatibility closure, hardening, documentation, 1.0 | 4–6 weeks |
 
 M0 through M5 are complete, and the `0.3` product gate is accepted. Joshua Myers
 independently reviewed and accepted both M5 tracks and approved the combined
-M5/`0.3` candidate on 2026-09-14. M6 is the next planned milestone.
+M5/`0.3` candidate on 2026-09-14. M6 is active. Joshua Myers approved the M6A
+robust architecture/method entry gate on 2026-09-14. The M6A technical candidate
+passed its technical gate and was independently reviewed and accepted by Joshua
+Myers on 2026-09-14. The next M6 gate is B1–B6 method approval before M6B begins.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months
 with two Python engineers and a part-time statistical-methods reviewer.
@@ -27,7 +30,7 @@ with two Python engineers and a part-time statistical-methods reviewer.
   grouping, and composition.
 - `0.2`: within-subject and categorical families.
 - `0.3`: coefficient plots and approved frequentist meta-analysis.
-- `0.4+`: robust/Bayesian previews as method gates pass.
+- `0.4`: approved robust/Bayesian methods and coefficient/meta extensions.
 - `1.0`: every upstream export is dispositioned, result schemas are
   stable, and production release evidence is approved.
 
@@ -40,6 +43,6 @@ with two Python engineers and a part-time statistical-methods reviewer.
 - Polars is canonical; pandas may exist only behind an approved adapter.
 
 See `MILESTONE_0.md`, `MILESTONE_1.md`, `MILESTONE_2.md`,
-`MILESTONE_3.md`, `MILESTONE_4.md`, `MILESTONE_5.md`, `compatibility.md`,
-`../PROJECT_BRIEF.md`, and `../STATISTICAL_ANALYSIS_PLAN.md` for active work and
-acceptance evidence.
+`MILESTONE_3.md`, `MILESTONE_4.md`, `MILESTONE_5.md`, `MILESTONE_6.md`,
+`compatibility.md`, `../PROJECT_BRIEF.md`, and
+`../STATISTICAL_ANALYSIS_PLAN.md` for active work and acceptance evidence.

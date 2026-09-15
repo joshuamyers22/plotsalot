@@ -120,6 +120,15 @@ from plotsalot.result import (
     ResourceLimits,
     StructuredResult,
 )
+from plotsalot.robust_result import (
+    ResamplingResult,
+    RobustComparisonResult,
+    RobustCorrelationMatrixResult,
+    RobustCorrelationResult,
+    RobustDotPlotResult,
+    RobustOneSampleResult,
+    TrimmedKernelResult,
+)
 from plotsalot.theme import StatsTheme, theme_ggstatsplot
 
 __all__ = [
@@ -151,6 +160,12 @@ __all__ = [
     "PairwiseComparisonResult",
     "PlotAnnotations",
     "ResourceLimits",
+    "ResamplingResult",
+    "RobustComparisonResult",
+    "RobustCorrelationMatrixResult",
+    "RobustCorrelationResult",
+    "RobustDotPlotResult",
+    "RobustOneSampleResult",
     "RepeatedSample",
     "RepeatedSampleAudit",
     "StatsTheme",
@@ -158,6 +173,7 @@ __all__ = [
     "CoefficientTable",
     "CoefficientTableResult",
     "TableCoefficientAnalysis",
+    "TrimmedKernelResult",
     "StatsPlot",
     "StructuredResult",
     "analyze_categorical",

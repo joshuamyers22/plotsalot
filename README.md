@@ -4,7 +4,10 @@
 workflows in [`ggstatsplot`](https://github.com/IndrajeetPatil/ggstatsplot).
 
 M0 through M5 are complete, including the accepted `0.3` product gate. The
-project remains pre-release and is not yet ready for production analytical use.
+M6 robust/Bayesian work is active. The M6A robust continuous-analysis track is
+implemented, independently reviewed, and accepted. M6B Bayesian method
+decisions remain pending. The project remains pre-release and is not yet ready
+for production analytical use.
 
 ## Development
 
@@ -58,6 +61,46 @@ analysis = analyze_gghistostats(data, "value", test_value=0.0)
 plot = render_gghistostats(analysis, title="Observed values")
 plot.axes["main"].grid(axis="y", alpha=0.2)
 ```
+
+M6A adds explicit fixed-20%-trim robust modes to histograms, labeled dots,
+scatter plots, correlation matrices, between-group comparisons, repeated
+comparisons, and their existing grouped variants. Association intervals own
+their RNG and require a seed:
+
+```python
+from plotsalot import ggbetweenstats, ggscatterstats
+
+robust_scatter = ggscatterstats(
+    data,
+    "x",
+    "y",
+    type="robust",
+    random_seed=20260914,
+    bootstrap_resamples=1999,
+)
+robust_groups = ggbetweenstats(
+    data,
+    "treatment",
+    "score",
+    type="robust",
+    pairwise_display="all",
+)
+
+print(robust_scatter.result.resampling)
+print(robust_groups.result.pairwise)
+```
+
+Robust mode uses 20% trimmed locations, marginal 20% Winsorized Pearson
+association, Yuen/Welch–Yuen independent comparisons, and trimmed
+subject-difference/Winsorized repeated comparisons. It reports raw differences,
+not a standardized robust effect. Correlation intervals are paired type-7
+percentile bootstraps using PCG64DXSM; `bootstrap_resamples` must be an odd value
+from 999 through 9,999 and total sampled-pair work is checked before any draw.
+Marginal Winsorization is not a high-breakdown defense against arbitrary
+bivariate leverage. Degenerate scale, inadequate effective sample, invalid
+bootstrap yield, or resource exhaustion fails atomically and never falls back
+to a classical method. See `docs/M6_STATISTICAL_METHODS.md` for exact formulas
+and adaptation boundaries.
 
 M2 also provides labeled means, Pearson scatter/correlation matrices, and atomic
 grouped operations:
@@ -225,7 +268,8 @@ discordant counts. Pearson paths fail on inadequate expected counts rather than
 switching methods. Pairwise and per-`y` stratum Holm families are retained
 separately, and `pairwise_display` changes annotations only.
 
-Only the approved classical modes are supported: one-sample Student tests,
+The approved classical and M6A robust continuous modes are supported.
+Classical mode includes one-sample Student tests,
 per-label mean intervals, two-sided Pearson correlations with Fisher intervals,
 Welch independent comparisons, paired tests, and Greenhouse–Geisser-corrected
 repeated-measures ANOVA, categorical Pearson tests, and exact binary paired
@@ -235,13 +279,17 @@ blocks only. Inputs are limited by default to 1,000,000 rows, 200 dot labels,
 50 matrix variables, 20 groups or comparison levels, 1,000,000 rendered
 observations, 10,000 subject paths, 20 composed panels, 20 categorical levels
 per axis, 400 categorical cells/labels, 190 categorical pairwise hypotheses,
-and a weighted categorical total of 1,000,000,000. Unsupported upstream
-arguments and nonparametric, robust, and Bayesian modes remain deferred. See
+and a weighted categorical total of 1,000,000,000. Robust association adds a
+default 100,000,000 and hard 500,000,000 resample-work ceiling. Unsupported
+upstream arguments, nonparametric modes, robust categorical/coefficient/meta
+paths, and every Bayesian mode remain deferred. See
 [`docs/MILESTONE_0.md`](docs/MILESTONE_0.md),
 [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md),
 [`docs/MILESTONE_2.md`](docs/MILESTONE_2.md),
 [`docs/MILESTONE_3.md`](docs/MILESTONE_3.md),
 [`docs/MILESTONE_4.md`](docs/MILESTONE_4.md),
+[`docs/MILESTONE_5.md`](docs/MILESTONE_5.md),
+[`docs/MILESTONE_6.md`](docs/MILESTONE_6.md),
 [`docs/CONTRACTS.md`](docs/CONTRACTS.md),
 [`docs/compatibility.md`](docs/compatibility.md), and
 [`STATISTICAL_ANALYSIS_PLAN.md`](STATISTICAL_ANALYSIS_PLAN.md) for scope and

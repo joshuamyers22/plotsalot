@@ -27,6 +27,18 @@ from plotsalot.comparison_result import (
 )
 from plotsalot.data import DEFAULT_MAX_ROWS, FloatArray
 from plotsalot.result import EffectSizeResult, IntervalResult, ResourceLimits
+from plotsalot.robust import TRIM_FRACTION, method_result, trimmed_kernel
+from plotsalot.robust_result import (
+    Alternative as RobustAlternative,
+)
+from plotsalot.robust_result import (
+    RobustComparisonLevelResult,
+    RobustComparisonResult,
+    RobustEffectResult,
+    RobustPairwiseComparisonResult,
+    RobustRepeatedCorrectionResult,
+    RobustTestResult,
+)
 
 DEFAULT_MAX_LEVELS = 20
 DEFAULT_MAX_RENDERED_OBSERVATIONS = 1_000_000
@@ -110,10 +122,12 @@ def _validate_options(
     maximum_levels: int,
     maximum_rendered_observations: int,
 ) -> PairwiseDisplay:
-    if method_type != "parametric":
-        raise ValueError("type must be 'parametric'; other modes are unsupported")
-    if alternative != "two-sided":
-        raise ValueError("alternative must be 'two-sided'")
+    if method_type not in {"parametric", "robust"}:
+        raise ValueError("type must be 'parametric' or 'robust'")
+    if alternative not in {"two-sided", "less", "greater"}:
+        raise ValueError("alternative must be 'two-sided', 'less', or 'greater'")
+    if method_type == "parametric" and alternative != "two-sided":
+        raise ValueError("parametric comparison alternative must be 'two-sided'")
     if not np.isfinite(conf_level) or not 0.0 < conf_level < 1.0:
         raise ValueError("conf_level must be strictly between 0 and 1")
     if p_adjust not in {"holm", "none"}:
@@ -367,6 +381,352 @@ def _omega_from_f(statistic: float, df1: float, df2: float) -> float:
     return max(0.0, (df1 * (statistic - 1.0)) / ((df1 * statistic) + df2 + 1.0))
 
 
+def _robust_probability(statistic: float, df: float, alternative: str) -> float:
+    if alternative == "two-sided":
+        return min(1.0, 2.0 * float(scipy_stats.t.sf(abs(statistic), df)))
+    if alternative == "greater":
+        return float(scipy_stats.t.sf(statistic, df))
+    return float(1.0 - scipy_stats.t.sf(statistic, df))
+
+
+def _robust_interval(
+    estimate: float,
+    standard_error: float,
+    df: float,
+    conf_level: float,
+    *,
+    target: str,
+    method: str,
+) -> IntervalResult:
+    critical = float(scipy_stats.t.ppf(0.5 + (conf_level / 2.0), df))
+    margin = critical * standard_error
+    return IntervalResult(
+        target=target,
+        method=method,
+        level=conf_level,
+        low=estimate - margin,
+        high=estimate + margin,
+    )
+
+
+def _robust_levels(
+    levels: tuple[object, ...],
+    values: tuple[FloatArray, ...],
+    conf_level: float,
+) -> tuple[RobustComparisonLevelResult, ...]:
+    results: list[RobustComparisonLevelResult] = []
+    for level, level_values in zip(levels, values, strict=True):
+        kernel, _ = trimmed_kernel(level_values)
+        interval = _robust_interval(
+            kernel.trimmed_mean,
+            sqrt(kernel.q),
+            float(kernel.h - 1),
+            conf_level,
+            target="population_20pct_trimmed_location",
+            method="trimmed_mean_student_t_two_sided",
+        )
+        results.append(
+            RobustComparisonLevelResult(
+                level=cast(str | int | float | bool, level),
+                n_obs=kernel.n,
+                mean=kernel.trimmed_mean,
+                standard_deviation=sqrt(kernel.winsorized_variance),
+                interval=interval,
+                kernel=kernel,
+            )
+        )
+    return tuple(results)
+
+
+def _yuen_contrast(
+    left: FloatArray,
+    right: FloatArray,
+    conf_level: float,
+    alternative: str,
+) -> RobustPairwiseComparisonResult:
+    left_kernel, _ = trimmed_kernel(left)
+    right_kernel, _ = trimmed_kernel(right)
+    estimate = left_kernel.trimmed_mean - right_kernel.trimmed_mean
+    standard_error = sqrt(left_kernel.q + right_kernel.q)
+    df = ((left_kernel.q + right_kernel.q) ** 2) / (
+        (left_kernel.q**2 / (left_kernel.h - 1))
+        + (right_kernel.q**2 / (right_kernel.h - 1))
+    )
+    statistic = estimate / standard_error
+    return RobustPairwiseComparisonResult(
+        left="__left__",
+        right="__right__",
+        estimate=estimate,
+        standard_error=standard_error,
+        test=RobustTestResult(
+            name="yuen_t",
+            target="population_20pct_trimmed_location_difference",
+            null_value=0.0,
+            alternative=cast(RobustAlternative, alternative),
+            statistic=statistic,
+            df1=None,
+            df2=df,
+            p_value=_robust_probability(statistic, df, alternative),
+            reference_distribution="student_t",
+        ),
+        interval=_robust_interval(
+            estimate,
+            standard_error,
+            df,
+            conf_level,
+            target="population_20pct_trimmed_location_difference",
+            method="yuen_satterthwaite_two_sided_pointwise",
+        ),
+        effect_size=RobustEffectResult(
+            name="raw_trimmed_location_difference",
+            value=estimate,
+            target="population_20pct_trimmed_location_difference",
+            standardized_effect_unavailable="robust_standardized_effect_not_approved",
+        ),
+        adjusted_p_value=0.0,
+        significant=False,
+        left_kernel=left_kernel,
+        right_kernel=right_kernel,
+        difference_kernel=None,
+    )
+
+
+def _trimmed_difference_contrast(
+    left: FloatArray,
+    right: FloatArray,
+    conf_level: float,
+    alternative: str,
+) -> RobustPairwiseComparisonResult:
+    kernel, _ = trimmed_kernel(left - right)
+    standard_error = sqrt(kernel.q)
+    df = float(kernel.h - 1)
+    statistic = kernel.trimmed_mean / standard_error
+    return RobustPairwiseComparisonResult(
+        left="__left__",
+        right="__right__",
+        estimate=kernel.trimmed_mean,
+        standard_error=standard_error,
+        test=RobustTestResult(
+            name="trimmed_subject_difference_t",
+            target="population_20pct_trimmed_subject_difference",
+            null_value=0.0,
+            alternative=cast(RobustAlternative, alternative),
+            statistic=statistic,
+            df1=None,
+            df2=df,
+            p_value=_robust_probability(statistic, df, alternative),
+            reference_distribution="student_t",
+        ),
+        interval=_robust_interval(
+            kernel.trimmed_mean,
+            standard_error,
+            df,
+            conf_level,
+            target="population_20pct_trimmed_location_difference",
+            method="trimmed_subject_difference_t_two_sided_pointwise",
+        ),
+        effect_size=RobustEffectResult(
+            name="raw_trimmed_location_difference",
+            value=kernel.trimmed_mean,
+            target="population_20pct_trimmed_subject_difference",
+            standardized_effect_unavailable="robust_standardized_effect_not_approved",
+        ),
+        adjusted_p_value=0.0,
+        significant=False,
+        left_kernel=None,
+        right_kernel=None,
+        difference_kernel=kernel,
+    )
+
+
+def _named_robust_contrast(
+    contrast: RobustPairwiseComparisonResult,
+    left: object,
+    right: object,
+    *,
+    adjusted_p_value: float,
+    alpha: float,
+) -> RobustPairwiseComparisonResult:
+    return RobustPairwiseComparisonResult(
+        left=cast(str | int | float | bool, left),
+        right=cast(str | int | float | bool, right),
+        estimate=contrast.estimate,
+        standard_error=contrast.standard_error,
+        test=contrast.test,
+        interval=contrast.interval,
+        effect_size=contrast.effect_size,
+        adjusted_p_value=adjusted_p_value,
+        significant=adjusted_p_value <= alpha,
+        left_kernel=contrast.left_kernel,
+        right_kernel=contrast.right_kernel,
+        difference_kernel=contrast.difference_kernel,
+    )
+
+
+def _robust_pairwise(
+    levels: tuple[object, ...],
+    values: tuple[FloatArray, ...],
+    *,
+    design: str,
+    conf_level: float,
+    p_adjust: str,
+    alpha: float,
+) -> tuple[RobustPairwiseComparisonResult, ...]:
+    raw: list[tuple[object, object, RobustPairwiseComparisonResult]] = []
+    for index, left in enumerate(levels):
+        for right_index in range(index + 1, len(levels)):
+            contrast = (
+                _yuen_contrast(
+                    values[index], values[right_index], conf_level, "two-sided"
+                )
+                if design == "between"
+                else _trimmed_difference_contrast(
+                    values[index], values[right_index], conf_level, "two-sided"
+                )
+            )
+            raw.append((left, levels[right_index], contrast))
+    adjusted = _adjust_p_values(
+        [contrast.test.p_value for _, _, contrast in raw], p_adjust
+    )
+    return tuple(
+        _named_robust_contrast(
+            contrast,
+            left,
+            right,
+            adjusted_p_value=adjusted_p,
+            alpha=alpha,
+        )
+        for (left, right, contrast), adjusted_p in zip(raw, adjusted, strict=True)
+    )
+
+
+def _welch_yuen(values: tuple[FloatArray, ...]) -> RobustTestResult:
+    kernels = tuple(trimmed_kernel(item)[0] for item in values)
+    weights = np.asarray([1.0 / kernel.q for kernel in kernels], dtype=np.float64)
+    locations = np.asarray(
+        [kernel.trimmed_mean for kernel in kernels], dtype=np.float64
+    )
+    total_weight = float(np.sum(weights))
+    weighted_location = float(np.sum(weights * locations) / total_weight)
+    groups = len(kernels)
+    a_value = float(
+        np.sum(weights * ((locations - weighted_location) ** 2)) / (groups - 1)
+    )
+    c_value = float(
+        np.sum(
+            ((1.0 - (weights / total_weight)) ** 2)
+            / np.asarray([kernel.h - 1 for kernel in kernels], dtype=np.float64)
+        )
+        / ((groups**2) - 1)
+    )
+    denominator = 1.0 + (2.0 * (groups - 2) * c_value)
+    if c_value <= 0.0 or denominator <= 0.0:
+        raise ValueError("Welch-Yuen omnibus denominator is invalid")
+    statistic = a_value / denominator
+    df1 = float(groups - 1)
+    df2 = 1.0 / (3.0 * c_value)
+    return RobustTestResult(
+        name="welch_yuen_anova",
+        target="equal_population_20pct_trimmed_locations",
+        null_value=None,
+        alternative="two-sided",
+        statistic=statistic,
+        df1=df1,
+        df2=df2,
+        p_value=float(scipy_stats.f.sf(statistic, df1, df2)),
+        reference_distribution="f",
+    )
+
+
+def _robust_repeated(
+    values: NDArray[np.float64],
+) -> tuple[RobustTestResult, RobustRepeatedCorrectionResult]:
+    subjects, conditions = values.shape
+    kernels_and_values = tuple(
+        trimmed_kernel(values[:, index]) for index in range(conditions)
+    )
+    kernels = tuple(item[0] for item in kernels_and_values)
+    winsorized: NDArray[np.float64] = np.empty_like(values)
+    for index, (_, column) in enumerate(kernels_and_values):
+        winsorized[:, index] = column
+    h = kernels[0].h
+    locations = np.asarray([kernel.trimmed_mean for kernel in kernels])
+    qc = float(h * np.sum((locations - np.mean(locations)) ** 2))
+    centered = (
+        winsorized
+        - np.mean(winsorized, axis=1, keepdims=True)
+        - np.mean(winsorized, axis=0, keepdims=True)
+        + np.mean(winsorized)
+    )
+    qe = float(np.sum(centered**2))
+    if qe <= 0.0:
+        raise ValueError("robust repeated design requires positive residual variation")
+    statistic = qc / (qe / (h - 1))
+    covariance_centered = winsorized - np.mean(winsorized, axis=0, keepdims=True)
+    covariance: NDArray[np.float64] = (covariance_centered.T @ covariance_centered) / (
+        subjects - 1
+    )
+    v_bar = float(np.mean(covariance))
+    v_diag = sum(float(covariance[index, index]) for index in range(conditions)) / (
+        conditions
+    )
+    row_means = np.mean(covariance, axis=1)
+    a_value = float((conditions**2) * ((v_diag - v_bar) ** 2) / (conditions - 1))
+    b_value = float(
+        np.sum(covariance**2)
+        - (2 * conditions * np.sum(row_means**2))
+        + ((conditions**2) * (v_bar**2))
+    )
+    if a_value <= 0.0 or b_value <= 0.0:
+        raise ValueError("robust repeated covariance epsilon is degenerate")
+    epsilon_hat = a_value / b_value
+    epsilon_denominator = (conditions - 1) * (
+        subjects - 1 - ((conditions - 1) * epsilon_hat)
+    )
+    if epsilon_denominator <= 0.0:
+        raise ValueError("robust repeated epsilon denominator is invalid")
+    epsilon_raw = (
+        (subjects * (conditions - 1) * epsilon_hat) - 2.0
+    ) / epsilon_denominator
+    if not np.isfinite(epsilon_raw) or epsilon_raw <= 0.0:
+        raise ValueError("robust repeated epsilon is invalid")
+    epsilon = min(1.0, max(1.0 / (conditions - 1), epsilon_raw))
+    uncorrected_df1 = float(conditions - 1)
+    uncorrected_df2 = float((conditions - 1) * (h - 1))
+    df1 = uncorrected_df1 * epsilon
+    df2 = uncorrected_df2 * epsilon
+    p_value = float(scipy_stats.f.sf(statistic, df1, df2))
+    correction = RobustRepeatedCorrectionResult(
+        name="wrs2_winsorized_epsilon",
+        epsilon=epsilon,
+        uncorrected_df1=uncorrected_df1,
+        uncorrected_df2=uncorrected_df2,
+        corrected_df1=df1,
+        corrected_df2=df2,
+        corrected_p_value=p_value,
+        covariance_a=a_value,
+        covariance_b=b_value,
+        epsilon_hat=epsilon_hat,
+        epsilon_raw=epsilon_raw,
+        qc=qc,
+        qe=qe,
+    )
+    return (
+        RobustTestResult(
+            name="winsorized_repeated_anova",
+            target="equal_population_20pct_trimmed_condition_locations",
+            null_value=None,
+            alternative="two-sided",
+            statistic=statistic,
+            df1=df1,
+            df2=df2,
+            p_value=p_value,
+            reference_distribution="f",
+        ),
+        correction,
+    )
+
+
 def analyze_ggbetweenstats(
     data: pl.DataFrame,
     x: str,
@@ -381,8 +741,9 @@ def analyze_ggbetweenstats(
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
+    trim_fraction: float = TRIM_FRACTION,
 ) -> ComparisonAnalysis:
-    """Analyze the approved Welch independent-groups comparison."""
+    """Analyze an approved Welch or robust independent-groups comparison."""
 
     display = _validate_options(
         method_type=type,
@@ -401,6 +762,91 @@ def analyze_ggbetweenstats(
         maximum_rows=maximum_rows,
         maximum_levels=maximum_levels,
     )
+    if type == "robust":
+        if trim_fraction != TRIM_FRACTION:
+            raise ValueError("trim_fraction must equal 0.20 for M6A robust methods")
+        if len(sample.levels) > 2 and alternative != "two-sided":
+            raise ValueError("robust omnibus alternatives must be 'two-sided'")
+        robust_levels = _robust_levels(
+            cast(tuple[object, ...], sample.levels), sample.values, conf_level
+        )
+        if len(sample.levels) == 2:
+            unnamed = _yuen_contrast(
+                sample.values[0], sample.values[1], conf_level, alternative
+            )
+            primary = _named_robust_contrast(
+                unnamed,
+                sample.levels[0],
+                sample.levels[1],
+                adjusted_p_value=unnamed.test.p_value,
+                alpha=pairwise_alpha,
+            )
+            omnibus = primary.test
+            estimate = primary.estimate
+            interval = primary.interval
+            effect_size = primary.effect_size
+            robust_pairwise: tuple[RobustPairwiseComparisonResult, ...] = ()
+        else:
+            omnibus = _welch_yuen(sample.values)
+            estimate = None
+            interval = None
+            effect_size = RobustEffectResult(
+                name="raw_trimmed_location_difference",
+                value=None,
+                target="omnibus_has_no_single_raw_difference",
+                standardized_effect_unavailable=(
+                    "robust_standardized_effect_not_approved"
+                ),
+            )
+            robust_pairwise = _robust_pairwise(
+                cast(tuple[object, ...], sample.levels),
+                sample.values,
+                design="between",
+                conf_level=conf_level,
+                p_adjust=p_adjust,
+                alpha=pairwise_alpha,
+            )
+        return ComparisonAnalysis(
+            sample=sample,
+            result=cast(
+                ComparisonResult,
+                RobustComparisonResult(
+                    schema_version=2,
+                    analysis="ggbetweenstats_robust",
+                    mode="robust",
+                    design="between",
+                    x=x,
+                    y=y,
+                    subject_id=None,
+                    sample=sample.audit,
+                    method=method_result("yuen_welch_yuen_twenty_percent_trimmed"),
+                    levels=robust_levels,
+                    omnibus=omnibus,
+                    estimate=estimate,
+                    interval=interval,
+                    effect_size=effect_size,
+                    pairwise=robust_pairwise,
+                    p_adjust=p_adjust,
+                    pairwise_alpha=float(pairwise_alpha),
+                    pairwise_display=display,
+                    correction=None,
+                    limits=ResourceLimits(
+                        maximum_rows=maximum_rows,
+                        maximum_levels=maximum_levels,
+                        maximum_pairwise_hypotheses=(
+                            maximum_levels * (maximum_levels - 1) // 2
+                        ),
+                        maximum_rendered_observations=maximum_rendered_observations,
+                    ),
+                    warnings=(
+                        "standardized robust effect unavailable: not approved for M6A",
+                        "pairwise intervals are pointwise and unadjusted",
+                    ),
+                ),
+            ),
+        )
+    if trim_fraction != TRIM_FRACTION:
+        raise ValueError("trim_fraction is unused for parametric analysis")
     levels = _level_results(
         cast(tuple[object, ...], sample.levels), sample.values, conf_level
     )
@@ -534,8 +980,9 @@ def analyze_ggwithinstats(
     maximum_levels: int = DEFAULT_MAX_LEVELS,
     maximum_rendered_observations: int = DEFAULT_MAX_RENDERED_OBSERVATIONS,
     maximum_subject_paths: int = DEFAULT_MAX_SUBJECT_PATHS,
+    trim_fraction: float = TRIM_FRACTION,
 ) -> ComparisonAnalysis:
-    """Analyze an explicit-subject complete-block repeated comparison."""
+    """Analyze an approved classical or robust complete-block comparison."""
 
     display = _validate_options(
         method_type=type,
@@ -556,9 +1003,98 @@ def analyze_ggwithinstats(
         subject_id,
         maximum_rows=maximum_rows,
         maximum_levels=maximum_levels,
-        minimum_subjects=3,
+        minimum_subjects=5 if type == "robust" else 3,
     )
     columns = tuple(sample.values[:, index] for index in range(len(sample.conditions)))
+    if type == "robust":
+        if trim_fraction != TRIM_FRACTION:
+            raise ValueError("trim_fraction must equal 0.20 for M6A robust methods")
+        if len(sample.conditions) > 2 and alternative != "two-sided":
+            raise ValueError("robust omnibus alternatives must be 'two-sided'")
+        robust_levels = _robust_levels(
+            cast(tuple[object, ...], sample.conditions), columns, conf_level
+        )
+        if len(sample.conditions) == 2:
+            unnamed = _trimmed_difference_contrast(
+                columns[0], columns[1], conf_level, alternative
+            )
+            primary = _named_robust_contrast(
+                unnamed,
+                sample.conditions[0],
+                sample.conditions[1],
+                adjusted_p_value=unnamed.test.p_value,
+                alpha=pairwise_alpha,
+            )
+            omnibus = primary.test
+            estimate = primary.estimate
+            interval = primary.interval
+            effect_size = primary.effect_size
+            robust_pairwise: tuple[RobustPairwiseComparisonResult, ...] = ()
+            correction = None
+        else:
+            omnibus, correction = _robust_repeated(sample.values)
+            estimate = None
+            interval = None
+            effect_size = RobustEffectResult(
+                name="raw_trimmed_location_difference",
+                value=None,
+                target="omnibus_has_no_single_raw_difference",
+                standardized_effect_unavailable=(
+                    "robust_standardized_effect_not_approved"
+                ),
+            )
+            robust_pairwise = _robust_pairwise(
+                cast(tuple[object, ...], sample.conditions),
+                columns,
+                design="within",
+                conf_level=conf_level,
+                p_adjust=p_adjust,
+                alpha=pairwise_alpha,
+            )
+        return ComparisonAnalysis(
+            sample=sample,
+            result=cast(
+                ComparisonResult,
+                RobustComparisonResult(
+                    schema_version=2,
+                    analysis="ggwithinstats_robust",
+                    mode="robust",
+                    design="within",
+                    x=x,
+                    y=y,
+                    subject_id=subject_id,
+                    sample=sample.audit,
+                    method=method_result(
+                        "trimmed_subject_difference_winsorized_repeated"
+                    ),
+                    levels=robust_levels,
+                    omnibus=omnibus,
+                    estimate=estimate,
+                    interval=interval,
+                    effect_size=effect_size,
+                    pairwise=robust_pairwise,
+                    p_adjust=p_adjust,
+                    pairwise_alpha=float(pairwise_alpha),
+                    pairwise_display=display,
+                    correction=correction,
+                    limits=ResourceLimits(
+                        maximum_rows=maximum_rows,
+                        maximum_levels=maximum_levels,
+                        maximum_pairwise_hypotheses=(
+                            maximum_levels * (maximum_levels - 1) // 2
+                        ),
+                        maximum_rendered_observations=maximum_rendered_observations,
+                        maximum_subject_paths=maximum_subject_paths,
+                    ),
+                    warnings=(
+                        "standardized robust effect unavailable: not approved for M6A",
+                        "pairwise intervals are pointwise and unadjusted",
+                    ),
+                ),
+            ),
+        )
+    if trim_fraction != TRIM_FRACTION:
+        raise ValueError("trim_fraction is unused for parametric analysis")
     levels = _level_results(
         cast(tuple[object, ...], sample.conditions), columns, conf_level
     )

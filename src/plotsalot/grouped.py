@@ -15,7 +15,11 @@ from plotsalot.correlation_analysis import (
     analyze_ggcorrmat,
     analyze_ggscatterstats,
 )
-from plotsalot.data import DEFAULT_MAX_ROWS, select_numeric_sample
+from plotsalot.data import (
+    DEFAULT_MAX_ROWS,
+    select_numeric_pair,
+    select_numeric_sample,
+)
 from plotsalot.dotplot import render_ggdotplotstats
 from plotsalot.dotplot_analysis import (
     DEFAULT_MAX_LABELS,
@@ -39,6 +43,13 @@ from plotsalot.result import (
     GroupResultItem,
     GroupSampleAudit,
     ResourceLimits,
+)
+from plotsalot.robust import (
+    DEFAULT_BOOTSTRAP_RESAMPLES,
+    DEFAULT_MAX_RESAMPLE_WORK,
+    TRIM_FRACTION,
+    child_seed,
+    validate_resampling,
 )
 
 AnalysisT = TypeVar("AnalysisT")
@@ -154,6 +165,9 @@ def grouped_result(
     correction_scope: str,
     items: tuple[GroupResultItem, ...],
     limits: ResourceLimits,
+    resampling_root_seed: int | None = None,
+    calculated_resample_work: int | None = None,
+    maximum_resample_work: int | None = None,
 ) -> GroupedResult:
     return GroupedResult(
         schema_version=1,
@@ -164,6 +178,9 @@ def grouped_result(
         groups=items,
         limits=limits,
         warnings=(),
+        resampling_root_seed=resampling_root_seed,
+        calculated_resample_work=calculated_resample_work,
+        maximum_resample_work=maximum_resample_work,
     )
 
 
@@ -181,8 +198,13 @@ def analyze_grouped_gghistostats(
     conf_level: float = 0.95,
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_groups: int = DEFAULT_MAX_GROUPS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
 ) -> GroupedAnalysis[HistogramAnalysis]:
     """Apply the approved histogram analysis atomically by group."""
+
+    if type not in {"parametric", "robust"}:
+        raise ValueError("type must be 'parametric' or 'robust'")
 
     partitions, sample = split_groups(
         data,
@@ -197,16 +219,22 @@ def analyze_grouped_gghistostats(
             item_sample = select_numeric_sample(
                 partition.data,
                 x,
-                minimum_size=2,
+                minimum_size=5 if type == "robust" else 2,
                 require_variation=True,
                 maximum_rows=maximum_rows,
             )
             item_analysis = analyze_one_sample_sample(
                 item_sample,
-                analysis="gghistostats_one_sample_parametric",
+                analysis=(
+                    "gghistostats_one_sample_robust"
+                    if type == "robust"
+                    else "gghistostats_one_sample_parametric"
+                ),
                 test_value=test_value,
                 alternative=alternative,
                 conf_level=conf_level,
+                trim_fraction=trim_fraction,
+                maximum_rows=maximum_rows,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
@@ -215,7 +243,11 @@ def analyze_grouped_gghistostats(
     return GroupedAnalysis(
         groups=tuple(groups),
         result=grouped_result(
-            analysis="grouped_gghistostats_one_sample_parametric",
+            analysis=(
+                "grouped_gghistostats_one_sample_robust"
+                if type == "robust"
+                else "grouped_gghistostats_one_sample_parametric"
+            ),
             group_column=group,
             sample=sample,
             correction_scope="none_across_groups",
@@ -240,6 +272,8 @@ def analyze_grouped_ggdotplotstats(
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_groups: int = DEFAULT_MAX_GROUPS,
     maximum_labels: int = DEFAULT_MAX_LABELS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
 ) -> GroupedAnalysis[DotPlotAnalysis]:
     """Apply the approved labeled dot-plot analysis atomically by group."""
 
@@ -262,6 +296,8 @@ def analyze_grouped_ggdotplotstats(
                 conf_level=conf_level,
                 maximum_rows=maximum_rows,
                 maximum_labels=maximum_labels,
+                type=type,
+                trim_fraction=trim_fraction,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
@@ -270,7 +306,11 @@ def analyze_grouped_ggdotplotstats(
     return GroupedAnalysis(
         groups=tuple(groups),
         result=grouped_result(
-            analysis="grouped_ggdotplotstats_one_sample_parametric",
+            analysis=(
+                "grouped_ggdotplotstats_one_sample_robust"
+                if type == "robust"
+                else "grouped_ggdotplotstats_one_sample_parametric"
+            ),
             group_column=group,
             sample=sample,
             correction_scope="none_across_groups",
@@ -293,6 +333,11 @@ def analyze_grouped_ggscatterstats(
     conf_level: float = 0.95,
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_groups: int = DEFAULT_MAX_GROUPS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
+    bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
+    random_seed: int | None = None,
+    maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
 ) -> GroupedAnalysis[CorrelationAnalysis]:
     """Apply the approved Pearson scatter analysis atomically by group."""
 
@@ -302,16 +347,47 @@ def analyze_grouped_ggscatterstats(
         maximum_rows=maximum_rows,
         maximum_groups=maximum_groups,
     )
+    total_work = 0
+    if type == "robust":
+        for partition in partitions:
+            pair = select_numeric_pair(
+                partition.data,
+                x,
+                y,
+                minimum_size=8,
+                maximum_rows=maximum_rows,
+            )
+            total_work += pair.audit.analyzed_rows * bootstrap_resamples
+        root_seed = validate_resampling(
+            bootstrap_resamples=bootstrap_resamples,
+            random_seed=random_seed,
+            maximum_resample_work=maximum_resample_work,
+            calculated_work=total_work,
+        )
+    else:
+        root_seed = 0
     groups: list[GroupAnalysisItem[CorrelationAnalysis]] = []
     results: list[GroupResultItem] = []
     for partition in partitions:
         try:
+            derived_seed = random_seed
+            if type == "robust":
+                derived_seed = child_seed(
+                    root_seed,
+                    "grouped_ggscatterstats_winsorized",
+                    (partition.group, *tuple(sorted((x, y)))),
+                )[0]
             item_analysis = analyze_ggscatterstats(
                 partition.data,
                 x,
                 y,
                 conf_level=conf_level,
                 maximum_rows=maximum_rows,
+                type=type,
+                trim_fraction=trim_fraction,
+                bootstrap_resamples=bootstrap_resamples,
+                random_seed=derived_seed,
+                maximum_resample_work=maximum_resample_work,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
@@ -320,7 +396,11 @@ def analyze_grouped_ggscatterstats(
     return GroupedAnalysis(
         groups=tuple(groups),
         result=grouped_result(
-            analysis="grouped_ggscatterstats_pearson",
+            analysis=(
+                "grouped_ggscatterstats_winsorized"
+                if type == "robust"
+                else "grouped_ggscatterstats_pearson"
+            ),
             group_column=group,
             sample=sample,
             correction_scope="none_across_groups",
@@ -329,6 +409,9 @@ def analyze_grouped_ggscatterstats(
                 maximum_rows=maximum_rows,
                 maximum_groups=maximum_groups,
             ),
+            resampling_root_seed=root_seed if type == "robust" else None,
+            calculated_resample_work=total_work if type == "robust" else None,
+            maximum_resample_work=(maximum_resample_work if type == "robust" else None),
         ),
     )
 
@@ -343,6 +426,11 @@ def analyze_grouped_ggcorrmat(
     p_adjust: str = "holm",
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_groups: int = DEFAULT_MAX_GROUPS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
+    bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
+    random_seed: int | None = None,
+    maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
 ) -> GroupedAnalysis[CorrelationMatrixAnalysis]:
     """Apply the approved Pearson matrix analysis atomically by group."""
 
@@ -352,10 +440,38 @@ def analyze_grouped_ggcorrmat(
         maximum_rows=maximum_rows,
         maximum_groups=maximum_groups,
     )
+    total_work = 0
+    if type == "robust":
+        for partition in partitions:
+            for index, left in enumerate(columns):
+                for right in columns[index + 1 :]:
+                    pair = select_numeric_pair(
+                        partition.data,
+                        left,
+                        right,
+                        minimum_size=8,
+                        maximum_rows=maximum_rows,
+                    )
+                    total_work += pair.audit.analyzed_rows * bootstrap_resamples
+        root_seed = validate_resampling(
+            bootstrap_resamples=bootstrap_resamples,
+            random_seed=random_seed,
+            maximum_resample_work=maximum_resample_work,
+            calculated_work=total_work,
+        )
+    else:
+        root_seed = 0
     groups: list[GroupAnalysisItem[CorrelationMatrixAnalysis]] = []
     results: list[GroupResultItem] = []
     for partition in partitions:
         try:
+            derived_seed = random_seed
+            if type == "robust":
+                derived_seed = child_seed(
+                    root_seed,
+                    "grouped_ggcorrmat_winsorized",
+                    (partition.group,),
+                )[0]
             item_analysis = analyze_ggcorrmat(
                 partition.data,
                 columns,
@@ -363,6 +479,11 @@ def analyze_grouped_ggcorrmat(
                 sig_level=sig_level,
                 p_adjust=p_adjust,
                 maximum_rows=maximum_rows,
+                type=type,
+                trim_fraction=trim_fraction,
+                bootstrap_resamples=bootstrap_resamples,
+                random_seed=derived_seed,
+                maximum_resample_work=maximum_resample_work,
             )
         except (TypeError, ValueError) as error:
             raise group_error(partition.group, error) from error
@@ -371,7 +492,11 @@ def analyze_grouped_ggcorrmat(
     return GroupedAnalysis(
         groups=tuple(groups),
         result=grouped_result(
-            analysis="grouped_ggcorrmat_pearson",
+            analysis=(
+                "grouped_ggcorrmat_winsorized"
+                if type == "robust"
+                else "grouped_ggcorrmat_pearson"
+            ),
             group_column=group,
             sample=sample,
             correction_scope="within_group_matrix",
@@ -381,6 +506,9 @@ def analyze_grouped_ggcorrmat(
                 maximum_groups=maximum_groups,
                 maximum_variables=50,
             ),
+            resampling_root_seed=root_seed if type == "robust" else None,
+            calculated_resample_work=total_work if type == "robust" else None,
+            maximum_resample_work=(maximum_resample_work if type == "robust" else None),
         ),
     )
 
@@ -497,6 +625,8 @@ def grouped_gghistostats(
     conf_level: float = 0.95,
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_groups: int = DEFAULT_MAX_GROUPS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
     binwidth: float | None = None,
     title: str | None = None,
 ) -> GroupedStatsPlot[AnalysisResult]:
@@ -511,6 +641,8 @@ def grouped_gghistostats(
         conf_level=conf_level,
         maximum_rows=maximum_rows,
         maximum_groups=maximum_groups,
+        type=type,
+        trim_fraction=trim_fraction,
     )
     return render_grouped_gghistostats(
         analysis,
@@ -531,6 +663,8 @@ def grouped_ggdotplotstats(
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_groups: int = DEFAULT_MAX_GROUPS,
     maximum_labels: int = DEFAULT_MAX_LABELS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
     show_intervals: bool = True,
     title: str | None = None,
 ) -> GroupedStatsPlot[DotPlotResult]:
@@ -547,6 +681,8 @@ def grouped_ggdotplotstats(
         maximum_rows=maximum_rows,
         maximum_groups=maximum_groups,
         maximum_labels=maximum_labels,
+        type=type,
+        trim_fraction=trim_fraction,
     )
     return render_grouped_ggdotplotstats(
         analysis,
@@ -564,6 +700,11 @@ def grouped_ggscatterstats(
     conf_level: float = 0.95,
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_groups: int = DEFAULT_MAX_GROUPS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
+    bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
+    random_seed: int | None = None,
+    maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
     title: str | None = None,
 ) -> GroupedStatsPlot[CorrelationResult]:
     """Analyze and render Pearson scatter plots by group."""
@@ -576,6 +717,11 @@ def grouped_ggscatterstats(
         conf_level=conf_level,
         maximum_rows=maximum_rows,
         maximum_groups=maximum_groups,
+        type=type,
+        trim_fraction=trim_fraction,
+        bootstrap_resamples=bootstrap_resamples,
+        random_seed=random_seed,
+        maximum_resample_work=maximum_resample_work,
     )
     return render_grouped_ggscatterstats(analysis, title=title)
 
@@ -590,6 +736,11 @@ def grouped_ggcorrmat(
     p_adjust: str = "holm",
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_groups: int = DEFAULT_MAX_GROUPS,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
+    bootstrap_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
+    random_seed: int | None = None,
+    maximum_resample_work: int = DEFAULT_MAX_RESAMPLE_WORK,
     title: str | None = None,
 ) -> GroupedStatsPlot[CorrelationMatrixResult]:
     """Analyze and render Pearson correlation matrices by group."""
@@ -603,5 +754,10 @@ def grouped_ggcorrmat(
         p_adjust=p_adjust,
         maximum_rows=maximum_rows,
         maximum_groups=maximum_groups,
+        type=type,
+        trim_fraction=trim_fraction,
+        bootstrap_resamples=bootstrap_resamples,
+        random_seed=random_seed,
+        maximum_resample_work=maximum_resample_work,
     )
     return render_grouped_ggcorrmat(analysis, title=title)

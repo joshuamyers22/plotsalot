@@ -1,0 +1,2 @@
+"n","g","h","x_lower_bound","x_upper_bound","y_lower_bound","y_upper_bound","x_winsorized_variance","y_winsorized_variance","winsorized_covariance","estimate","statistic","df","p_value"
+10,2,6,3,9,2,9,6.62222222222222,10.0555555555556,4.77777777777778,0.585492095363845,2.04276110709144,4,0.110595996714888

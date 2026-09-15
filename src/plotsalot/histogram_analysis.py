@@ -9,19 +9,34 @@ from typing import Literal, Protocol, cast
 import numpy as np
 import polars as pl
 
-from plotsalot.data import FloatArray, NumericSample, select_numeric_sample
+from plotsalot.data import (
+    DEFAULT_MAX_ROWS,
+    FloatArray,
+    NumericSample,
+    select_numeric_sample,
+)
 from plotsalot.result import (
     AnalysisResult,
     EffectSizeResult,
     EstimateResult,
     IntervalResult,
+    ResourceLimits,
     TestResult,
+)
+from plotsalot.robust import TRIM_FRACTION, method_result, trimmed_kernel
+from plotsalot.robust_result import (
+    RobustEffectResult,
+    RobustEstimateResult,
+    RobustOneSampleResult,
+    RobustTestResult,
 )
 
 Alternative = Literal["two-sided", "less", "greater"]
 OneSampleAnalysisIdentity = Literal[
     "gghistostats_one_sample_parametric",
     "ggdotplotstats_one_sample_parametric",
+    "gghistostats_one_sample_robust",
+    "ggdotplotstats_one_sample_robust",
 ]
 
 
@@ -32,6 +47,10 @@ class _TtestResult(Protocol):
 
 class _TDistribution(Protocol):
     def ppf(self, probability: float, df: float) -> float: ...
+
+    def cdf(self, value: float, df: float) -> float: ...
+
+    def sf(self, value: float, df: float) -> float: ...
 
 
 class _ScipyStats(Protocol):
@@ -49,8 +68,8 @@ class _ScipyStats(Protocol):
 scipy_stats = cast(_ScipyStats, import_module("scipy.stats"))
 
 _PROTOTYPE_WARNING = (
-    "Adapted method: effect-size uncertainty and nonparametric, robust, and "
-    "Bayesian modes are not implemented."
+    "Adapted method: effect-size uncertainty and nonparametric and Bayesian "
+    "modes are not implemented."
 )
 
 
@@ -75,16 +94,35 @@ def analyze_gghistostats(
     test_value: float = 0.0,
     alternative: Alternative = "two-sided",
     conf_level: float = 0.95,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
+    maximum_rows: int = DEFAULT_MAX_ROWS,
 ) -> HistogramAnalysis:
-    """Analyze the parametric one-sample histogram method without rendering."""
+    """Analyze an approved classical or robust one-sample histogram method."""
 
-    sample = select_numeric_sample(data, x, minimum_size=2, require_variation=True)
+    if type not in {"parametric", "robust"}:
+        raise ValueError("type must be 'parametric' or 'robust'")
+    if type == "parametric" and trim_fraction != TRIM_FRACTION:
+        raise ValueError("trim_fraction is unused for parametric analysis")
+    sample = select_numeric_sample(
+        data,
+        x,
+        minimum_size=5 if type == "robust" else 2,
+        require_variation=True,
+        maximum_rows=maximum_rows,
+    )
     return analyze_one_sample_sample(
         sample,
-        analysis="gghistostats_one_sample_parametric",
+        analysis=(
+            "gghistostats_one_sample_robust"
+            if type == "robust"
+            else "gghistostats_one_sample_parametric"
+        ),
         test_value=test_value,
         alternative=alternative,
         conf_level=conf_level,
+        trim_fraction=trim_fraction,
+        maximum_rows=maximum_rows,
     )
 
 
@@ -95,6 +133,8 @@ def analyze_one_sample_sample(
     test_value: float = 0.0,
     alternative: Alternative = "two-sided",
     conf_level: float = 0.95,
+    trim_fraction: float = TRIM_FRACTION,
+    maximum_rows: int = DEFAULT_MAX_ROWS,
 ) -> HistogramAnalysis:
     """Apply the approved one-sample method to an already reconciled sample."""
 
@@ -104,6 +144,64 @@ def analyze_one_sample_sample(
         raise ValueError("alternative must be 'two-sided', 'less', or 'greater'")
     if not np.isfinite(test_value):
         raise ValueError("test_value must be finite")
+
+    if analysis.endswith("_robust"):
+        kernel, _ = trimmed_kernel(sample.values, trim_fraction=trim_fraction)
+        standard_error = float(np.sqrt(kernel.q))
+        statistic = (kernel.trimmed_mean - test_value) / standard_error
+        df = float(kernel.h - 1)
+        if alternative == "two-sided":
+            p_value = min(1.0, 2.0 * float(scipy_stats.t.sf(abs(statistic), df)))
+        elif alternative == "less":
+            p_value = float(scipy_stats.t.cdf(statistic, df))
+        else:
+            p_value = float(scipy_stats.t.sf(statistic, df))
+        critical = float(scipy_stats.t.ppf(0.5 + (conf_level / 2.0), df))
+        margin = critical * standard_error
+        result = RobustOneSampleResult(
+            schema_version=2,
+            analysis=analysis,
+            mode="robust",
+            column=sample.column,
+            sample=sample.audit,
+            method=method_result("twenty_percent_trimmed_location"),
+            estimate=RobustEstimateResult(
+                name="trimmed_mean",
+                value=kernel.trimmed_mean,
+                standard_deviation=float(np.sqrt(kernel.winsorized_variance)),
+                kernel=kernel,
+            ),
+            test=RobustTestResult(
+                name="trimmed_mean_t",
+                target="population_20pct_trimmed_location",
+                null_value=float(test_value),
+                alternative=alternative,
+                statistic=statistic,
+                df1=None,
+                df2=df,
+                p_value=p_value,
+                reference_distribution="student_t",
+            ),
+            interval=IntervalResult(
+                target="population_20pct_trimmed_location",
+                method="trimmed_mean_student_t_two_sided",
+                level=conf_level,
+                low=kernel.trimmed_mean - margin,
+                high=kernel.trimmed_mean + margin,
+            ),
+            effect_size=RobustEffectResult(
+                name="raw_trimmed_location_difference",
+                value=kernel.trimmed_mean - test_value,
+                target="population_20pct_trimmed_location_difference",
+                standardized_effect_unavailable="not_approved_for_m6a",
+            ),
+            limits=ResourceLimits(maximum_rows=maximum_rows),
+            warnings=("standardized effect unavailable: not approved for M6A",),
+        )
+        return HistogramAnalysis(sample=sample, result=cast(AnalysisResult, result))
+
+    if trim_fraction != TRIM_FRACTION:
+        raise ValueError("trim_fraction is unused for parametric analysis")
 
     values = sample.values
     mean = float(np.mean(values))

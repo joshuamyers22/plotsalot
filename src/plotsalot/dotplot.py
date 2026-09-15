@@ -17,6 +17,8 @@ from plotsalot.dotplot_analysis import (
 from plotsalot.histogram_analysis import Alternative
 from plotsalot.plot import PlotAnnotations, StatsPlot
 from plotsalot.result import DotPlotResult
+from plotsalot.robust import TRIM_FRACTION
+from plotsalot.robust_result import RobustDotPlotResult
 
 
 class _DotAxes(Protocol):
@@ -85,7 +87,7 @@ def _draw_dotplot(
     title: str,
     show_intervals: bool,
 ) -> PlotAnnotations:
-    result = analysis.result
+    result = cast(DotPlotResult | RobustDotPlotResult, analysis.result)
     positions = np.arange(len(result.estimates), dtype=np.float64)
     for position, estimate in zip(positions, result.estimates, strict=True):
         if show_intervals and estimate.interval is not None:
@@ -102,11 +104,12 @@ def _draw_dotplot(
         else:
             axes.plot(estimate.value, position, "o", color="black")
 
+    robust = isinstance(result, RobustDotPlotResult)
     axes.axvline(
         result.one_sample.estimate.value,
         color="#1f77b4",
         linestyle="--",
-        label="overall mean",
+        label="overall 20% trimmed mean" if robust else "overall mean",
     )
     axes.set_yticks(positions, [str(estimate.label) for estimate in result.estimates])
     axes.set_xlabel(result.x)
@@ -115,16 +118,29 @@ def _draw_dotplot(
     axes.legend()
 
     test = result.one_sample.test
-    subtitle = (
-        f"t({test.df:.0f}) = {test.statistic:.2f}, "
-        f"{_p_value_text(test.p_value)}, "
-        f"Cohen's d = {result.one_sample.effect_size.value:.2f}"
-    )
-    caption = (
-        f"n = {result.sample.analyzed_rows}; "
-        f"{result.sample.dropped_null_rows} null row(s) excluded; "
-        f"{result.one_sample.interval.level:.0%} per-label mean CIs where estimable"
-    )
+    if robust:
+        subtitle = (
+            f"20% trimmed-mean t({test.df:.0f}) = {test.statistic:.2f}, "
+            f"{_p_value_text(test.p_value)}; raw difference = "
+            f"{result.one_sample.effect_size.value:.2f}; "
+            "standardized effect unavailable"
+        )
+        caption = (
+            f"n = {result.sample.analyzed_rows}; "
+            f"{result.sample.dropped_null_rows} null row(s) excluded; "
+            f"{result.one_sample.interval.level:.0%} per-label trimmed-location CIs"
+        )
+    else:
+        subtitle = (
+            f"t({test.df:.0f}) = {test.statistic:.2f}, "
+            f"{_p_value_text(test.p_value)}, "
+            f"Cohen's d = {result.one_sample.effect_size.value:.2f}"
+        )
+        caption = (
+            f"n = {result.sample.analyzed_rows}; "
+            f"{result.sample.dropped_null_rows} null row(s) excluded; "
+            f"{result.one_sample.interval.level:.0%} per-label mean CIs where estimable"
+        )
     axes.text(
         0.5,
         1.01,
@@ -178,12 +194,14 @@ def ggdotplotstats(
     test_value: float = 0.0,
     alternative: Alternative = "two-sided",
     conf_level: float = 0.95,
+    type: str = "parametric",
+    trim_fraction: float = TRIM_FRACTION,
     maximum_rows: int = DEFAULT_MAX_ROWS,
     maximum_labels: int = DEFAULT_MAX_LABELS,
     title: str | None = None,
     show_intervals: bool = True,
 ) -> StatsPlot[DotPlotResult]:
-    """Analyze and render the approved parametric labeled dot plot."""
+    """Analyze and render an approved classical or robust labeled dot plot."""
 
     analysis = analyze_ggdotplotstats(
         data,
@@ -192,6 +210,8 @@ def ggdotplotstats(
         test_value=test_value,
         alternative=alternative,
         conf_level=conf_level,
+        type=type,
+        trim_fraction=trim_fraction,
         maximum_rows=maximum_rows,
         maximum_labels=maximum_labels,
     )
