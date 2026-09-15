@@ -7,11 +7,12 @@ M0 through M5 are complete, including the accepted `0.3` product gate. The
 M6 robust/Bayesian work is active. The M6A robust continuous-analysis track is
 implemented, independently reviewed, and accepted. M6B Bayesian data analysis
 is also implemented, independently reviewed, and accepted. The detailed
-R4/B5 M6C coefficient/meta method contract is approved; pass 1 is technically
-verified and pass 2 passed under a provisional, boundary-only calibration
-disposition that must be revisited in M7. Pass 3 and M6C candidate acceptance
-remain open. The project remains pre-release and is not yet ready for
-production analytical use.
+R4/B5 M6C coefficient/meta method contract is approved; all three
+implementation passes have cleared their technical gates. Pass 2 uses a
+provisional, boundary-only calibration disposition that must be revisited in
+M7. Joshua Myers independently reviewed and accepted the M6C candidate on
+2026-09-15. The separate combined M6/`0.4` decision remains open, and the
+project remains pre-release and is not yet ready for production analytical use.
 
 ## Development
 
@@ -291,9 +292,40 @@ Unsupported upstream arguments, nonparametric modes, and robust categorical
 analysis remain deferred. M6C exposes renderer-independent analysis for
 strict caller-reported robust confidence and posterior credible coefficient
 summaries plus pass-2 robust Student-t4 and proper-prior Bayesian normal-normal
-aggregate meta-analysis engines. Rendering remains assigned to pass 3; the
-pass-2 statistical gate passed under the provisional boundary-only calibration
-disposition that must be revisited in M7. See
+aggregate meta-analysis engines. Pass 3 adds semantic forest rendering,
+extraction, heterogeneous composition, and retained performance evidence. For
+example:
+
+```python
+from plotsalot import ggcoefstats
+
+robust_coefficients = ggcoefstats(
+    coefficient_summary,
+    type="robust",
+    robust_method="Huber M-estimator",
+    robust_tuning="c=1.345",
+    interval_method="sandwich Wald",
+    estimate_label="coefficient",
+    effect_scale="linear predictor",
+    effect_direction="positive is higher",
+    effect_units="outcome units",
+)
+
+bayesian_meta = ggcoefstats(
+    study_summaries,
+    type="bayes",
+    meta_analytic_effect=True,
+    prior_mean_scale=1.0,
+    prior_tau_scale=0.5,
+    estimand="population mean difference",
+    effect_scale="mean difference",
+    effect_direction="positive favors treatment",
+    effect_units="points",
+)
+```
+
+The pass-2 statistical gate passed under the provisional boundary-only
+calibration disposition that must be revisited in M7. See
 [`docs/MILESTONE_0.md`](docs/MILESTONE_0.md),
 [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md),
 [`docs/MILESTONE_2.md`](docs/MILESTONE_2.md),

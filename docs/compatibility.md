@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M0–M5, M6A, and M6B complete; M6C passes 1–2 passed, pass 3 open
+- Status: M0–M5 and M6A–M6C complete; combined M6/0.4 acceptance open
 
 Definitions:
 
@@ -212,5 +212,7 @@ M6C pass-1 technical gate. Both aggregate engines are implemented, but one
 predeclared small-study and one confirmation zero-heterogeneity coverage cell
 remain retained findings. Joshua Myers provisionally accepted a conservative
 rule limited to `k<20` or generating `tau=0`, with mandatory M7 review; pass 2
-therefore passed, while the shared renderer remains open. Independent review is
-still required before these rows become accepted compatibility behavior.
+therefore passed. The shared semantic renderer, exact result extraction,
+heterogeneous composition, and resource benchmark now pass their technical
+gate. Joshua Myers independently reviewed and accepted these M6C compatibility
+dispositions on 2026-09-15.

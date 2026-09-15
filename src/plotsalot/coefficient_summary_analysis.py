@@ -94,6 +94,10 @@ def _is_nonempty_string(value: object) -> bool:
     return isinstance(value, str) and bool(value)
 
 
+def _is_renderable_identity(value: object) -> bool:
+    return isinstance(value, str) and 1 <= len(value) <= 200 and value.isprintable()
+
+
 def _has_runtime_type(value: object, expected: type[object]) -> bool:
     return isinstance(value, expected)
 
@@ -118,15 +122,15 @@ def _validate_identity(
     is_intercepts: tuple[bool, ...],
 ) -> None:
     count = len(terms)
-    if count < 1 or any(not _is_nonempty_string(term) for term in terms):
-        raise ValueError("coefficient terms must be nonempty strings")
+    if count < 1 or any(not _is_renderable_identity(term) for term in terms):
+        raise ValueError("coefficient terms must be renderable strings of length 1-200")
     if identity_columns != tuple(
         column for column in IDENTITY_COLUMNS if column in identity_columns
     ):
         raise ValueError("coefficient identity columns are unsupported")
     if len(identities) != count or any(
         len(identity) != len(identity_columns)
-        or any(not _is_nonempty_string(value) for value in identity)
+        or any(not _is_renderable_identity(value) for value in identity)
         for identity in identities
     ):
         raise ValueError("coefficient structured identities are invalid")

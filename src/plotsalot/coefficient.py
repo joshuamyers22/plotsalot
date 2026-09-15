@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from textwrap import fill
 from typing import Literal, Protocol, cast
 
 from matplotlib.colors import is_color_like
@@ -13,8 +14,13 @@ from plotsalot.coefficient_meta_analysis import (
     BayesianMetaAnalysis,
     RobustMetaAnalysis,
 )
+from plotsalot.coefficient_meta_result import BayesianMetaResult, RobustMetaResult
 from plotsalot.coefficient_result import CoefficientResult, CoefficientTableResult
-from plotsalot.coefficient_summary_analysis import ReportedCoefficientAnalysis
+from plotsalot.coefficient_summary_analysis import (
+    PosteriorCoefficientTableResult,
+    ReportedCoefficientAnalysis,
+    RobustCoefficientTableResult,
+)
 from plotsalot.coefficient_table_analysis import TableCoefficientAnalysis
 from plotsalot.plot import PlotAnnotations, StatsPlot
 from plotsalot.theme import StatsTheme, theme_ggstatsplot
@@ -77,6 +83,8 @@ class _CoefficientAxes(Protocol):
 
 
 class _CoefficientFigure(Protocol):
+    def suptitle(self, label: str, *, y: float) -> object: ...
+
     def text(
         self,
         x: float,
@@ -92,9 +100,72 @@ class _CoefficientFigure(Protocol):
         self, width: float, height: float, *, forward: bool
     ) -> object: ...
 
+    def subplots_adjust(
+        self,
+        *,
+        left: float,
+        right: float,
+        bottom: float,
+        top: float,
+    ) -> None: ...
+
 
 def _p_text(value: float) -> str:
     return "p < 0.001" if value < 0.001 else f"p = {value:.3f}"
+
+
+def _validate_analysis_type(analysis: object) -> None:
+    if not isinstance(
+        analysis,
+        (
+            CoefficientAnalysis,
+            TableCoefficientAnalysis,
+            ReportedCoefficientAnalysis,
+            RobustMetaAnalysis,
+            BayesianMetaAnalysis,
+        ),
+    ):
+        raise TypeError("analysis must be an approved coefficient analysis")
+
+
+def _finalize_m6c_figure(
+    figure: Figure,
+    renderer: _CoefficientAxes,
+    *,
+    title: str,
+    subtitle: str,
+    caption: str,
+    results_subtitle: bool,
+    stats_labels: bool,
+    height: float,
+) -> None:
+    figure_renderer = cast(_CoefficientFigure, figure)
+    figure_renderer.suptitle(title, y=0.98)
+    if results_subtitle:
+        renderer.text(
+            0.5,
+            1.03,
+            fill(subtitle, width=96),
+            transform=renderer.transAxes,
+            ha="center",
+            va="bottom",
+            fontsize="small",
+        )
+    figure_renderer.text(
+        0.01,
+        0.015,
+        fill(caption, width=118),
+        ha="left",
+        va="bottom",
+        fontsize="x-small",
+    )
+    figure_renderer.set_size_inches(9.6, height, forward=True)
+    figure_renderer.subplots_adjust(
+        left=0.16,
+        right=0.64 if stats_labels else 0.95,
+        bottom=0.19,
+        top=0.78,
+    )
 
 
 def _subtitle(result: CoefficientResult) -> str:
@@ -168,6 +239,428 @@ def _coefficient_caption(result: CoefficientTableResult) -> str:
             f"; OLS {model.covariance_type}, n = {model.nobs}, AIC = {aic}, BIC = {bic}"
         )
     return text
+
+
+def _reported_identity_label(
+    result: RobustCoefficientTableResult | PosteriorCoefficientTableResult,
+    index: int,
+) -> str:
+    identity = result.terms[index].identity
+    values = tuple(
+        value
+        for value in (
+            identity.response,
+            identity.component,
+            identity.group,
+            identity.term,
+        )
+        if value is not None
+    )
+    return " | ".join(values)
+
+
+def _reported_coefficient_annotations(
+    result: RobustCoefficientTableResult | PosteriorCoefficientTableResult,
+) -> tuple[str, str]:
+    common = (
+        f"n terms = {result.retained_rows}; estimate: {result.estimate_label}; "
+        f"scale: {result.effect_scale}; direction: {result.effect_direction}; "
+        f"units: {result.effect_units}; excluded intercepts: "
+        f"{len(result.excluded_intercepts)}"
+    )
+    if isinstance(result, RobustCoefficientTableResult):
+        subtitle = (
+            f"Caller-reported unverified robust summaries; "
+            f"{result.conf_level:.0%} confidence intervals"
+        )
+        caption = (
+            f"{common}; method: {result.provenance.robust_method}; tuning: "
+            f"{result.provenance.robust_tuning}; interval method: "
+            f"{result.provenance.interval_method}"
+        )
+        return subtitle, caption
+    subtitle = (
+        f"Caller-reported unverified posterior summaries; "
+        f"{result.credible_level:.0%} equal-tail credible intervals"
+    )
+    caption = (
+        f"{common}; model: {result.provenance.posterior_model}; likelihood: "
+        f"{result.provenance.likelihood}; prior: "
+        f"{result.provenance.prior_description}; computation: "
+        f"{result.provenance.computation_method}"
+    )
+    return subtitle, caption
+
+
+def _render_reported_coefficients(
+    analysis: ReportedCoefficientAnalysis,
+    *,
+    title: str | None,
+    results_subtitle: bool,
+    show_intervals: bool,
+    x_label: str | None,
+    point_color: str,
+    theme: StatsTheme | None,
+) -> StatsPlot[RobustCoefficientTableResult | PosteriorCoefficientTableResult]:
+    result = analysis.result
+    figure = Figure()
+    axes = figure.subplots()
+    renderer = cast(_CoefficientAxes, axes)
+    count = len(result.terms)
+    positions = tuple(float(count - index) for index in range(count))
+    renderer.axvline(result.null_value, color="#666666", linestyle="--", linewidth=1.0)
+    if isinstance(result, RobustCoefficientTableResult):
+        for term, position in zip(result.terms, positions, strict=True):
+            point = term.estimate
+            interval = term.interval
+            label = (
+                f"estimate = {point:.3g}; {result.conf_level:.0%} CI "
+                f"[{interval.low:.3g}, {interval.high:.3g}]"
+            )
+            xerr = (
+                [[point - interval.low], [interval.high - point]]
+                if show_intervals
+                else None
+            )
+            renderer.errorbar(
+                point,
+                position,
+                xerr=xerr,
+                fmt="o",
+                color=point_color,
+                capsize=3.0,
+                markersize=5.0,
+                label=None,
+                zorder=3,
+            )
+            if result.stats_labels:
+                renderer.text(
+                    1.01,
+                    position,
+                    label,
+                    transform=axes.get_yaxis_transform(),
+                    ha="left",
+                    va="center",
+                    fontsize="small",
+                )
+    else:
+        for term, position in zip(result.terms, positions, strict=True):
+            point = term.summary.median
+            interval = term.summary.interval
+            label = (
+                f"median = {point:.3g}; {result.credible_level:.0%} CrI "
+                f"[{interval.low:.3g}, {interval.high:.3g}]\n"
+                f"P(>{result.null_value:.3g}) = "
+                f"{term.summary.probability_above_null:.3f}, "
+                f"P(<{result.null_value:.3g}) = "
+                f"{term.summary.probability_below_null:.3f}\n"
+                f"P(={result.null_value:.3g}) = "
+                f"{term.summary.probability_at_null:.3f}"
+            )
+            xerr = (
+                [[point - interval.low], [interval.high - point]]
+                if show_intervals
+                else None
+            )
+            renderer.errorbar(
+                point,
+                position,
+                xerr=xerr,
+                fmt="o",
+                color=point_color,
+                capsize=3.0,
+                markersize=5.0,
+                label=None,
+                zorder=3,
+            )
+            if result.stats_labels:
+                renderer.text(
+                    1.01,
+                    position,
+                    label,
+                    transform=axes.get_yaxis_transform(),
+                    ha="left",
+                    va="center",
+                    fontsize="small",
+                )
+    renderer.set_yticks(
+        positions, [_reported_identity_label(result, index) for index in range(count)]
+    )
+    renderer.set_ylim(0.5, float(count) + 0.5)
+    renderer.set_xlabel(x_label or f"{result.estimate_label} ({result.effect_units})")
+    rendered_title = title or (
+        "Robust coefficient summaries"
+        if isinstance(result, RobustCoefficientTableResult)
+        else "Posterior coefficient summaries"
+    )
+    subtitle, caption = _reported_coefficient_annotations(result)
+    (theme or theme_ggstatsplot()).apply(axes)
+    _finalize_m6c_figure(
+        figure,
+        renderer,
+        title=rendered_title,
+        subtitle=subtitle,
+        caption=caption,
+        results_subtitle=results_subtitle,
+        stats_labels=result.stats_labels,
+        height=min(24.0, max(4.8, 2.5 + 0.34 * count)),
+    )
+    return StatsPlot(
+        figure,
+        {"main": axes},
+        result,
+        PlotAnnotations(rendered_title, subtitle, caption),
+    )
+
+
+def _robust_meta_annotations(result: RobustMetaResult) -> tuple[str, str]:
+    pooled = result.meta_analysis.pooled
+    subtitle = (
+        f"Student-t4 ML: pooled = {pooled.estimate:.3g}, "
+        f"{result.conf_level:.0%} profile CI [{pooled.interval.low:.3g}, "
+        f"{pooled.interval.high:.3g}], LR chi²(1) = {pooled.statistic:.3g}, "
+        f"{_p_text(pooled.p_value)}; "
+        f"tau² = {pooled.tau_squared:.3g}"
+    )
+    warnings = ", ".join(result.warnings) if result.warnings else "none"
+    caption = (
+        f"k = {result.retained_rows}; estimand: {result.meta_analysis.estimand}; "
+        f"scale: {result.meta_analysis.effect_scale}; direction: "
+        f"{result.meta_analysis.effect_direction}; units: "
+        f"{result.meta_analysis.effect_units}; heterogeneity Q/I² unavailable "
+        f"({pooled.heterogeneity_absence_reason}); prediction unavailable "
+        f"({pooled.prediction_absence_reason}); selected start: "
+        f"{result.convergence.selected_start}; work: {result.work.actual_work}/"
+        f"{result.work.reserved_work}; warnings: {warnings}"
+    )
+    return subtitle, caption
+
+
+def _render_robust_meta(
+    analysis: RobustMetaAnalysis,
+    *,
+    title: str | None,
+    results_subtitle: bool,
+    show_intervals: bool,
+    x_label: str | None,
+    point_color: str,
+    pooled_color: str,
+    theme: StatsTheme | None,
+) -> StatsPlot[RobustMetaResult]:
+    result = analysis.result
+    figure = Figure()
+    axes = figure.subplots()
+    renderer = cast(_CoefficientAxes, axes)
+    count = len(result.studies)
+    positions = tuple(float(count - index) for index in range(count))
+    renderer.axvline(
+        result.meta_analysis.null_value,
+        color="#666666",
+        linestyle="--",
+        linewidth=1.0,
+    )
+    for study, position in zip(result.studies, positions, strict=True):
+        interval = study.sampling_interval
+        renderer.errorbar(
+            study.estimate,
+            position,
+            xerr=(
+                [
+                    [study.estimate - interval.low],
+                    [interval.high - study.estimate],
+                ]
+                if show_intervals
+                else None
+            ),
+            fmt="o",
+            color=point_color,
+            capsize=3.0,
+            markersize=5.0,
+            label=None,
+            zorder=3,
+        )
+        if result.stats_labels:
+            renderer.text(
+                1.01,
+                position,
+                f"estimate = {study.estimate:.3g}; latent precision = "
+                f"{study.latent_precision:.3g}",
+                transform=axes.get_yaxis_transform(),
+                ha="left",
+                va="center",
+                fontsize="small",
+            )
+    pooled = result.meta_analysis.pooled
+    renderer.errorbar(
+        pooled.estimate,
+        0.0,
+        xerr=[
+            [pooled.estimate - pooled.interval.low],
+            [pooled.interval.high - pooled.estimate],
+        ],
+        fmt="D",
+        color=pooled_color,
+        capsize=4.0,
+        markersize=7.0,
+        label="pooled profile-likelihood confidence interval",
+        zorder=4,
+    )
+    renderer.set_yticks((*positions, 0.0), [*result.display_order, "Pooled"])
+    renderer.set_ylim(-1.0, float(count + 1))
+    renderer.set_xlabel(
+        x_label
+        or f"{result.meta_analysis.effect_scale} ({result.meta_analysis.effect_units})"
+    )
+    rendered_title = title or f"Robust meta-analysis of {result.meta_analysis.estimand}"
+    renderer.legend(loc="best")
+    subtitle, caption = _robust_meta_annotations(result)
+    (theme or theme_ggstatsplot()).apply(axes)
+    _finalize_m6c_figure(
+        figure,
+        renderer,
+        title=rendered_title,
+        subtitle=subtitle,
+        caption=caption,
+        results_subtitle=results_subtitle,
+        stats_labels=result.stats_labels,
+        height=min(24.0, max(4.8, 2.8 + 0.34 * count)),
+    )
+    return StatsPlot(
+        figure,
+        {"main": axes},
+        result,
+        PlotAnnotations(rendered_title, subtitle, caption),
+    )
+
+
+def _bayesian_meta_annotations(result: BayesianMetaResult) -> tuple[str, str]:
+    primary = result.primary
+    mean = primary.population_mean
+    tau = primary.tau
+    prediction = primary.true_effect_prediction
+    subtitle = (
+        f"Bayesian NNHM: pooled median = {mean.median:.3g}, "
+        f"{result.credible_level:.0%} CrI [{mean.interval.low:.3g}, "
+        f"{mean.interval.high:.3g}]; {primary.evidence.display}; "
+        f"P(mu>{result.null_value:.3g}) = {mean.probability_above_null:.3f}; "
+        f"tau median = {tau.median:.3g}, {result.credible_level:.0%} CrI "
+        f"[{tau.interval.low:.3g}, {tau.interval.high:.3g}]"
+    )
+    sensitivities = ", ".join(
+        f"{fit.label}: {fit.evidence.display}" for fit in result.sensitivities
+    )
+    warnings = ", ".join(result.warnings) if result.warnings else "none"
+    caption = (
+        f"k = {result.retained_rows}; estimand: {result.estimand}; scale: "
+        f"{result.effect_scale}; direction: {result.effect_direction}; units: "
+        f"{result.effect_units}; prior mu SD = {primary.prior.mean_scale:.3g}; "
+        f"prior tau scale = {primary.prior.tau_scale:.3g}; posterior prediction "
+        f"[{prediction.interval.low:.3g}, {prediction.interval.high:.3g}]; "
+        f"sensitivities: {sensitivities}; work: {result.work.actual_work}/"
+        f"{result.work.reserved_work}; warnings: {warnings}"
+    )
+    return subtitle, caption
+
+
+def _render_bayesian_meta(
+    analysis: BayesianMetaAnalysis,
+    *,
+    title: str | None,
+    results_subtitle: bool,
+    show_intervals: bool,
+    show_prediction: bool,
+    x_label: str | None,
+    point_color: str,
+    pooled_color: str,
+    theme: StatsTheme | None,
+) -> StatsPlot[BayesianMetaResult]:
+    result = analysis.result
+    figure = Figure()
+    axes = figure.subplots()
+    renderer = cast(_CoefficientAxes, axes)
+    count = len(result.studies)
+    positions = tuple(float(count - index) for index in range(count))
+    renderer.axvline(result.null_value, color="#666666", linestyle="--", linewidth=1.0)
+    for study, position in zip(result.studies, positions, strict=True):
+        interval = study.sampling_interval
+        renderer.errorbar(
+            study.estimate,
+            position,
+            xerr=(
+                [
+                    [study.estimate - interval.low],
+                    [interval.high - study.estimate],
+                ]
+                if show_intervals
+                else None
+            ),
+            fmt="o",
+            color=point_color,
+            capsize=3.0,
+            markersize=5.0,
+            label=None,
+            zorder=3,
+        )
+        if result.stats_labels:
+            renderer.text(
+                1.01,
+                position,
+                f"reported estimate = {study.estimate:.3g}; SE = "
+                f"{study.standard_error:.3g}",
+                transform=axes.get_yaxis_transform(),
+                ha="left",
+                va="center",
+                fontsize="small",
+            )
+    pooled = result.primary.population_mean
+    renderer.errorbar(
+        pooled.median,
+        0.0,
+        xerr=[
+            [pooled.median - pooled.interval.low],
+            [pooled.interval.high - pooled.median],
+        ],
+        fmt="D",
+        color=pooled_color,
+        capsize=4.0,
+        markersize=7.0,
+        label="pooled equal-tail credible interval",
+        zorder=4,
+    )
+    prediction = result.primary.true_effect_prediction.interval
+    if show_prediction:
+        renderer.hlines(
+            0.0,
+            prediction.low,
+            prediction.high,
+            color=pooled_color,
+            linewidth=5.0,
+            label="new-study posterior predictive credible interval",
+            zorder=2,
+        )
+    renderer.set_yticks((*positions, 0.0), [*result.display_order, "Posterior pooled"])
+    renderer.set_ylim(-1.0, float(count + 1))
+    renderer.set_xlabel(x_label or f"{result.effect_scale} ({result.effect_units})")
+    rendered_title = title or f"Bayesian meta-analysis of {result.estimand}"
+    renderer.legend(loc="best")
+    subtitle, caption = _bayesian_meta_annotations(result)
+    (theme or theme_ggstatsplot()).apply(axes)
+    _finalize_m6c_figure(
+        figure,
+        renderer,
+        title=rendered_title,
+        subtitle=subtitle,
+        caption=caption,
+        results_subtitle=results_subtitle,
+        stats_labels=result.stats_labels,
+        height=min(24.0, max(4.8, 2.8 + 0.34 * count)),
+    )
+    return StatsPlot(
+        figure,
+        {"main": axes},
+        result,
+        PlotAnnotations(rendered_title, subtitle, caption),
+    )
 
 
 def _render_coefficients(
@@ -273,17 +766,16 @@ def render_ggcoefstats(
     point_color: str = "#4c78a8",
     pooled_color: str = "#e45756",
     theme: StatsTheme | None = None,
-) -> StatsPlot[CoefficientResult] | StatsPlot[CoefficientTableResult]:
+) -> (
+    StatsPlot[CoefficientResult]
+    | StatsPlot[CoefficientTableResult]
+    | StatsPlot[RobustCoefficientTableResult | PosteriorCoefficientTableResult]
+    | StatsPlot[RobustMetaResult]
+    | StatsPlot[BayesianMetaResult]
+):
     """Render one typed coefficient analysis without recomputing statistics."""
 
-    if isinstance(
-        analysis,
-        (ReportedCoefficientAnalysis, RobustMetaAnalysis, BayesianMetaAnalysis),
-    ):
-        raise NotImplementedError(
-            "M6C robust and Bayesian coefficient/meta rendering is assigned to "
-            "implementation pass 3"
-        )
+    _validate_analysis_type(analysis)
 
     for value, label in (
         (results_subtitle, "results_subtitle"),
@@ -299,6 +791,42 @@ def render_ggcoefstats(
         raise ValueError("title must be nonempty when supplied")
     if x_label is not None and not x_label:
         raise ValueError("x_label must be nonempty when supplied")
+
+    if isinstance(analysis, ReportedCoefficientAnalysis):
+        return _render_reported_coefficients(
+            analysis,
+            title=title,
+            results_subtitle=results_subtitle,
+            show_intervals=show_intervals,
+            x_label=x_label,
+            point_color=point_color,
+            theme=theme,
+        )
+
+    if isinstance(analysis, RobustMetaAnalysis):
+        return _render_robust_meta(
+            analysis,
+            title=title,
+            results_subtitle=results_subtitle,
+            show_intervals=show_intervals,
+            x_label=x_label,
+            point_color=point_color,
+            pooled_color=pooled_color,
+            theme=theme,
+        )
+
+    if isinstance(analysis, BayesianMetaAnalysis):
+        return _render_bayesian_meta(
+            analysis,
+            title=title,
+            results_subtitle=results_subtitle,
+            show_intervals=show_intervals,
+            show_prediction=show_prediction,
+            x_label=x_label,
+            point_color=point_color,
+            pooled_color=pooled_color,
+            theme=theme,
+        )
 
     if isinstance(analysis, TableCoefficientAnalysis):
         return _render_coefficients(
@@ -456,7 +984,13 @@ def ggcoefstats(
     point_color: str = "#4c78a8",
     pooled_color: str = "#e45756",
     theme: StatsTheme | None = None,
-) -> StatsPlot[CoefficientResult] | StatsPlot[CoefficientTableResult]:
+) -> (
+    StatsPlot[CoefficientResult]
+    | StatsPlot[CoefficientTableResult]
+    | StatsPlot[RobustCoefficientTableResult | PosteriorCoefficientTableResult]
+    | StatsPlot[RobustMetaResult]
+    | StatsPlot[BayesianMetaResult]
+):
     """Analyze and render an approved M5 coefficient or meta-analysis input."""
 
     analysis = analyze_ggcoefstats(

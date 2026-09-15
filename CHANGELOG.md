@@ -156,3 +156,10 @@
   1.0.
 - Recorded an isolated ggstatsplot/metaplus comparison whose conservative point
   coverage did not formally reproduce the M6C finding at 200 cases per cell.
+- Completed the M6C pass-3 technical candidate with semantic robust/posterior
+  coefficient and robust/Bayesian meta forest rendering, exact extraction and
+  mixed-mode composition identity, adversarial label/runtime boundaries,
+  retained 10/100/500 coefficient and robust-meta plus 3/10/100/500 Bayesian-
+  meta performance/work grids, public documentation, and production evidence.
+  Joshua Myers independently reviewed the candidate, accepted every disposition,
+  and accepted M6C on 2026-09-15; combined M6/`0.4` acceptance remains open.

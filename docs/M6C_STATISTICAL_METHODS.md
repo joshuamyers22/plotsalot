@@ -1,6 +1,6 @@
 # M6C Coefficient and Meta-analysis Method Proposal
 
-- Status: methods approved; passes 1–2 passed; provisional boundary rule requires M7 review
+- Status: accepted 2026-09-15; provisional boundary rule requires M7 review
 - Version: 0.1.0
 - Date: 2026-09-15
 - Product/statistical owner: Joshua Myers
@@ -16,6 +16,10 @@ proposal without revision on 2026-09-15, authorizing M6C implementation and
 acceptance-fixture construction exactly as specified. The approval does not
 accept an implementation, close M6C, close M6, or approve the `0.4` candidate.
 Those remain distinct gates in `MILESTONE_6.md`.
+
+After all three implementation passes and production gates completed, Joshua
+Myers independently reviewed and accepted the M6C candidate on 2026-09-15. The
+combined M6/`0.4` decision remains separate.
 
 The proposal deliberately keeps `ggcoefstats` a reporting and aggregate-data
 surface. It adds no regression fitting, arbitrary fitted-result dispatch,
@@ -447,6 +451,10 @@ study, pooled-mean, and Bayesian prediction layers have distinct artist roles.
 The null line is exactly the retained `null_value`. Extraction and heterogeneous
 composition preserve the exact result object and all qualifications.
 
+Implementation status (2026-09-15): this renderer and its extraction,
+composition, identity-validation, and semantic-injection tests passed the M6C
+pass-3 technical gate. Independent candidate review remains separate.
+
 There is no grouped `ggcoefstats` surface in M6C. General regression,
 meta-regression, dependent effects, multivariate/network/diagnostic meta-analysis,
 publication-bias correction, selection models, model averaging, transformed
@@ -567,7 +575,8 @@ relabeling either retained artifact. It is explicitly temporary governance
 debt: M7/1.0 hardening must reconsider the boundary calibration and record a
 final disposition.
 
-This approval authorizes M6C implementation and acceptance-fixture construction
-only. Independent review, M6C acceptance, combined M6 acceptance, and the
-`0.4` product decision remain separate and cannot be self-approved by the
-implementation owner.
+At the method-entry gate, this approval authorized M6C implementation and
+acceptance-fixture construction only. Independent review, M6C acceptance,
+combined M6 acceptance, and the `0.4` product decision remained separate and
+could not be self-approved by the implementation owner. The later M6C review
+and acceptance are recorded above and in `evidence/M6C_SIGNOFF.md`.

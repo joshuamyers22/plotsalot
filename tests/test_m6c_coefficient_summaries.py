@@ -332,17 +332,20 @@ class M6CCoefficientAnalysisTests(unittest.TestCase):
             analyze_robust(only_significant=True)
         with self.assertRaisesRegex(ValueError, "alpha"):
             analyze_posterior(alpha=0.1)
-        with self.assertRaisesRegex(NotImplementedError, "pass 3"):
-            render_ggcoefstats(analyze_robust())
-        with self.assertRaisesRegex(NotImplementedError, "pass 3"):
-            ggcoefstats(
-                robust_frame(),
-                type="robust",
-                robust_method="Huber M-estimator",
-                robust_tuning="c=1.345",
-                interval_method="sandwich Wald",
-                **COMMON,
-            )
+        robust_analysis = analyze_robust()
+        rendered = render_ggcoefstats(robust_analysis)
+        self.addCleanup(rendered.figure.clear)
+        self.assertIs(rendered.result, robust_analysis.result)
+        public = ggcoefstats(
+            robust_frame(),
+            type="robust",
+            robust_method="Huber M-estimator",
+            robust_tuning="c=1.345",
+            interval_method="sandwich Wald",
+            **COMMON,
+        )
+        self.addCleanup(public.figure.clear)
+        self.assertIsInstance(public.result, RobustCoefficientTableResult)
         with self.assertRaises(TypeError):
             analyze_ggcoefstats(
                 object(),

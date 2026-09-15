@@ -41,10 +41,12 @@ Myers on 2026-09-15: the conservative allowance now applies only when `k<20` or
 the generating heterogeneity is exactly `tau=0`; the original two-sided rule
 continues for every `k>=20, tau>0` cell. This post-confirmation disposition does
 not recast either retained run as predeclared passing evidence. M7 must revisit
-the exception and explicitly reaffirm, replace, or remove it before 1.0. The
-next project gate is M6C pass 3: shared rendering, API/extraction/composition,
-retained benchmarks, documentation, adversarial review, and production gates.
-Candidate review and final M6/`0.4` acceptance remain later gates.
+the exception and explicitly reaffirm, replace, or remove it before 1.0. M6C
+pass 3 now implements shared semantic rendering, API/extraction/composition,
+retained benchmarks, documentation, adversarial self-review, and production
+evidence. Joshua Myers independently reviewed and accepted the complete M6C
+candidate on 2026-09-15. The next project gate is the separate combined
+M6/`0.4` review and acceptance decision.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months
 with two Python engineers and a part-time statistical-methods reviewer.

@@ -33,6 +33,7 @@ benchmark:
 	uv run python benchmarks/benchmark_m5b.py
 	uv run python benchmarks/benchmark_m6a.py
 	uv run python benchmarks/benchmark_m6b.py
+	uv run python benchmarks/benchmark_m6c.py
 	uv run python tools/verify_benchmark.py
 verify-benchmark:
 	uv run python tools/verify_benchmark.py

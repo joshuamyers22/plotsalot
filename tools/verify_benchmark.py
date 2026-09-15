@@ -15,6 +15,7 @@ M5A_RESULT = ROOT / "benchmarks" / "results" / "m5a-baseline.json"
 M5B_RESULT = ROOT / "benchmarks" / "results" / "m5b-baseline.json"
 M6A_RESULT = ROOT / "benchmarks" / "results" / "m6a-baseline.json"
 M6B_RESULT = ROOT / "benchmarks" / "results" / "m6b-baseline.json"
+M6C_RESULT = ROOT / "benchmarks" / "results" / "m6c-baseline.json"
 
 
 def _positive_int(value: Any, label: str) -> int:
@@ -335,6 +336,49 @@ def verify_benchmark() -> None:
         raise AssertionError("M6B 10-level scalar-coordinate work differs")
     if resource["20"].get("calculated_work") != 8 * 4096 * 21:
         raise AssertionError("M6B 20-level scalar-coordinate work differs")
+
+    m6c = json.loads(M6C_RESULT.read_text())
+    if m6c.get("schema_version") != 1:
+        raise AssertionError("unsupported M6C benchmark schema")
+    measurement = m6c.get("measurement", {})
+    if measurement.get("repeats") != 5:
+        raise AssertionError("M6C baseline must retain five samples")
+    if measurement.get("input_frame_allocation") != "outside measured phases":
+        raise AssertionError("M6C input allocation boundary must be explicit")
+    coefficient_results = m6c.get("coefficient_results")
+    if not isinstance(coefficient_results, dict) or set(coefficient_results) != {
+        "10",
+        "100",
+        "500",
+    }:
+        raise AssertionError("M6C coefficient-count grid is incomplete")
+    for count, cases in coefficient_results.items():
+        if not isinstance(cases, dict) or set(cases) != {"robust", "posterior"}:
+            raise AssertionError(f"M6C coefficient {count}: modes are incomplete")
+        for mode, phases in cases.items():
+            if not isinstance(phases, dict):
+                raise AssertionError(f"M6C coefficient {count}.{mode}: invalid phases")
+            for phase in ("analysis", "render"):
+                _verify_summary(
+                    phases.get(phase), f"M6C.coefficient.{count}.{mode}.{phase}"
+                )
+    for grid_name, expected, reserved in (
+        ("robust_meta_results", {"10", "100", "500"}, 20_000_000),
+        ("bayesian_meta_results", {"3", "10", "100", "500"}, 25_000_000),
+    ):
+        grid = m6c.get(grid_name)
+        if not isinstance(grid, dict) or set(grid) != expected:
+            raise AssertionError(f"M6C {grid_name} grid is incomplete")
+        for studies, phases in grid.items():
+            if not isinstance(phases, dict):
+                raise AssertionError(f"M6C {grid_name}.{studies}: invalid phases")
+            for phase in ("analysis", "render"):
+                _verify_summary(phases.get(phase), f"M6C.{grid_name}.{studies}.{phase}")
+            if phases.get("reserved_work") != reserved:
+                raise AssertionError(f"M6C {grid_name}.{studies}: work reserve differs")
+            _positive_int(
+                phases.get("actual_work"), f"M6C.{grid_name}.{studies}.actual_work"
+            )
 
 
 def main() -> None:

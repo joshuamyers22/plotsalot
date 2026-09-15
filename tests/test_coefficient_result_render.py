@@ -16,7 +16,11 @@ from plotsalot import (
     ggcoefstats,
     render_ggcoefstats,
 )
-from plotsalot.coefficient_result import CoefficientResourceLimits, PredictionResult
+from plotsalot.coefficient_result import (
+    CoefficientResourceLimits,
+    CoefficientResult,
+    PredictionResult,
+)
 from plotsalot.result import IntervalResult
 
 
@@ -384,9 +388,10 @@ class CoefficientResultAndRenderTests(unittest.TestCase):
             only_significant=True,
         )
         self.addCleanup(meta_plot.figure.clear)
+        meta_result = cast(CoefficientResult, meta_plot.result)
         visible_labels = tuple(text.get_text() for text in meta_plot.axes["main"].texts)
-        self.assertLess(len(visible_labels), len(meta_plot.result.terms) + 1)
-        self.assertEqual(len(meta_plot.result.terms), 5)
+        self.assertLess(len(visible_labels), len(meta_result.terms) + 1)
+        self.assertEqual(len(meta_result.terms), 5)
 
         composed = combine_plots((meta_plot,), columns=1)
         self.addCleanup(composed.figure.clear)

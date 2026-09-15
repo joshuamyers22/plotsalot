@@ -3,9 +3,9 @@
 These contracts are the M1 foundation extended by the approved M2 univariate
 and correlation records, the approved M3 comparison, composition, and theme
 records, the approved M4 categorical records, the implemented M5
-coefficient/meta-analysis family, the technically verified M6C pass-1
-coefficient-summary boundaries, and the implemented M6C pass-2 aggregate
-engines whose statistical gate remains blocked.
+coefficient/meta-analysis family, and the complete three-pass M6C technical
+candidate for strict coefficient summaries, aggregate engines, and semantic
+rendering. Joshua Myers independently reviewed and accepted M6C on 2026-09-15.
 
 ## Data boundary
 
@@ -147,8 +147,10 @@ reruns model fitting, REML, or inference.
 `ReportedCoefficientAnalysis`. Aggregate robust and Bayesian modes return
 `RobustMetaAnalysis` and `BayesianMetaAnalysis`; the former uses fixed-t4
 multistart/profile inference and the latter analytic conditional calculations
-plus bounded one-dimensional quadrature. Their semantic renderer remains a
-pass-3 boundary and fails before constructing a figure.
+plus bounded one-dimensional quadrature. The shared renderer emits distinct
+confidence, credible, pooled, and predictive semantic roles using retained
+result values only. Extraction and mixed classical/robust/Bayesian composition
+preserve the exact result objects.
 
 ## Plot boundary
 

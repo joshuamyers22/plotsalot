@@ -334,8 +334,9 @@ class RobustMetaPass2Tests(unittest.TestCase):
                 replace(analysis.table, terms=tuple(reversed(analysis.table.terms))),
                 result,
             )
-        with self.assertRaisesRegex(NotImplementedError, "pass 3"):
-            render_ggcoefstats(analysis)
+        rendered = render_ggcoefstats(analysis)
+        self.addCleanup(rendered.figure.clear)
+        self.assertIs(rendered.result, result)
 
     def test_component_invariants_and_schema_round_trip(self) -> None:
         result = robust().result
@@ -547,8 +548,10 @@ class BayesianMetaPass2Tests(unittest.TestCase):
         with self.assertRaises(M6CMetaError) as work:
             bayes(maximum_work=24_999_999)
         self.assertEqual(work.exception.code, "m6c_meta_work_preflight_failed")
-        with self.assertRaisesRegex(NotImplementedError, "pass 3"):
-            render_ggcoefstats(bayes())
+        analysis = bayes()
+        rendered = render_ggcoefstats(analysis)
+        self.addCleanup(rendered.figure.clear)
+        self.assertIs(rendered.result, analysis.result)
 
     def test_result_sensitivity_and_quadrature_mutations_fail(self) -> None:
         analysis = bayes()

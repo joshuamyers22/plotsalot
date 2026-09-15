@@ -130,6 +130,13 @@ def _numeric_option(value: object, label: str) -> float:
     return numeric
 
 
+def _validate_m6c_study_identities(terms: tuple[str, ...]) -> None:
+    if any(not 1 <= len(term) <= 200 or not term.isprintable() for term in terms):
+        raise ValueError(
+            "M6C study identities must be renderable strings of length 1-200"
+        )
+
+
 def _score(y: np.ndarray, variances: np.ndarray, tau_squared: float) -> float:
     weights = 1.0 / (variances + tau_squared)
     total = float(np.sum(weights))
@@ -584,6 +591,8 @@ def analyze_ggcoefstats(
         raise ValueError(f"maximum_labels cannot exceed {HARD_MAX_LABELS}")
 
     table = select_study_effects(data, maximum_studies=maximum_studies)
+    if type in {"robust", "bayes"}:
+        _validate_m6c_study_identities(table.terms)
     if len(table.terms) > maximum_rendered_points:
         raise ValueError(
             f"study count exceeds maximum_rendered_points={maximum_rendered_points}"
