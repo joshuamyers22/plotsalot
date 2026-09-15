@@ -1,6 +1,6 @@
 # Project Brief
 
-- Status: M0–M6 complete; pre-1.0 cleanup and M7 remain
+- Status: M0–M6 and public 0.1.1 complete; proposed M7 entry gate under review
 - Last updated: 2026-09-15
 
 ## Outcome
@@ -92,18 +92,18 @@
 
 | Requirement | Verification | Owner | Status |
 |---|---|---|---|
-| Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for M0 |
+| Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for published 0.1.1 |
 | Upstream is pinned | `docs/upstream/manifest.json` and hashes | Technical lead | Passing |
-| Public API inventory is complete | `docs/compatibility.md` versus namespaces | Product owner | Baseline complete |
-| No R runtime dependency | Python-only isolated wheel smoke test | Technical lead | Passing for prototype |
-| Statistical correctness | Method specs, analytic cases, R oracle, independent review | Joshua Myers | M0 specification approved |
+| Public API inventory is complete | `docs/compatibility.md`, M7 machine ledger, and namespaces | Product owner | 22-export baseline complete; M7 1.0 proposal pending |
+| No R runtime dependency | Python-only isolated wheel smoke test | Technical lead | Passing for published 0.1.1 |
+| Statistical correctness | Method specs, analytic cases, R oracle, independent review | Joshua Myers | M0–M6 approved; M6C boundary disposition provisional until M7 |
 | MIT license posture | ADR-010 and qualified review | Joshua Myers | Approved |
-| Initial walking skeleton | Focused tests and saved headless figure | Technical lead | Passing |
+| Trusted package publication | OIDC release workflow, hashes, metadata, and clean-index smoke | Joshua Myers | 0.1.1 published and verified |
 
 ## Open decisions
 
 | Question | Decision deadline | Owner | ADR |
 |---|---|---|---|
-| Does the cleaned `0.1.1` patch candidate remain the next public version, or should it be replaced by `0.4.0` to match the internal product gate? | Before the next tag or PyPI publication | Joshua Myers | Pending |
-| What supported-version and private-reporting response policy applies after publication? | Before PyPI publication | Joshua Myers | Pending |
-| Which deferred compatibility gaps must close for 1.0? | M7 entry | Product/statistical owner | ADR-004 |
+| Approve the proposed existing-surface 1.0 compatibility scope and per-gap dispositions? | M7 entry | Joshua Myers | M7-D1 / ADR-004 |
+| Approve the locked M6C boundary experiment before generating new evidence? | M7B entry | Joshua Myers | M7-D2 / ADR-005 |
+| Approve the 1.x API/schema, deprecation, and migration policy? | M7C entry | Joshua Myers | M7-D3 / ADR-007 |

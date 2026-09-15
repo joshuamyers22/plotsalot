@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tomllib
 import unittest
 from pathlib import Path
@@ -14,9 +15,15 @@ class RepositoryPolicyTests(unittest.TestCase):
             "checklists/RELEASE_READINESS.md",
             "docs/GETTING_STARTED.md",
             "docs/INTERPRETATION_AND_LIMITATIONS.md",
+            "docs/API_STABILITY.md",
+            "docs/M7_CALIBRATION_PLAN.md",
+            "docs/MILESTONE_7.md",
             "docs/README.md",
             "docs/RELEASING.md",
             "docs/USER_GUIDE.md",
+            "docs/adr/ADR-007-public-api-schema-stability.md",
+            "docs/evidence/M7_VERIFICATION_LOOP.md",
+            "docs/m7/compatibility-disposition.json",
             "src/plotsalot/py.typed",
         }
 
@@ -68,6 +75,67 @@ class RepositoryPolicyTests(unittest.TestCase):
         )
         self.assertNotIn("PYPI_TOKEN", workflow)
         self.assertNotIn("secrets.", workflow)
+
+    def test_m7_compatibility_ledger_covers_pinned_exports(self) -> None:
+        ledger = json.loads(
+            (ROOT / "docs" / "m7" / "compatibility-disposition.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected = {
+            "combine_plots",
+            "extract_caption",
+            "extract_stats",
+            "extract_subtitle",
+            "ggbarstats",
+            "ggbetweenstats",
+            "ggcoefstats",
+            "ggcorrmat",
+            "ggdotplotstats",
+            "gghistostats",
+            "ggpiestats",
+            "ggscatterstats",
+            "ggwithinstats",
+            "grouped_ggbarstats",
+            "grouped_ggbetweenstats",
+            "grouped_ggcorrmat",
+            "grouped_ggdotplotstats",
+            "grouped_gghistostats",
+            "grouped_ggpiestats",
+            "grouped_ggscatterstats",
+            "grouped_ggwithinstats",
+            "theme_ggstatsplot",
+        }
+        exports = ledger["exports"]
+        names = [item["upstream_export"] for item in exports]
+        self.assertEqual(len(names), len(set(names)))
+        self.assertEqual(set(names), expected)
+        self.assertEqual(ledger["upstream"]["export_count"], len(expected))
+
+        upstream = json.loads(
+            (ROOT / "docs" / "upstream" / "manifest.json").read_text(encoding="utf-8")
+        )["repositories"][0]
+        self.assertEqual(ledger["upstream"]["name"], upstream["name"])
+        self.assertEqual(ledger["upstream"]["revision"], upstream["revision"])
+        self.assertEqual(
+            ledger["upstream"]["export_count"],
+            upstream["inventory"]["exported_symbols"],
+        )
+
+        import plotsalot
+
+        public_names = set(plotsalot.__all__)
+        ledger_surfaces = {
+            surface for item in exports for surface in item["python_surfaces"]
+        }
+        self.assertEqual(ledger_surfaces - public_names, set())
+
+        gaps = [gap for item in exports for gap in item["gaps"]]
+        gap_ids = [gap["id"] for gap in gaps]
+        self.assertEqual(len(gap_ids), len(set(gap_ids)))
+        allowed = set(ledger["proposal"]["gap_dispositions"])
+        self.assertTrue(gaps)
+        self.assertTrue(all(gap["proposal"] in allowed for gap in gaps))
 
 
 if __name__ == "__main__":

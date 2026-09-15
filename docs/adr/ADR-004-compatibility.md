@@ -27,5 +27,8 @@ Visual equivalence requires semantic layers and annotations, not pixels.
 
 ## Verification
 
-CI will eventually compare the upstream inventories with the compatibility
-matrix and fail when an export or supported method lacks a disposition.
+`tests/test_repository_policy.py` compares the proposed M7 machine ledger with
+the pinned upstream name, revision, export count, exact 22-export inventory, and
+exported Python surfaces. It also rejects duplicate exports/gap identifiers and
+unknown disposition values. Passing that structural test does not approve a
+proposed product disposition; M7-D1 remains an accountable owner gate.

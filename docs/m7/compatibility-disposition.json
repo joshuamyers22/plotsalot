@@ -1,0 +1,459 @@
+{
+  "schema_version": 1,
+  "status": "proposed",
+  "approval_required": "M7-D1",
+  "upstream": {
+    "name": "ggstatsplot",
+    "revision": "7a724cd0ab55668b9d0b2e84b12c711c5be68ac8",
+    "export_count": 22
+  },
+  "proposal": {
+    "one_zero_scope": "stabilize_existing_adapted_surface",
+    "new_statistical_families_required": false,
+    "gap_dispositions": [
+      "post_1_0",
+      "rejected"
+    ]
+  },
+  "exports": [
+    {
+      "upstream_export": "combine_plots",
+      "python_surfaces": ["combine_plots"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-001",
+          "capability": "guide collection and shared-axis inference",
+          "proposal": "post_1_0",
+          "rationale": "Useful additive composition work, but not required to stabilize result-preserving rectangular composition."
+        },
+        {
+          "id": "M7-COMP-002",
+          "capability": "patchwork expressions and arbitrary Matplotlib figures",
+          "proposal": "rejected",
+          "rationale": "Conflicts with typed plotsalot containers, bounded panel identity, and exact result provenance."
+        }
+      ]
+    },
+    {
+      "upstream_export": "extract_caption",
+      "python_surfaces": ["extract_caption"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": []
+    },
+    {
+      "upstream_export": "extract_stats",
+      "python_surfaces": ["extract_stats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": []
+    },
+    {
+      "upstream_export": "extract_subtitle",
+      "python_surfaces": ["extract_subtitle"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": []
+    },
+    {
+      "upstream_export": "ggbarstats",
+      "python_surfaces": ["ggbarstats", "analyze_ggbarstats", "render_ggbarstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-003",
+          "capability": "robust categorical analysis",
+          "proposal": "post_1_0",
+          "rationale": "No approved robust categorical estimand or method contract exists."
+        },
+        {
+          "id": "M7-COMP-004",
+          "capability": "continuity correction, simulated inference, and alternative exact families",
+          "proposal": "post_1_0",
+          "rationale": "Requires explicit sampling-plan and sparse-cell method decisions."
+        },
+        {
+          "id": "M7-COMP-005",
+          "capability": "structural-zero and multicategory paired models",
+          "proposal": "post_1_0",
+          "rationale": "Requires new data, estimand, and Bayesian/classical method specifications."
+        },
+        {
+          "id": "M7-COMP-006",
+          "capability": "arbitrary ggplot layers",
+          "proposal": "rejected",
+          "rationale": "Owned semantic Matplotlib rendering is a project invariant."
+        }
+      ]
+    },
+    {
+      "upstream_export": "ggbetweenstats",
+      "python_surfaces": ["ggbetweenstats", "analyze_ggbetweenstats", "render_ggbetweenstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-007",
+          "capability": "nonparametric and equal-variance comparison families",
+          "proposal": "post_1_0",
+          "rationale": "Each family needs approved estimands, effects, intervals, pairwise policy, and oracle evidence."
+        },
+        {
+          "id": "M7-COMP-008",
+          "capability": "effect-size intervals and arbitrary contrasts",
+          "proposal": "post_1_0",
+          "rationale": "Additive but statistically material; not needed to stabilize current Welch, robust, and Bayesian modes."
+        },
+        {
+          "id": "M7-COMP-009",
+          "capability": "arbitrary ggplot layers",
+          "proposal": "rejected",
+          "rationale": "Owned semantic Matplotlib rendering is a project invariant."
+        }
+      ]
+    },
+    {
+      "upstream_export": "ggcoefstats",
+      "python_surfaces": ["ggcoefstats", "analyze_ggcoefstats", "render_ggcoefstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-010",
+          "capability": "additional narrow fitted-model adapters such as WLS, GLS, and GLM",
+          "proposal": "post_1_0",
+          "rationale": "Each adapter must prove exact parameter, covariance, identity, and scale semantics."
+        },
+        {
+          "id": "M7-COMP-011",
+          "capability": "fitted robust/Bayesian objects and posterior-draw ingestion",
+          "proposal": "post_1_0",
+          "rationale": "Requires new object boundaries, diagnostics, artifact limits, and method approvals."
+        },
+        {
+          "id": "M7-COMP-012",
+          "capability": "automatic term creation, exponentiation, transformed parameters, and ANOVA effects",
+          "proposal": "post_1_0",
+          "rationale": "Scale and identity transformations must be explicit rather than inferred."
+        },
+        {
+          "id": "M7-COMP-013",
+          "capability": "arbitrary model dispatch, dynamic tidiers, and ellipsis forwarding",
+          "proposal": "rejected",
+          "rationale": "Conflicts with strict allowlists, owned Polars boundaries, and explicit failure."
+        },
+        {
+          "id": "M7-COMP-014",
+          "capability": "automatic model selection, outlier deletion, and estimator fallback",
+          "proposal": "rejected",
+          "rationale": "Conflicts with approved no-fallback and caller-selected analysis invariants."
+        }
+      ]
+    },
+    {
+      "upstream_export": "ggcorrmat",
+      "python_surfaces": ["ggcorrmat", "analyze_ggcorrmat", "render_ggcorrmat"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-015",
+          "capability": "Spearman, Kendall, partial correlation, and other robust estimators",
+          "proposal": "post_1_0",
+          "rationale": "Each estimator changes missingness, test, interval, and matrix-family semantics."
+        },
+        {
+          "id": "M7-COMP-016",
+          "capability": "additional multiplicity corrections and matrix layouts",
+          "proposal": "post_1_0",
+          "rationale": "Additive after correction-family and semantic-layout contracts are approved."
+        }
+      ]
+    },
+    {
+      "upstream_export": "ggdotplotstats",
+      "python_surfaces": ["ggdotplotstats", "analyze_ggdotplotstats", "render_ggdotplotstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-017",
+          "capability": "nonparametric methods and additional interval families",
+          "proposal": "post_1_0",
+          "rationale": "Requires new estimand, interval, and label contracts."
+        },
+        {
+          "id": "M7-COMP-018",
+          "capability": "label expressions and arbitrary layers",
+          "proposal": "rejected",
+          "rationale": "Unbounded expression evaluation and foreign layers violate owned rendering boundaries."
+        }
+      ]
+    },
+    {
+      "upstream_export": "gghistostats",
+      "python_surfaces": ["gghistostats", "analyze_gghistostats", "render_gghistostats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-019",
+          "capability": "nonparametric one-sample methods and standardized robust effects",
+          "proposal": "post_1_0",
+          "rationale": "Requires separately approved estimands, uncertainty, and effects."
+        },
+        {
+          "id": "M7-COMP-020",
+          "capability": "effect-size intervals and additional centrality controls",
+          "proposal": "post_1_0",
+          "rationale": "Additive only after result and renderer meanings are specified."
+        },
+        {
+          "id": "M7-COMP-021",
+          "capability": "arbitrary ggplot layers",
+          "proposal": "rejected",
+          "rationale": "Owned semantic Matplotlib rendering is a project invariant."
+        }
+      ]
+    },
+    {
+      "upstream_export": "ggpiestats",
+      "python_surfaces": ["ggpiestats", "analyze_ggpiestats", "render_ggpiestats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-022",
+          "capability": "robust categorical analysis",
+          "proposal": "post_1_0",
+          "rationale": "No approved robust categorical estimand or method contract exists."
+        },
+        {
+          "id": "M7-COMP-023",
+          "capability": "continuity correction, simulated inference, structural zeros, and multicategory paired models",
+          "proposal": "post_1_0",
+          "rationale": "Requires explicit sampling-plan, sparse-cell, and paired-model decisions."
+        },
+        {
+          "id": "M7-COMP-024",
+          "capability": "arbitrary ggplot layers",
+          "proposal": "rejected",
+          "rationale": "Owned semantic Matplotlib rendering is a project invariant."
+        }
+      ]
+    },
+    {
+      "upstream_export": "ggscatterstats",
+      "python_surfaces": ["ggscatterstats", "analyze_ggscatterstats", "render_ggscatterstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-025",
+          "capability": "Spearman, Kendall, and partial correlation",
+          "proposal": "post_1_0",
+          "rationale": "Changes the estimator, missingness, uncertainty, and interpretation contract."
+        },
+        {
+          "id": "M7-COMP-026",
+          "capability": "regression smoothing, marginal distributions, and point labels",
+          "proposal": "post_1_0",
+          "rationale": "Useful additive semantic layers but not required for current association stability."
+        },
+        {
+          "id": "M7-COMP-027",
+          "capability": "arbitrary ggplot layers",
+          "proposal": "rejected",
+          "rationale": "Owned semantic Matplotlib rendering is a project invariant."
+        }
+      ]
+    },
+    {
+      "upstream_export": "ggwithinstats",
+      "python_surfaces": ["ggwithinstats", "analyze_ggwithinstats", "render_ggwithinstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-028",
+          "capability": "nonparametric repeated methods, alternate missingness populations, and sphericity switching",
+          "proposal": "post_1_0",
+          "rationale": "Each changes the subject population, estimand, correction, or pairwise family."
+        },
+        {
+          "id": "M7-COMP-029",
+          "capability": "effect-size intervals and arbitrary contrasts",
+          "proposal": "post_1_0",
+          "rationale": "Statistically material additive work outside current stable modes."
+        },
+        {
+          "id": "M7-COMP-030",
+          "capability": "inferred subjects and upstream row-index fallback",
+          "proposal": "rejected",
+          "rationale": "Conflicts with explicit subject identity and auditable pairing."
+        }
+      ]
+    },
+    {
+      "upstream_export": "grouped_ggbarstats",
+      "python_surfaces": ["grouped_ggbarstats", "analyze_grouped_ggbarstats", "render_grouped_ggbarstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-031",
+          "capability": "nested grouping and category-domain sampling",
+          "proposal": "post_1_0",
+          "rationale": "Requires bounded nested identity and common-domain contracts."
+        },
+        {
+          "id": "M7-COMP-032",
+          "capability": "partial grouped success",
+          "proposal": "rejected",
+          "rationale": "Conflicts with atomic grouped failure."
+        }
+      ]
+    },
+    {
+      "upstream_export": "grouped_ggbetweenstats",
+      "python_surfaces": ["grouped_ggbetweenstats", "analyze_grouped_ggbetweenstats", "render_grouped_ggbetweenstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-033",
+          "capability": "nested grouping and pooled cross-group correction families",
+          "proposal": "post_1_0",
+          "rationale": "Requires a new hypothesis-family and resource-allocation contract."
+        },
+        {
+          "id": "M7-COMP-034",
+          "capability": "partial grouped success",
+          "proposal": "rejected",
+          "rationale": "Conflicts with atomic grouped failure."
+        }
+      ]
+    },
+    {
+      "upstream_export": "grouped_ggcorrmat",
+      "python_surfaces": ["grouped_ggcorrmat", "analyze_grouped_ggcorrmat", "render_grouped_ggcorrmat"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-035",
+          "capability": "nested grouping and pooled cross-group correction families",
+          "proposal": "post_1_0",
+          "rationale": "Requires bounded nested matrices and a new hypothesis-family contract."
+        },
+        {
+          "id": "M7-COMP-036",
+          "capability": "partial grouped success",
+          "proposal": "rejected",
+          "rationale": "Conflicts with atomic grouped failure and stable stream identity."
+        }
+      ]
+    },
+    {
+      "upstream_export": "grouped_ggdotplotstats",
+      "python_surfaces": ["grouped_ggdotplotstats", "analyze_grouped_ggdotplotstats", "render_grouped_ggdotplotstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-037",
+          "capability": "nested grouping",
+          "proposal": "post_1_0",
+          "rationale": "Requires bounded nested identity, layout, and work allocation."
+        },
+        {
+          "id": "M7-COMP-038",
+          "capability": "partial grouped success",
+          "proposal": "rejected",
+          "rationale": "Conflicts with atomic grouped failure."
+        }
+      ]
+    },
+    {
+      "upstream_export": "grouped_gghistostats",
+      "python_surfaces": ["grouped_gghistostats", "analyze_grouped_gghistostats", "render_grouped_gghistostats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-039",
+          "capability": "nested grouping",
+          "proposal": "post_1_0",
+          "rationale": "Requires bounded nested identity, layout, and work allocation."
+        },
+        {
+          "id": "M7-COMP-040",
+          "capability": "partial grouped success",
+          "proposal": "rejected",
+          "rationale": "Conflicts with atomic grouped failure."
+        }
+      ]
+    },
+    {
+      "upstream_export": "grouped_ggpiestats",
+      "python_surfaces": ["grouped_ggpiestats", "analyze_grouped_ggpiestats", "render_grouped_ggpiestats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-041",
+          "capability": "nested grouping and category-domain sampling",
+          "proposal": "post_1_0",
+          "rationale": "Requires bounded nested identity and common-domain contracts."
+        },
+        {
+          "id": "M7-COMP-042",
+          "capability": "partial grouped success",
+          "proposal": "rejected",
+          "rationale": "Conflicts with atomic grouped failure."
+        }
+      ]
+    },
+    {
+      "upstream_export": "grouped_ggscatterstats",
+      "python_surfaces": ["grouped_ggscatterstats", "analyze_grouped_ggscatterstats", "render_grouped_ggscatterstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-043",
+          "capability": "nested grouping and pooled cross-group correction families",
+          "proposal": "post_1_0",
+          "rationale": "Requires new nested stream, hypothesis-family, and work contracts."
+        },
+        {
+          "id": "M7-COMP-044",
+          "capability": "partial grouped success",
+          "proposal": "rejected",
+          "rationale": "Conflicts with atomic grouped failure and stable stream identity."
+        }
+      ]
+    },
+    {
+      "upstream_export": "grouped_ggwithinstats",
+      "python_surfaces": ["grouped_ggwithinstats", "analyze_grouped_ggwithinstats", "render_grouped_ggwithinstats"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-045",
+          "capability": "nested grouping and alternate subject scopes",
+          "proposal": "post_1_0",
+          "rationale": "Requires explicit nested subject identity, missingness, and work contracts."
+        },
+        {
+          "id": "M7-COMP-046",
+          "capability": "inferred subjects or partial grouped success",
+          "proposal": "rejected",
+          "rationale": "Conflicts with explicit subject identity and atomic grouped failure."
+        }
+      ]
+    },
+    {
+      "upstream_export": "theme_ggstatsplot",
+      "python_surfaces": ["theme_ggstatsplot"],
+      "one_zero_proposal": "stabilize_existing_adapted_surface",
+      "gaps": [
+        {
+          "id": "M7-COMP-047",
+          "capability": "additional owned theme tokens and presets",
+          "proposal": "post_1_0",
+          "rationale": "Compatible additive work after the stable token contract is frozen."
+        },
+        {
+          "id": "M7-COMP-048",
+          "capability": "ggplot theme objects, global rcParams mutation, and pixel identity",
+          "proposal": "rejected",
+          "rationale": "Conflicts with local immutable themes and semantic-not-pixel rendering compatibility."
+        }
+      ]
+    }
+  ]
+}
