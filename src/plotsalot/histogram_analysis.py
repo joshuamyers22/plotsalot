@@ -77,9 +77,9 @@ class _ScipyStats(Protocol):
 
 scipy_stats = cast(_ScipyStats, import_module("scipy.stats"))
 
-_PROTOTYPE_WARNING = (
-    "Adapted method: effect-size uncertainty and nonparametric and Bayesian "
-    "modes are not implemented."
+_CLASSICAL_WARNING = (
+    "Adapted method: effect-size uncertainty and nonparametric modes are not "
+    "implemented."
 )
 
 
@@ -329,7 +329,7 @@ def analyze_one_sample_sample(
             value=effect_size,
             standardizer="sample_standard_deviation_ddof_1",
         ),
-        warnings=(_PROTOTYPE_WARNING,),
+        warnings=(_CLASSICAL_WARNING,),
     )
 
     return HistogramAnalysis(sample=sample, result=result)

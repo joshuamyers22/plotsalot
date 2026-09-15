@@ -171,8 +171,8 @@ pairs. The full request is rejected before drawing if it exceeds its selected
 ceiling; rows, pairs, variables, or groups are never silently reduced. Invalid
 effective counts, non-finite input, degenerate Winsorized scale/covariance,
 insufficient valid bootstrap replicates, and robust repeated-matrix degeneracy
-fail without returning a classical result. Robust categorical and robust
-coefficient/meta-analysis remain deferred to M6C contracts.
+fail without returning a classical result. Robust categorical analysis remains
+deferred; robust coefficient/meta-analysis is handled separately by M6C.
 
 ## M6B Bayesian-method disposition
 
@@ -191,7 +191,7 @@ H1/H0 orientation; upstream qualitative evidence labels are not reproduced.
 
 The native engine uses locked NumPy/SciPy exact expressions, adaptive
 Gauss–Kronrod quadrature, or eight independently scrambled 4,096-point Sobol
-replicates. Bayesian coefficient and meta-analysis remain deferred to M6C.
+replicates. Bayesian coefficient and meta-analysis are handled separately by M6C.
 
 ## Approved M6C coefficient/meta disposition
 

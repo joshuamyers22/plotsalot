@@ -14,44 +14,19 @@ on 2026-09-13. This repository executes that plan through the following gates.
 | M6 | Robust and Bayesian methods ([detail](MILESTONE_6.md)) | 8–13 weeks |
 | M7 | Compatibility closure, hardening, documentation, 1.0 | 4–6 weeks |
 
-M0 through M5 are complete, and the `0.3` product gate is accepted. Joshua Myers
-independently reviewed and accepted both M5 tracks and approved the combined
-M5/`0.3` candidate on 2026-09-14. M6 is active. Joshua Myers approved the M6A
-robust architecture/method entry gate on 2026-09-14. The M6A technical candidate
-passed its technical gate and was independently reviewed and accepted by Joshua
-Myers on 2026-09-14. Joshua Myers approved the detailed M6B B1–B6 method
-contract on 2026-09-15, independently reviewed the resulting scalar, matrix,
-comparison, categorical, and grouped candidate, and accepted M6B. The next
-M6C pass 1 subsequently passed its technical gate with strict reported robust
-and posterior coefficient-summary profiles and schema-v2/v3 results. Pass 2
-implemented the approved robust Student-t4 and Bayesian normal-normal aggregate
-meta-analysis engines. Its formula/oracle, contamination, Bayesian SBC, schema,
-and fault checks pass. The approved warned-small-study disposition resolves the
-conservative `k=10, tau=0` cell, but the fresh 2,000-case confirmation also finds
-conservative coverage at `k=50, tau=0` (`0.9645`, 99% Wilson interval
-`[0.9522, 0.9737]`), which fails the unchanged `k>=20` rule. An isolated upstream
-comparison using pinned ggstatsplot/statsExpressions with `metaplus` ran 200
-cases in each normal-null and matched fixed-Student-t4-null cell at `k=10,50`.
-Its point coverage was also conservative (`0.960` through `0.985`), but every
-99% Wilson interval contained `0.95`; the M6C finding therefore did not formally
-reproduce at that resolution and cannot be assigned the same mechanism because
-upstream fits a different normal-mixture model. Statistical-owner disposition
-of the `k=50, tau=0` confirmation finding was provisionally approved by Joshua
-Myers on 2026-09-15: the conservative allowance now applies only when `k<20` or
-the generating heterogeneity is exactly `tau=0`; the original two-sided rule
-continues for every `k>=20, tau>0` cell. This post-confirmation disposition does
-not recast either retained run as predeclared passing evidence. M7 must revisit
-the exception and explicitly reaffirm, replace, or remove it before 1.0. M6C
-pass 3 now implements shared semantic rendering, API/extraction/composition,
-retained benchmarks, documentation, adversarial self-review, and production
-evidence. Joshua Myers independently reviewed and accepted the complete M6C
-candidate on 2026-09-15. The next project gate is the separate combined
-M6/`0.4` review and acceptance decision. The combined clean-tree technical
-release gate now passes check, audit, build, isolated-wheel, oracle, benchmark,
-reproducibility, schema, compatibility, and cross-mode composition checks. The
-final M6/`0.4` candidate was approved by Joshua Myers on 2026-09-15. M6 and the
-`0.4` product gate are complete; M7 compatibility closure and 1.0 hardening are
-next.
+M0 through M6 are complete. Joshua Myers approved each method family and the
+final combined M6/`0.4` candidate by 2026-09-15 after the retained technical,
+adversarial, oracle, benchmark, and installed-artifact gates passed. The detailed
+history remains in the milestone and evidence records rather than in this plan's
+current-state summary.
+
+M7 compatibility closure and 1.0 hardening are next. It must revisit the
+provisional M6C conservative-coverage disposition for `k<20` or generating
+`tau=0`, finish every deferred compatibility classification required for 1.0,
+and establish the public API/schema stability boundary. The cleanup candidate is
+versioned `0.1.1` because `v0.1.0` already exists, and the owner approved that
+public release version on 2026-09-15. PyPI pending-publisher registration and
+publication remain separate delivery steps.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months
 with two Python engineers and a part-time statistical-methods reviewer.
@@ -77,4 +52,4 @@ with two Python engineers and a part-time statistical-methods reviewer.
 See `MILESTONE_0.md`, `MILESTONE_1.md`, `MILESTONE_2.md`,
 `MILESTONE_3.md`, `MILESTONE_4.md`, `MILESTONE_5.md`, `MILESTONE_6.md`,
 `compatibility.md`, `../PROJECT_BRIEF.md`, and
-`../STATISTICAL_ANALYSIS_PLAN.md` for active work and acceptance evidence.
+`../STATISTICAL_ANALYSIS_PLAN.md` for planned work and acceptance evidence.

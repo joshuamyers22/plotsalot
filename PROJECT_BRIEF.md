@@ -1,7 +1,7 @@
 # Project Brief
 
-- Status: Accepted M0 baseline
-- Last updated: 2026-09-14
+- Status: M0–M6 complete; pre-1.0 cleanup and M7 remain
+- Last updated: 2026-09-15
 
 ## Outcome
 
@@ -104,7 +104,6 @@
 
 | Question | Decision deadline | Owner | ADR |
 |---|---|---|---|
-| Is `plotsalot` an official port and what license will it use? | Decided: independent MIT project | Joshua Myers | ADR-001, ADR-010 |
-| Which renderer and dataframe contracts are stable? | End of M0 | Technical/visualization owners | ADR-002, ADR-003 |
-| Which behaviors define compatibility? | End of M0 | Product/statistical owners | ADR-004 |
-| Which Bayesian and robust methods ship? | Before their implementation | Statistical owner | ADR-005, ADR-006 |
+| Does the cleaned `0.1.1` patch candidate remain the next public version, or should it be replaced by `0.4.0` to match the internal product gate? | Before the next tag or PyPI publication | Joshua Myers | Pending |
+| What supported-version and private-reporting response policy applies after publication? | Before PyPI publication | Joshua Myers | Pending |
+| Which deferred compatibility gaps must close for 1.0? | M7 entry | Product/statistical owner | ADR-004 |

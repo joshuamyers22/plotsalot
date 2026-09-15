@@ -44,6 +44,7 @@ class GgHistoStatsTests(unittest.TestCase):
         )
         self.assertLess(result.interval.low, result.estimate.value)
         self.assertGreater(result.interval.high, result.estimate.value)
+        self.assertNotIn("Bayesian", result.warnings[0])
 
     def test_nulls_are_dropped_and_reconciled(self) -> None:
         data = pl.DataFrame({"value": [1.0, None, 2.0, 3.0]})

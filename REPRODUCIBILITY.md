@@ -1,44 +1,90 @@
 # Reproducibility
 
-Every result must record the Git commit, locked environment, command and
-parameters, input identifiers and SHA-256 hashes, UTC evaluation time, timezone
-and calendar, units and precision, transformation version, and output hash.
+Plotsalot separates runtime behavior, development-time compatibility evidence,
+and retained performance evidence. A released wheel or sdist requires only
+Python and its declared Python dependencies; it never invokes R, Docker, or the
+network.
 
-Raw inputs are immutable. Corrections create a new version. Derived data must be
-rebuildable from authorized inputs and committed code. Random procedures require
-an explicit seed and documented generator. Benchmarks record hardware and data
-shape. Reconciliation tests define tolerances and explain why they are safe.
+## Runtime and dependency environment
 
-Polars is the default tabular engine. Record its locked version and relevant
-streaming/lazy execution settings with evidence. Do not cross a pandas boundary
-implicitly; document required interoperability, conversion ownership, null and
-dtype semantics, and memory cost in an ADR.
+- Supported Python versions begin at 3.11 and are declared in `pyproject.toml`.
+- `uv.lock` is the authoritative resolver-generated development lockfile.
+- Local and CI environments use `uv sync --frozen --dev`.
+- Runtime versions and method provenance are retained in structured evidence
+  where the result contract requires them.
+- Dependency changes update `pyproject.toml` and the regenerated lockfile
+  together and rerun numerical regression evidence.
 
-Statsmodels is the default statistical/regression engine. Record the exact model
-class, formula or design matrix, intercept handling, missing-data policy,
-covariance estimator, weights/clusters, random seed where applicable, diagnostics,
-sample filters, and locked Statsmodels/NumPy versions with each result.
+## Tests and builds
 
-For simple OLS, use the generated regression-evidence command to record these
-fields in a versioned, deterministic JSON contract. Pass the revision, UTC
-evaluation time, sample-filter declaration, validation design, and leakage
-controls explicitly. Retain the printed artifact hash beside the review or run
-manifest. Do not use the command's diagnostics as automatic approval thresholds;
-pre-specify fit-for-purpose thresholds and time-aware validation in the analysis
-plan.
+From a clean checkout:
 
-For temporal prediction, prefer the generated expanding-window command over a
-random split. Preserve source order, record feature and target availability, use
-only labels available strictly before each test window, and retain per-observation
-out-of-sample predictions. Compare against a fold-local baseline. Treat upstream
-availability metadata and point-in-time universe construction as separately
-audited inputs; this template cannot prove their truth.
+```sh
+make setup
+make check
+make audit
+make build
+```
 
-Publish reviewed tabular outputs through the versioned Parquet contract. Preserve
-a portable source identifier and hash, code revision, UTC creation time, exact
-schema and invariants, partition/sort/key definitions, writer versions, and file
-hashes in the manifest. Verify before lazy scanning and never mutate a published
-version. Checksums detect change; they do not authenticate the publisher.
+`make check` runs formatting, lint, strict type checking, the unit and contract
+tests, branch-aware coverage enforcement, and documentation-link validation. `make
+audit` queries OSV for locked runtime dependencies and checks the dependency
+license allowlist. `make build` creates the sdist and universal wheel from the
+declared build backend.
 
-Notebooks explore and communicate; production calculations live in typed modules
-with regression tests. A notebook result is not release evidence by itself.
+Release tags must exactly match package metadata. Release artifacts are built in
+CI from the tagged commit; local `dist/` files are ignored and are not release
+inputs.
+
+## Statistical and stochastic evidence
+
+Each analysis contract defines sample construction, missing/non-finite handling,
+estimand, interval or posterior convention, correction family, and failure
+behavior. Consequential changes require an updated method specification and
+review evidence.
+
+Random procedures require an explicit seed or a documented identity-derived
+stream. Robust bootstrap and Bayesian randomized quasi-Monte Carlo paths use
+owned generators, bounded work, and retained generator/provenance metadata. A
+request that exceeds its ceiling fails before drawing rather than silently
+reducing work.
+
+## R oracle
+
+The development-only oracle is pinned by `oracle/renv.lock` and the upstream
+revision recorded in `docs/upstream/manifest.json`. Checked-in fixtures include
+input and output hashes and are verified without R during the default test suite.
+
+To regenerate reviewed oracle fixtures:
+
+```sh
+make oracle
+```
+
+This command requires Docker and the declared R platform. Differences caused by
+intentional Python adaptations are documented in the method specifications and
+compatibility matrix rather than hidden by loose tolerances.
+
+## Performance evidence
+
+Retained benchmark artifacts record workload shape, phase-separated samples,
+environment identity, and allocation or work measurements. Regenerate them only
+on a controlled host appropriate for comparison:
+
+```sh
+make benchmark
+```
+
+Shared CI verifies artifact shape and invariants but does not treat noisy timing
+on a generic runner as a release threshold.
+
+## Data and downstream results
+
+Callers own their source data and saved figures. Plotsalot performs no implicit
+persistence or remote telemetry. For reproducible downstream work, retain the
+package version, Git revision when applicable, structured result, analysis
+parameters, input identity/hash, units, random seed, and evaluation time.
+
+The included dataset and regression-evidence utilities retain stricter source,
+schema, availability, and output hashes for their documented workflows. See
+`docs/PARQUET_DATASETS.md` and `docs/REGRESSION_EVIDENCE.md`.
