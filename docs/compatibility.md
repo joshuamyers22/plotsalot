@@ -1,7 +1,7 @@
 # Upstream Compatibility Matrix
 
 - Baseline revisions: see `upstream/manifest.json`
-- Status: M0–M5 and M6A–M6C complete; combined M6/0.4 acceptance open
+- Status: M0–M6 complete; combined 0.4 product gate accepted; M7 closure next
 
 Definitions:
 

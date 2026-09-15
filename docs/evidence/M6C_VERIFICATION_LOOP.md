@@ -55,9 +55,9 @@
 | # | Planned slice | Required new evidence | Gate state |
 |---:|---|---|---|
 | 0 | Method-entry audit, R4/B5 proposal, sign-off ledger, and verification contract only | Published tMeta/NNHM review, GPL/MIT boundary, inherited M5/M6 constraints, exact pending decisions | Entry gate passed 2026-09-15; implementation authorized |
-| 1 | R4-C/B5-C strict table profiles and schema-v2/v3 result variants | Hand calculations, invalid/mixed profiles, probability partitions, source/order/mutation/JSON tests; v1 serialization stability | Technical gate passed 2026-09-15; review remains open |
+| 1 | R4-C/B5-C strict table profiles and schema-v2/v3 result variants | Hand calculations, invalid/mixed profiles, probability partitions, source/order/mutation/JSON tests; v1 serialization stability | Technical gate passed; accepted by Joshua Myers 2026-09-15 |
 | 2 | R4-M/B5-M native engines and complete statistical results | Independent high-precision/R oracles, multistart/profile/quadrature faults, invariance, contamination, SBC, work/limit evidence | Technical gate passed 2026-09-15 with provisional owner-approved `k<20 OR tau=0` conservative rule; M7 review required |
-| 3 | Shared renderer/API/extraction/composition, retained benchmark, docs, adversarial and production gates | Injection/artist identity, cross-mode composition, package audit/build/wheel/oracle/benchmark/reproducibility evidence | Technical gate passed 2026-09-15; independent review remains open |
+| 3 | Shared renderer/API/extraction/composition, retained benchmark, docs, adversarial and production gates | Injection/artist identity, cross-mode composition, package audit/build/wheel/oracle/benchmark/reproducibility evidence | Technical gate passed; independently reviewed and accepted 2026-09-15 |
 
 ## Entry findings and dispositions
 

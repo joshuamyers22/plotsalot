@@ -1,6 +1,6 @@
 # Statistical Analysis Plan: Cross-Language Parity Program
 
-- Status: M0–M5, M6A, and M6B complete; M6C implementation authorized
+- Status: M0–M6 complete; combined 0.4 product gate accepted; M7 next
 - Version: 0.1.0
 - Date: 2026-09-13
 - Statistical owner/reviewer: Joshua Myers; M0 approval recorded 2026-09-14
@@ -165,8 +165,11 @@ and posterior coefficient profiles, fixed-Student-t4 robust aggregate
 meta-analysis, and proper-prior Bayesian normal-normal meta-analysis with
 bounded deterministic quadrature. Joshua Myers approved every R4/B5 M6C entry
 decision without revision on 2026-09-15, authorizing implementation and fixture
-construction. Implementation verification, independent candidate review, and
-final M6/`0.4` acceptance remain separate open gates.
+construction. The three-pass M6C candidate then passed its technical gate and
+was independently reviewed and accepted by Joshua Myers. The combined M6/`0.4`
+candidate passes its clean-tree production, reproducibility, compatibility,
+schema, and composition gate. Joshua Myers approved the final combined M6/`0.4`
+candidate on 2026-09-15, closing M6 and the product gate.
 
 ## Diagnostics and validation
 
@@ -201,6 +204,6 @@ final M6/`0.4` acceptance remain separate open gates.
   upstream adaptations on 2026-09-14 and approved the M2 classical
   specification on the same date. Joshua Myers approved the M3 classical
   comparison specification and the M4 classical categorical specification on
-  2026-09-14, and approved M5 K1–K4/MA1–MA4 on that date. M6 robust and Bayesian
-  methods require separate R1–R4/B1–B6/G6 and ADR-005/ADR-006 approvals under
-  this plan.
+  2026-09-14, and approved M5 K1–K4/MA1–MA4 on that date. Joshua Myers approved
+  M6 R1–R4/B1–B6/G6 and ADR-005/ADR-006, independently accepted M6A–M6C,
+  and approved the final combined M6/`0.4` candidate on 2026-09-15.

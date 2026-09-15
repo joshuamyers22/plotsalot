@@ -163,3 +163,11 @@
   meta performance/work grids, public documentation, and production evidence.
   Joshua Myers independently reviewed the candidate, accepted every disposition,
   and accepted M6C on 2026-09-15; combined M6/`0.4` acceptance remains open.
+- Passed the combined clean-tree M6/`0.4` technical release gate: 267 tests and
+  coverage, strict typing/lint, OSV/license audit, source/wheel build, oracle and
+  benchmark verification, seeded/RQMC replay, cross-track schema/composition
+  reconciliation, and isolated Python 3.12 plus minimum-supported Python 3.11
+  installed-wheel M6A/M6B/M6C smoke checks. No tag, release, or publication was
+  part of the technical gate itself.
+- Recorded Joshua Myers's final combined M6/`0.4` approval, closing M6 and the
+  `0.4` product gate. M7 compatibility closure and 1.0 hardening are next.

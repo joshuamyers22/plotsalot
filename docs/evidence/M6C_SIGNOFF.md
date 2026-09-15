@@ -2,8 +2,8 @@
 
 Joshua Myers approved the M6C statistical and numerical entry decisions without
 revision on 2026-09-15. After the three-pass technical candidate completed, he
-independently reviewed and accepted M6C on the same date. Combined M6/`0.4`
-acceptance remains open.
+independently reviewed and accepted M6C on the same date. He approved the
+combined M6/`0.4` candidate after its technical release gate passed.
 
 | Decision | Role | Approver | Decision/date | Status |
 |---|---|---|---|---|
@@ -18,7 +18,8 @@ acceptance remains open.
 | M6C technical release-candidate gates | Implementation owner | Codex | Three-pass technical gate complete, 2026-09-15 | Complete |
 | Independent adversarial review | Independent reviewer | Joshua Myers | Accepted, 2026-09-15 | Complete |
 | M6C release acceptance | Product/statistical owner | Joshua Myers | Accepted, 2026-09-15 | Complete |
-| Combined M6/`0.4` acceptance | Product/statistical owner | Pending | Not started | Blocking |
+| Combined M6/`0.4` technical release gate | Implementation owner | Codex | Passed, 2026-09-15 | Complete |
+| Combined M6/`0.4` acceptance | Product/statistical owner | Joshua Myers | Approved, 2026-09-15 | Complete |
 
 The approved decisions are specified in `../M6C_STATISTICAL_METHODS.md`, with
 entry evidence in `M6C_METHOD_AUDIT.md` and architecture boundaries in
@@ -26,5 +27,5 @@ entry evidence in `M6C_METHOD_AUDIT.md` and architecture boundaries in
 `../adr/ADR-006-bayesian-engine-architecture.md`.
 
 The first six approvals authorized implementation and fixture construction.
-The later independent-review and release-acceptance decisions close M6C only;
-they do not close combined M6 or approve `0.4`.
+The later independent-review and release-acceptance decisions closed M6C. The
+final combined approval recorded above closes M6 and the `0.4` product gate.

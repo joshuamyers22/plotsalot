@@ -11,8 +11,10 @@ R4/B5 M6C coefficient/meta method contract is approved; all three
 implementation passes have cleared their technical gates. Pass 2 uses a
 provisional, boundary-only calibration disposition that must be revisited in
 M7. Joshua Myers independently reviewed and accepted the M6C candidate on
-2026-09-15. The separate combined M6/`0.4` decision remains open, and the
-project remains pre-release and is not yet ready for production analytical use.
+2026-09-15. The combined technical release gate passed, and Joshua Myers
+approved the final M6/`0.4` candidate. M6 and the `0.4` product gate are
+complete. M7 compatibility closure and 1.0 hardening remain; the project is not
+yet ready for production analytical use.
 
 ## Development
 

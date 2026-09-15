@@ -6,6 +6,8 @@ records, the approved M4 categorical records, the implemented M5
 coefficient/meta-analysis family, and the complete three-pass M6C technical
 candidate for strict coefficient summaries, aggregate engines, and semantic
 rendering. Joshua Myers independently reviewed and accepted M6C on 2026-09-15.
+The combined clean-tree M6/`0.4` technical release gate passed on that date;
+Joshua Myers subsequently approved the final candidate.
 
 ## Data boundary
 

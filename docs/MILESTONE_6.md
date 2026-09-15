@@ -1,6 +1,6 @@
 # Milestone M6: Robust and Bayesian Methods
 
-- Status: M6A, M6B, and M6C accepted; combined M6/0.4 decision next
+- Status: Complete; combined M6/0.4 product gate accepted
 - Contract date: 2026-09-14
 - Target duration: 8–13 weeks
 - Product and statistical owner: Joshua Myers
@@ -136,8 +136,8 @@ function.
 | Performance and work baselines | Phase-separated robust and Bayesian grids with time, memory, draws/evaluations, and ceilings | All | M6A/M6B/M6C verified |
 | Compatibility disposition | Every touched `type`, tuning, prior, evidence, model, and meta argument classified and tested | All | M6A/M6B/M6C complete |
 | Public documentation | Supported modes, assumptions, priors, diagnostics, reproducibility, limits, errors, adaptations, and examples match implementation | All | M6A/M6B/M6C complete |
-| Production gate | Check, audit, build, isolated-wheel/core-import and Bayesian-extra smoke, oracle, benchmark, and reproducibility verification pass | All | M6A/M6B verified; M6C pass-3 gate complete |
-| Review and sign-off | Verification loops, adversarial findings, independent review, Joshua Myers track acceptance, and final M6/`0.4` approval | All | M6A accepted 2026-09-14; M6B/M6C accepted 2026-09-15; combined gate open |
+| Production gate | Check, audit, build, isolated-wheel/core-import and Bayesian-extra smoke, oracle, benchmark, and reproducibility verification pass | All | Combined clean-tree M6/0.4 gate passed 2026-09-15 |
+| Review and sign-off | Verification loops, adversarial findings, independent review, Joshua Myers track acceptance, and final M6/`0.4` approval | All | M6A accepted 2026-09-14; M6B/M6C and combined M6/0.4 accepted 2026-09-15 |
 
 ## Required statistical and architecture decisions
 
@@ -521,6 +521,8 @@ are never accepted and ignored.
 - `docs/evidence/M6C_ADVERSARIAL_REVIEW.md`;
 - `docs/evidence/M6C_VERIFICATION.md`;
 - `docs/evidence/M6C_SIGNOFF.md`;
+- `docs/evidence/M6_RELEASE_VERIFICATION.md`;
+- `docs/evidence/M6_SIGNOFF.md`;
 - robust/Bayesian result-schema revisions and stable typed error/warning codes;
 - raw and normalized pinned-R fixtures plus independent/calibration artifacts
   and the updated oracle manifest;
@@ -579,4 +581,6 @@ the two-sided rule. M7 must revisit that exception before 1.0. Pass 3 completed
 the shared semantic renderer, API/extraction/composition integration, retained
 benchmark, documentation, adversarial self-review, and production evidence.
 Joshua Myers independently reviewed and accepted M6C on 2026-09-15. The next
-gate is the separate combined M6/`0.4` review and acceptance decision.
+combined clean-tree production/reproducibility gate passed on that date. The
+final M6/`0.4` candidate was then approved by Joshua Myers. M6 and the `0.4`
+product gate are complete; M7 is next.

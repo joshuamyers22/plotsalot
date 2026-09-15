@@ -46,7 +46,12 @@ pass 3 now implements shared semantic rendering, API/extraction/composition,
 retained benchmarks, documentation, adversarial self-review, and production
 evidence. Joshua Myers independently reviewed and accepted the complete M6C
 candidate on 2026-09-15. The next project gate is the separate combined
-M6/`0.4` review and acceptance decision.
+M6/`0.4` review and acceptance decision. The combined clean-tree technical
+release gate now passes check, audit, build, isolated-wheel, oracle, benchmark,
+reproducibility, schema, compatibility, and cross-mode composition checks. The
+final M6/`0.4` candidate was approved by Joshua Myers on 2026-09-15. M6 and the
+`0.4` product gate are complete; M7 compatibility closure and 1.0 hardening are
+next.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months
 with two Python engineers and a part-time statistical-methods reviewer.
