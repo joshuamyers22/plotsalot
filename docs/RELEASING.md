@@ -6,12 +6,11 @@ checksums to a GitHub release, and then publishes that same wheel and source
 distribution to PyPI through OpenID Connect (OIDC). No long-lived PyPI token is
 used by the workflow.
 
-## One-time trusted-publisher setup
+## Trusted-publisher configuration
 
 The GitHub `pypi` environment is restricted to stable version tags and requires
-repository-owner approval. Because the PyPI project does not yet exist, sign in
-to [PyPI account publishing](https://pypi.org/manage/account/publishing/) and add
-a pending GitHub Actions publisher with exactly these values:
+repository-owner approval. The PyPI project trusts a GitHub Actions publisher
+with exactly these values:
 
 | Field | Value |
 |---|---|
@@ -21,11 +20,12 @@ a pending GitHub Actions publisher with exactly these values:
 | Workflow filename | `release.yml` |
 | Environment name | `pypi` |
 
-The pending publisher creates the PyPI project on its first successful upload.
-It does not reserve the project name beforehand. Do not add a PyPI API token to
-GitHub Actions secrets. A previously created token is unnecessary for this
-workflow and can be revoked after trusted publishing is confirmed, unless it is
-needed for a separate, documented purpose.
+The initial pending publisher created the project during the `0.1.1` upload and
+was converted to a normal publisher. Maintainers can review it in the
+[PyPI publishing settings](https://pypi.org/manage/project/plotsalot/settings/publishing/).
+Do not add a PyPI API token to GitHub Actions secrets. A manually created token
+is unnecessary for this workflow and should be revoked unless it serves a
+separate, documented purpose.
 
 ## Prepare a release
 

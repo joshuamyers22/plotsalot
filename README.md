@@ -13,8 +13,8 @@ validation of a statistical model or a substantive conclusion.
 
 ## Install
 
-Plotsalot supports Python 3.11 and newer on Linux and macOS. After the first PyPI
-release:
+Plotsalot supports Python 3.11 and newer on Linux and macOS. Install the current
+release from PyPI:
 
 ```sh
 python -m pip install plotsalot

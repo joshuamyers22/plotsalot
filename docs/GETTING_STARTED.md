@@ -6,7 +6,7 @@ and requires no network access.
 
 ## Install and import
 
-Plotsalot supports Python 3.11 and newer. After the first PyPI release:
+Plotsalot supports Python 3.11 and newer. Install the current release from PyPI:
 
 ```sh
 python -m pip install plotsalot

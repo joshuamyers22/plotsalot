@@ -25,8 +25,8 @@ provisional M6C conservative-coverage disposition for `k<20` or generating
 `tau=0`, finish every deferred compatibility classification required for 1.0,
 and establish the public API/schema stability boundary. The cleanup candidate is
 versioned `0.1.1` because `v0.1.0` already exists, and the owner approved that
-public release version on 2026-09-15. PyPI pending-publisher registration and
-publication remain separate delivery steps.
+public release version on 2026-09-15. Version `0.1.1` was published to PyPI
+through the protected GitHub trusted-publishing workflow on that date.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months
 with two Python engineers and a part-time statistical-methods reviewer.
