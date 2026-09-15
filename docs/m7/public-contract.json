@@ -1,11 +1,12 @@
 {
   "manifest_version": 1,
-  "status": "m7a_inventory",
+  "status": "m7a_pass2_technical_candidate",
   "generated_from": {
     "package": "src/plotsalot/__init__.py",
     "metadata": "pyproject.toml",
     "schemas": "schemas/*.json",
-    "cli_parsers": "src/plotsalot/*_cli.py and src/plotsalot/cli.py"
+    "cli_parsers": "src/plotsalot/*_cli.py and src/plotsalot/cli.py",
+    "compatibility_scope": "docs/m7/compatibility-disposition.json"
   },
   "distribution": {
     "name": "plotsalot",
@@ -14,6 +15,89 @@
   },
   "public_api": {
     "export_count": 144,
+    "one_x_candidate": "retain_all_current_root_exports",
+    "breaking_changes_from_0_1_1": [],
+    "category_counts": {
+      "analysis_container": 12,
+      "coded_exception": 1,
+      "plot_contract": 5,
+      "result_component": 27,
+      "result_protocol": 1,
+      "selected_data": 9,
+      "selector_function": 7,
+      "serialized_result": 25,
+      "shared_analysis_function": 1,
+      "upstream_workflow_surface": 56
+    },
+    "categories": {
+      "upstream_workflow_surface": {
+        "reason": "Approved Python surface for one of the 22 pinned upstream exports.",
+        "documentation": [
+          "docs/compatibility.md",
+          "docs/USER_GUIDE.md",
+          "docs/CONTRACTS.md"
+        ]
+      },
+      "shared_analysis_function": {
+        "reason": "Shared explicit analysis entry point used by supported renderers.",
+        "documentation": [
+          "docs/CONTRACTS.md",
+          "docs/M4_STATISTICAL_METHODS.md"
+        ]
+      },
+      "selector_function": {
+        "reason": "Owned validation and data-selection boundary for public workflows.",
+        "documentation": [
+          "docs/CONTRACTS.md"
+        ]
+      },
+      "serialized_result": {
+        "reason": "Top-level typed result with a versioned JSON-safe representation.",
+        "documentation": [
+          "docs/CONTRACTS.md",
+          "schemas/"
+        ]
+      },
+      "result_component": {
+        "reason": "Typed field record exposed by a supported public result contract.",
+        "documentation": [
+          "docs/CONTRACTS.md",
+          "docs/README.md"
+        ]
+      },
+      "analysis_container": {
+        "reason": "Typed analysis/render handoff preserving exact data-result identity.",
+        "documentation": [
+          "docs/CONTRACTS.md"
+        ]
+      },
+      "selected_data": {
+        "reason": "Typed owned data boundary returned by a public selector or analysis.",
+        "documentation": [
+          "docs/CONTRACTS.md"
+        ]
+      },
+      "plot_contract": {
+        "reason": "Typed figure, annotations, or local-theme contract for rendering.",
+        "documentation": [
+          "docs/CONTRACTS.md",
+          "docs/USER_GUIDE.md"
+        ]
+      },
+      "result_protocol": {
+        "reason": "Minimum public structural protocol accepted by plot containers.",
+        "documentation": [
+          "docs/CONTRACTS.md"
+        ]
+      },
+      "coded_exception": {
+        "reason": "Public exception with machine-readable failure codes.",
+        "documentation": [
+          "docs/API_STABILITY.md",
+          "docs/M6C_STATISTICAL_METHODS.md"
+        ]
+      }
+    },
     "symbols": [
       {
         "name": "AnalysisResult",
@@ -31,7 +115,9 @@
           "effect_size",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "BayesianCategoricalResult",
@@ -65,7 +151,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "BayesianComparisonResult",
@@ -92,7 +180,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "BayesianCorrelationMatrixResult",
@@ -113,7 +203,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "BayesianCorrelationResult",
@@ -136,7 +228,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "BayesianDotPlotResult",
@@ -157,7 +251,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "BayesianEvidenceResult",
@@ -173,7 +269,9 @@
           "prior_model_odds",
           "sensitivity"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "BayesianMetaAnalysis",
@@ -184,7 +282,9 @@
           "table",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "BayesianMetaEvidenceResult",
@@ -198,7 +298,9 @@
           "display",
           "prior_model_odds"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "BayesianMetaFitResult",
@@ -215,7 +317,9 @@
           "evidence",
           "quadrature"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "BayesianMetaPriorResult",
@@ -234,7 +338,9 @@
           "prior_predictive_effect_standard_deviation",
           "proper"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "BayesianMetaQuadratureResult",
@@ -259,7 +365,9 @@
           "scipy_version",
           "converged"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "BayesianMetaResult",
@@ -294,7 +402,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "BayesianMetaStudyResult",
@@ -307,7 +417,9 @@
           "standard_error",
           "sampling_interval"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "BayesianOneSampleResult",
@@ -329,7 +441,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "BayesianPosteriorSummary",
@@ -345,7 +459,9 @@
           "probability_below_null",
           "probability_at_null"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "CategoricalAnalysis",
@@ -356,7 +472,9 @@
           "table",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "CategoricalResult",
@@ -390,7 +508,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "CategoricalSampleAudit",
@@ -405,7 +525,9 @@
           "dropped_null_y_rows",
           "dropped_null_count_rows"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "CategoricalTable",
@@ -421,7 +543,9 @@
           "observed",
           "audit"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "selected_data"
       },
       {
         "name": "CoefficientAnalysis",
@@ -432,7 +556,9 @@
           "table",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "CoefficientResult",
@@ -460,7 +586,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "CoefficientTable",
@@ -481,7 +609,9 @@
           "dfs",
           "p_values"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "selected_data"
       },
       {
         "name": "CoefficientTableResult",
@@ -514,7 +644,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "ComparisonAnalysis",
@@ -525,7 +657,9 @@
           "sample",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "ComparisonResult",
@@ -553,7 +687,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "ComparisonSample",
@@ -567,7 +703,9 @@
           "values",
           "audit"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "selected_data"
       },
       {
         "name": "ComposedStatsPlot",
@@ -580,7 +718,9 @@
           "result",
           "annotations"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "plot_contract"
       },
       {
         "name": "CompositionResult",
@@ -600,7 +740,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "CorrelationAnalysis",
@@ -611,7 +753,9 @@
           "sample",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "CorrelationMatrixAnalysis",
@@ -621,7 +765,9 @@
         "dataclass_fields": [
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "CorrelationMatrixResult",
@@ -638,7 +784,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "CorrelationResult",
@@ -657,7 +805,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "DotPlotAnalysis",
@@ -668,7 +818,9 @@
           "sample",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "DotPlotResult",
@@ -686,7 +838,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "GroupedAnalysis",
@@ -697,7 +851,9 @@
           "groups",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "GroupedResult",
@@ -720,7 +876,9 @@
           "calculated_bayesian_work",
           "maximum_bayesian_work"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "GroupedStatsPlot",
@@ -732,7 +890,9 @@
           "result",
           "annotations"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "plot_contract"
       },
       {
         "name": "HistogramAnalysis",
@@ -743,14 +903,18 @@
           "sample",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "M6CMetaError",
         "kind": "exception",
         "defined_in": "plotsalot.coefficient_meta_analysis",
         "signature": "(code: 'str', message: 'str') -> 'None'",
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "coded_exception"
       },
       {
         "name": "M6CMetaResourceLimits",
@@ -765,7 +929,9 @@
           "hard_maximum_work",
           "maximum_serialized_fields"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "M6CWorkResult",
@@ -778,7 +944,9 @@
           "maximum_work",
           "work_unit"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "MetaAnalysisResult",
@@ -799,7 +967,9 @@
           "heterogeneity",
           "convergence"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "MetaStudyIdentityResult",
@@ -811,7 +981,9 @@
           "source_position",
           "display_position"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "NumericSample",
@@ -823,7 +995,9 @@
           "values",
           "audit"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "selected_data"
       },
       {
         "name": "PairedNumericSample",
@@ -837,7 +1011,9 @@
           "y_values",
           "audit"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "selected_data"
       },
       {
         "name": "PairwiseComparisonResult",
@@ -855,7 +1031,9 @@
           "adjusted_p_value",
           "significant"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "PlotAnnotations",
@@ -867,7 +1045,9 @@
           "subtitle",
           "caption"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "plot_contract"
       },
       {
         "name": "PosteriorCoefficientProvenanceResult",
@@ -881,7 +1061,9 @@
           "computation_method",
           "source"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "PosteriorCoefficientSummaryResult",
@@ -896,7 +1078,9 @@
           "probability_below_null",
           "probability_at_null"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "PosteriorCoefficientSummaryTable",
@@ -916,7 +1100,9 @@
           "is_intercepts",
           "profile"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "selected_data"
       },
       {
         "name": "PosteriorCoefficientTableResult",
@@ -952,7 +1138,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "PosteriorCoefficientTermResult",
@@ -966,7 +1154,9 @@
           "display_position",
           "summary"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "RepeatedSample",
@@ -982,7 +1172,9 @@
           "values",
           "audit"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "selected_data"
       },
       {
         "name": "RepeatedSampleAudit",
@@ -998,7 +1190,9 @@
           "excluded_incomplete_rows",
           "excluded_incomplete_subjects"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "ReportedCoefficientAnalysis",
@@ -1009,7 +1203,9 @@
           "table",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "ResamplingResult",
@@ -1031,7 +1227,9 @@
           "hard_maximum_resample_work",
           "batch_index_limit"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "ResourceLimits",
@@ -1051,7 +1249,9 @@
           "maximum_cells",
           "maximum_total_count"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "RobustCoefficientProvenanceResult",
@@ -1064,7 +1264,9 @@
           "interval_method",
           "source"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "RobustCoefficientSummaryTable",
@@ -1081,7 +1283,9 @@
           "is_intercepts",
           "profile"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "selected_data"
       },
       {
         "name": "RobustCoefficientTableResult",
@@ -1117,7 +1321,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "RobustCoefficientTermResult",
@@ -1132,7 +1338,9 @@
           "estimate",
           "interval"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "RobustComparisonResult",
@@ -1162,7 +1370,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "RobustCorrelationMatrixResult",
@@ -1183,7 +1393,9 @@
           "calculated_resample_work",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "RobustCorrelationResult",
@@ -1208,7 +1420,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "RobustDotPlotResult",
@@ -1228,7 +1442,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "RobustMetaAnalysis",
@@ -1239,7 +1455,9 @@
           "table",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "RobustMetaAnalysisResult",
@@ -1257,7 +1475,9 @@
           "pooled",
           "convergence"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "RobustMetaConvergenceResult",
@@ -1281,7 +1501,9 @@
           "profile_evaluations",
           "converged"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "RobustMetaPooledResult",
@@ -1300,7 +1522,9 @@
           "heterogeneity_absence_reason",
           "prediction_absence_reason"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "RobustMetaResult",
@@ -1329,7 +1553,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "RobustMetaStartResult",
@@ -1347,7 +1573,9 @@
           "score_norm",
           "boundary"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "RobustMetaStudyResult",
@@ -1365,7 +1593,9 @@
           "normalized_share",
           "weighted_contribution"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "RobustOneSampleResult",
@@ -1386,7 +1616,9 @@
           "limits",
           "warnings"
         ],
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "serialized_result"
       },
       {
         "name": "StatsPlot",
@@ -1399,7 +1631,9 @@
           "result",
           "annotations"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "plot_contract"
       },
       {
         "name": "StatsTheme",
@@ -1416,14 +1650,18 @@
           "title_size",
           "label_size"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "plot_contract"
       },
       {
         "name": "StructuredResult",
         "kind": "protocol",
         "defined_in": "plotsalot.result",
         "signature": "(*args, **kwargs)",
-        "has_to_dict": true
+        "has_to_dict": true,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_protocol"
       },
       {
         "name": "StudyEffectTable",
@@ -1435,7 +1673,9 @@
           "estimates",
           "standard_errors"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "selected_data"
       },
       {
         "name": "TableCoefficientAnalysis",
@@ -1446,7 +1686,9 @@
           "table",
           "result"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "analysis_container"
       },
       {
         "name": "TrimmedKernelResult",
@@ -1464,391 +1706,521 @@
           "winsorized_variance",
           "q"
         ],
-        "has_to_dict": false
+        "has_to_dict": false,
+        "one_x_disposition": "stabilize",
+        "contract_category": "result_component"
       },
       {
         "name": "analyze_categorical",
         "kind": "function",
         "defined_in": "plotsalot.categorical_analysis",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'CategoricalAnalysis'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'CategoricalAnalysis'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "shared_analysis_function"
       },
       {
         "name": "analyze_ggbarstats",
         "kind": "function",
         "defined_in": "plotsalot.categorical_analysis",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'CategoricalAnalysis'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'CategoricalAnalysis'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_ggbetweenstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison_analysis",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'ComparisonAnalysis'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'ComparisonAnalysis'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_ggcoefstats",
         "kind": "function",
         "defined_in": "plotsalot.coefficient_analysis",
-        "signature": "(data: 'object', *, meta_analytic_effect: 'bool' = False, type: \"Literal['parametric', 'robust', 'bayes']\" = 'parametric', estimate_label: 'str' = '', estimand: 'str' = '', effect_scale: 'str' = '', effect_direction: 'str' = '', effect_units: 'str' = '', dependence: 'str' = 'independent', null_value: 'float' = 0.0, conf_level: 'float' = 0.95, credible_level: 'float' = 0.95, alpha: 'float' = 0.05, stats_labels: 'bool' = True, only_significant: 'bool' = False, exclude_intercept: 'bool' = False, sort: 'str' = 'none', maximum_coefficients: 'int' = 500, maximum_studies: 'int' = 500, maximum_rendered_points: 'int' = 500, maximum_labels: 'int' = 200, robust_method: 'str' = '', robust_tuning: 'str' = '', interval_method: 'str' = '', posterior_model: 'str' = '', likelihood: 'str' = '', prior_description: 'str' = '', computation_method: 'str' = '', prior_mean_scale: 'float | None' = None, prior_tau_scale: 'float | None' = None, maximum_work: 'int' = 100000000) -> 'CoefficientAnalysis | TableCoefficientAnalysis | ReportedCoefficientAnalysis | RobustMetaAnalysis | BayesianMetaAnalysis'"
+        "signature": "(data: 'object', *, meta_analytic_effect: 'bool' = False, type: \"Literal['parametric', 'robust', 'bayes']\" = 'parametric', estimate_label: 'str' = '', estimand: 'str' = '', effect_scale: 'str' = '', effect_direction: 'str' = '', effect_units: 'str' = '', dependence: 'str' = 'independent', null_value: 'float' = 0.0, conf_level: 'float' = 0.95, credible_level: 'float' = 0.95, alpha: 'float' = 0.05, stats_labels: 'bool' = True, only_significant: 'bool' = False, exclude_intercept: 'bool' = False, sort: 'str' = 'none', maximum_coefficients: 'int' = 500, maximum_studies: 'int' = 500, maximum_rendered_points: 'int' = 500, maximum_labels: 'int' = 200, robust_method: 'str' = '', robust_tuning: 'str' = '', interval_method: 'str' = '', posterior_model: 'str' = '', likelihood: 'str' = '', prior_description: 'str' = '', computation_method: 'str' = '', prior_mean_scale: 'float | None' = None, prior_tau_scale: 'float | None' = None, maximum_work: 'int' = 100000000) -> 'CoefficientAnalysis | TableCoefficientAnalysis | ReportedCoefficientAnalysis | RobustMetaAnalysis | BayesianMetaAnalysis'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_ggcorrmat",
         "kind": "function",
         "defined_in": "plotsalot.correlation_analysis",
-        "signature": "(data: 'object', columns: 'object', *, conf_level: 'float' = 0.95, sig_level: 'float' = 0.05, p_adjust: 'str' = 'holm', maximum_rows: 'int' = 1000000, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'CorrelationMatrixAnalysis'"
+        "signature": "(data: 'object', columns: 'object', *, conf_level: 'float' = 0.95, sig_level: 'float' = 0.05, p_adjust: 'str' = 'holm', maximum_rows: 'int' = 1000000, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'CorrelationMatrixAnalysis'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_ggdotplotstats",
         "kind": "function",
         "defined_in": "plotsalot.dotplot_analysis",
-        "signature": "(data: 'object', x: 'str', y: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, maximum_rows: 'int' = 1000000, maximum_labels: 'int' = 200) -> 'DotPlotAnalysis'"
+        "signature": "(data: 'object', x: 'str', y: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, maximum_rows: 'int' = 1000000, maximum_labels: 'int' = 200) -> 'DotPlotAnalysis'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_gghistostats",
         "kind": "function",
         "defined_in": "plotsalot.histogram_analysis",
-        "signature": "(data: 'pl.DataFrame', x: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, maximum_rows: 'int' = 1000000) -> 'HistogramAnalysis'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, maximum_rows: 'int' = 1000000) -> 'HistogramAnalysis'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_ggpiestats",
         "kind": "function",
         "defined_in": "plotsalot.categorical_analysis",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'CategoricalAnalysis'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'CategoricalAnalysis'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_ggscatterstats",
         "kind": "function",
         "defined_in": "plotsalot.correlation_analysis",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'CorrelationAnalysis'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'CorrelationAnalysis'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_ggwithinstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison_analysis",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, subject_id: 'str', type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, maximum_subject_paths: 'int' = 10000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'ComparisonAnalysis'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, subject_id: 'str', type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, maximum_subject_paths: 'int' = 10000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'ComparisonAnalysis'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_grouped_ggbarstats",
         "kind": "function",
         "defined_in": "plotsalot.categorical_grouped",
-        "signature": "(data: 'object', x: 'str', group: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[CategoricalAnalysis]'"
+        "signature": "(data: 'object', x: 'str', group: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[CategoricalAnalysis]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_grouped_ggbetweenstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison_grouped",
-        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[ComparisonAnalysis]'"
+        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[ComparisonAnalysis]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_grouped_ggcorrmat",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(data: 'object', columns: 'list[str] | tuple[str, ...]', group: 'str', *, conf_level: 'float' = 0.95, sig_level: 'float' = 0.05, p_adjust: 'str' = 'holm', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[CorrelationMatrixAnalysis]'"
+        "signature": "(data: 'object', columns: 'list[str] | tuple[str, ...]', group: 'str', *, conf_level: 'float' = 0.95, sig_level: 'float' = 0.05, p_adjust: 'str' = 'holm', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[CorrelationMatrixAnalysis]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_grouped_ggdotplotstats",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_labels: 'int' = 200, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[DotPlotAnalysis]'"
+        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_labels: 'int' = 200, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[DotPlotAnalysis]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_grouped_gghistostats",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(data: 'object', x: 'str', group: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[HistogramAnalysis]'"
+        "signature": "(data: 'object', x: 'str', group: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[HistogramAnalysis]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_grouped_ggpiestats",
         "kind": "function",
         "defined_in": "plotsalot.categorical_grouped",
-        "signature": "(data: 'object', x: 'str', group: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[CategoricalAnalysis]'"
+        "signature": "(data: 'object', x: 'str', group: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[CategoricalAnalysis]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_grouped_ggscatterstats",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[CorrelationAnalysis]'"
+        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[CorrelationAnalysis]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "analyze_grouped_ggwithinstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison_grouped",
-        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, subject_id: 'str', type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, maximum_subject_paths: 'int' = 10000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[ComparisonAnalysis]'"
+        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, subject_id: 'str', type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, maximum_subject_paths: 'int' = 10000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000) -> 'GroupedAnalysis[ComparisonAnalysis]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "combine_plots",
         "kind": "function",
         "defined_in": "plotsalot.composition",
-        "signature": "(plotlist: 'Sequence[object]', *, rows: 'int | None' = None, columns: 'int | None' = None, guides: 'str' = 'keep', title: 'str' = 'Combined plots', subtitle: 'str' = '', caption: 'str' = '', x_label: 'str | None' = None, y_label: 'str | None' = None, panel_tags: 'str | None' = None, maximum_panels: 'int' = 20) -> 'ComposedStatsPlot'"
+        "signature": "(plotlist: 'Sequence[object]', *, rows: 'int | None' = None, columns: 'int | None' = None, guides: 'str' = 'keep', title: 'str' = 'Combined plots', subtitle: 'str' = '', caption: 'str' = '', x_label: 'str | None' = None, y_label: 'str | None' = None, panel_tags: 'str | None' = None, maximum_panels: 'int' = 20) -> 'ComposedStatsPlot'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "extract_caption",
         "kind": "function",
         "defined_in": "plotsalot.plot",
-        "signature": "(plot: 'PlotResultContainer[StructuredResult]') -> 'str'"
+        "signature": "(plot: 'PlotResultContainer[StructuredResult]') -> 'str'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "extract_stats",
         "kind": "function",
         "defined_in": "plotsalot.plot",
-        "signature": "(plot: 'PlotResultContainer[ResultT]') -> 'ResultT'"
+        "signature": "(plot: 'PlotResultContainer[ResultT]') -> 'ResultT'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "extract_subtitle",
         "kind": "function",
         "defined_in": "plotsalot.plot",
-        "signature": "(plot: 'PlotResultContainer[StructuredResult]') -> 'str'"
+        "signature": "(plot: 'PlotResultContainer[StructuredResult]') -> 'str'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "ggbarstats",
         "kind": "function",
         "defined_in": "plotsalot.categorical",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, label: 'str' = 'percentage', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[CategoricalResult]'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, label: 'str' = 'percentage', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[CategoricalResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "ggbetweenstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[ComparisonResult]'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[ComparisonResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "ggcoefstats",
         "kind": "function",
         "defined_in": "plotsalot.coefficient",
-        "signature": "(data: 'object', *, meta_analytic_effect: 'bool' = False, type: \"Literal['parametric', 'robust', 'bayes']\" = 'parametric', estimate_label: 'str' = '', estimand: 'str' = '', effect_scale: 'str' = '', effect_direction: 'str' = '', effect_units: 'str' = '', dependence: 'str' = 'independent', null_value: 'float' = 0.0, conf_level: 'float' = 0.95, credible_level: 'float' = 0.95, alpha: 'float' = 0.05, stats_labels: 'bool' = True, only_significant: 'bool' = False, exclude_intercept: 'bool' = False, sort: 'str' = 'none', maximum_coefficients: 'int' = 500, maximum_studies: 'int' = 500, maximum_rendered_points: 'int' = 500, maximum_labels: 'int' = 200, robust_method: 'str' = '', robust_tuning: 'str' = '', interval_method: 'str' = '', posterior_model: 'str' = '', likelihood: 'str' = '', prior_description: 'str' = '', computation_method: 'str' = '', prior_mean_scale: 'float | None' = None, prior_tau_scale: 'float | None' = None, maximum_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, show_intervals: 'bool' = True, show_prediction: 'bool' = True, x_label: 'str | None' = None, point_color: 'str' = '#4c78a8', pooled_color: 'str' = '#e45756', theme: 'StatsTheme | None' = None) -> 'StatsPlot[CoefficientResult] | StatsPlot[CoefficientTableResult] | StatsPlot[RobustCoefficientTableResult | PosteriorCoefficientTableResult] | StatsPlot[RobustMetaResult] | StatsPlot[BayesianMetaResult]'"
+        "signature": "(data: 'object', *, meta_analytic_effect: 'bool' = False, type: \"Literal['parametric', 'robust', 'bayes']\" = 'parametric', estimate_label: 'str' = '', estimand: 'str' = '', effect_scale: 'str' = '', effect_direction: 'str' = '', effect_units: 'str' = '', dependence: 'str' = 'independent', null_value: 'float' = 0.0, conf_level: 'float' = 0.95, credible_level: 'float' = 0.95, alpha: 'float' = 0.05, stats_labels: 'bool' = True, only_significant: 'bool' = False, exclude_intercept: 'bool' = False, sort: 'str' = 'none', maximum_coefficients: 'int' = 500, maximum_studies: 'int' = 500, maximum_rendered_points: 'int' = 500, maximum_labels: 'int' = 200, robust_method: 'str' = '', robust_tuning: 'str' = '', interval_method: 'str' = '', posterior_model: 'str' = '', likelihood: 'str' = '', prior_description: 'str' = '', computation_method: 'str' = '', prior_mean_scale: 'float | None' = None, prior_tau_scale: 'float | None' = None, maximum_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, show_intervals: 'bool' = True, show_prediction: 'bool' = True, x_label: 'str | None' = None, point_color: 'str' = '#4c78a8', pooled_color: 'str' = '#e45756', theme: 'StatsTheme | None' = None) -> 'StatsPlot[CoefficientResult] | StatsPlot[CoefficientTableResult] | StatsPlot[RobustCoefficientTableResult | PosteriorCoefficientTableResult] | StatsPlot[RobustMetaResult] | StatsPlot[BayesianMetaResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "ggcorrmat",
         "kind": "function",
         "defined_in": "plotsalot.correlation",
-        "signature": "(data: 'pl.DataFrame', columns: 'list[str] | tuple[str, ...]', *, conf_level: 'float' = 0.95, sig_level: 'float' = 0.05, p_adjust: 'str' = 'holm', maximum_rows: 'int' = 1000000, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None) -> 'StatsPlot[CorrelationMatrixResult]'"
+        "signature": "(data: 'pl.DataFrame', columns: 'list[str] | tuple[str, ...]', *, conf_level: 'float' = 0.95, sig_level: 'float' = 0.05, p_adjust: 'str' = 'holm', maximum_rows: 'int' = 1000000, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None) -> 'StatsPlot[CorrelationMatrixResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "ggdotplotstats",
         "kind": "function",
         "defined_in": "plotsalot.dotplot",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, maximum_rows: 'int' = 1000000, maximum_labels: 'int' = 200, title: 'str | None' = None, show_intervals: 'bool' = True) -> 'StatsPlot[DotPlotResult]'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, maximum_rows: 'int' = 1000000, maximum_labels: 'int' = 200, title: 'str | None' = None, show_intervals: 'bool' = True) -> 'StatsPlot[DotPlotResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "gghistostats",
         "kind": "function",
         "defined_in": "plotsalot.histogram",
-        "signature": "(data: 'pl.DataFrame', x: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, maximum_rows: 'int' = 1000000, binwidth: 'float | None' = None, title: 'str | None' = None) -> 'StatsPlot[AnalysisResult]'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, maximum_rows: 'int' = 1000000, binwidth: 'float | None' = None, title: 'str | None' = None) -> 'StatsPlot[AnalysisResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "ggpiestats",
         "kind": "function",
         "defined_in": "plotsalot.categorical",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, label: 'str' = 'percentage', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[CategoricalResult]'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, label: 'str' = 'percentage', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[CategoricalResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "ggscatterstats",
         "kind": "function",
         "defined_in": "plotsalot.correlation",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None) -> 'StatsPlot[CorrelationResult]'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None) -> 'StatsPlot[CorrelationResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "ggwithinstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison",
-        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, subject_id: 'str', type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, maximum_subject_paths: 'int' = 10000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, show_subject_paths: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[ComparisonResult]'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', y: 'str', *, subject_id: 'str', type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, maximum_subject_paths: 'int' = 10000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, show_subject_paths: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[ComparisonResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "grouped_ggbarstats",
         "kind": "function",
         "defined_in": "plotsalot.categorical_grouped",
-        "signature": "(data: 'pl.DataFrame', x: 'str', group: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, label: 'str' = 'percentage', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[CategoricalResult]'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', group: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, label: 'str' = 'percentage', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[CategoricalResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "grouped_ggbetweenstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison_grouped",
-        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[ComparisonResult]'"
+        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[ComparisonResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "grouped_ggcorrmat",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(data: 'object', columns: 'list[str] | tuple[str, ...]', group: 'str', *, conf_level: 'float' = 0.95, sig_level: 'float' = 0.05, p_adjust: 'str' = 'holm', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None) -> 'GroupedStatsPlot[CorrelationMatrixResult]'"
+        "signature": "(data: 'object', columns: 'list[str] | tuple[str, ...]', group: 'str', *, conf_level: 'float' = 0.95, sig_level: 'float' = 0.05, p_adjust: 'str' = 'holm', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None) -> 'GroupedStatsPlot[CorrelationMatrixResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "grouped_ggdotplotstats",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_labels: 'int' = 200, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, show_intervals: 'bool' = True, title: 'str | None' = None) -> 'GroupedStatsPlot[DotPlotResult]'"
+        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_labels: 'int' = 200, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, show_intervals: 'bool' = True, title: 'str | None' = None) -> 'GroupedStatsPlot[DotPlotResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "grouped_gghistostats",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(data: 'object', x: 'str', group: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, binwidth: 'float | None' = None, title: 'str | None' = None) -> 'GroupedStatsPlot[AnalysisResult]'"
+        "signature": "(data: 'object', x: 'str', group: 'str', *, test_value: 'float' = 0.0, alternative: 'Alternative' = 'two-sided', conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, binwidth: 'float | None' = None, title: 'str | None' = None) -> 'GroupedStatsPlot[AnalysisResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "grouped_ggpiestats",
         "kind": "function",
         "defined_in": "plotsalot.categorical_grouped",
-        "signature": "(data: 'pl.DataFrame', x: 'str', group: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, label: 'str' = 'percentage', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[CategoricalResult]'"
+        "signature": "(data: 'pl.DataFrame', x: 'str', group: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, type: 'str' = 'parametric', paired: 'bool' = False, ratio: 'Mapping[ScalarIdentity, float] | None' = None, alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', proportion_test: 'bool' = True, label: 'str' = 'percentage', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000, maximum_labels: 'int' = 400, prior_cell_concentration: 'float' = 1.0, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[CategoricalResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "grouped_ggscatterstats",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None) -> 'GroupedStatsPlot[CorrelationResult]'"
+        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, conf_level: 'float' = 0.95, maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, type: 'str' = 'parametric', trim_fraction: 'float' = 0.2, bootstrap_resamples: 'int' = 1999, random_seed: 'int | None' = None, maximum_resample_work: 'int' = 100000000, correlation_prior_shape: 'float' = 1.0, credible_level: 'float' = 0.95, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None) -> 'GroupedStatsPlot[CorrelationResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "grouped_ggwithinstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison_grouped",
-        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, subject_id: 'str', type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, maximum_subject_paths: 'int' = 10000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, show_subject_paths: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[ComparisonResult]'"
+        "signature": "(data: 'object', x: 'str', y: 'str', group: 'str', *, subject_id: 'str', type: 'str' = 'parametric', alternative: 'str' = 'two-sided', conf_level: 'float' = 0.95, p_adjust: 'str' = 'holm', pairwise_alpha: 'float' = 0.05, pairwise_display: 'str' = 'significant', maximum_rows: 'int' = 1000000, maximum_groups: 'int' = 20, maximum_levels: 'int' = 20, maximum_rendered_observations: 'int' = 1000000, maximum_subject_paths: 'int' = 10000, trim_fraction: 'float' = 0.2, prior_location: 'float | None' = None, prior_scale: 'float | None' = None, credible_level: 'float' = 0.95, random_seed: 'int | None' = None, maximum_bayesian_work: 'int' = 100000000, title: 'str | None' = None, results_subtitle: 'bool' = True, show_subject_paths: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[ComparisonResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_ggbarstats",
         "kind": "function",
         "defined_in": "plotsalot.categorical",
-        "signature": "(analysis: 'CategoricalAnalysis', *, label: 'str' = 'percentage', title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None, color_domain: 'tuple[ScalarIdentity, ...] | None' = None) -> 'StatsPlot[CategoricalResult]'"
+        "signature": "(analysis: 'CategoricalAnalysis', *, label: 'str' = 'percentage', title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None, color_domain: 'tuple[ScalarIdentity, ...] | None' = None) -> 'StatsPlot[CategoricalResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_ggbetweenstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison",
-        "signature": "(analysis: 'ComparisonAnalysis', *, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[ComparisonResult]'"
+        "signature": "(analysis: 'ComparisonAnalysis', *, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[ComparisonResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_ggcoefstats",
         "kind": "function",
         "defined_in": "plotsalot.coefficient",
-        "signature": "(analysis: 'CoefficientAnalysis | TableCoefficientAnalysis | ReportedCoefficientAnalysis | RobustMetaAnalysis | BayesianMetaAnalysis', *, title: 'str | None' = None, results_subtitle: 'bool' = True, show_intervals: 'bool' = True, show_prediction: 'bool' = True, x_label: 'str | None' = None, point_color: 'str' = '#4c78a8', pooled_color: 'str' = '#e45756', theme: 'StatsTheme | None' = None) -> 'StatsPlot[CoefficientResult] | StatsPlot[CoefficientTableResult] | StatsPlot[RobustCoefficientTableResult | PosteriorCoefficientTableResult] | StatsPlot[RobustMetaResult] | StatsPlot[BayesianMetaResult]'"
+        "signature": "(analysis: 'CoefficientAnalysis | TableCoefficientAnalysis | ReportedCoefficientAnalysis | RobustMetaAnalysis | BayesianMetaAnalysis', *, title: 'str | None' = None, results_subtitle: 'bool' = True, show_intervals: 'bool' = True, show_prediction: 'bool' = True, x_label: 'str | None' = None, point_color: 'str' = '#4c78a8', pooled_color: 'str' = '#e45756', theme: 'StatsTheme | None' = None) -> 'StatsPlot[CoefficientResult] | StatsPlot[CoefficientTableResult] | StatsPlot[RobustCoefficientTableResult | PosteriorCoefficientTableResult] | StatsPlot[RobustMetaResult] | StatsPlot[BayesianMetaResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_ggcorrmat",
         "kind": "function",
         "defined_in": "plotsalot.correlation",
-        "signature": "(analysis: 'CorrelationMatrixAnalysis', *, title: 'str | None' = None) -> 'StatsPlot[CorrelationMatrixResult]'"
+        "signature": "(analysis: 'CorrelationMatrixAnalysis', *, title: 'str | None' = None) -> 'StatsPlot[CorrelationMatrixResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_ggdotplotstats",
         "kind": "function",
         "defined_in": "plotsalot.dotplot",
-        "signature": "(analysis: 'DotPlotAnalysis', *, title: 'str | None' = None, show_intervals: 'bool' = True) -> 'StatsPlot[DotPlotResult]'"
+        "signature": "(analysis: 'DotPlotAnalysis', *, title: 'str | None' = None, show_intervals: 'bool' = True) -> 'StatsPlot[DotPlotResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_gghistostats",
         "kind": "function",
         "defined_in": "plotsalot.histogram",
-        "signature": "(analysis: 'HistogramAnalysis', *, binwidth: 'float | None' = None, title: 'str | None' = None) -> 'StatsPlot[AnalysisResult]'"
+        "signature": "(analysis: 'HistogramAnalysis', *, binwidth: 'float | None' = None, title: 'str | None' = None) -> 'StatsPlot[AnalysisResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_ggpiestats",
         "kind": "function",
         "defined_in": "plotsalot.categorical",
-        "signature": "(analysis: 'CategoricalAnalysis', *, label: 'str' = 'percentage', title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None, color_domain: 'tuple[ScalarIdentity, ...] | None' = None) -> 'StatsPlot[CategoricalResult]'"
+        "signature": "(analysis: 'CategoricalAnalysis', *, label: 'str' = 'percentage', title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None, color_domain: 'tuple[ScalarIdentity, ...] | None' = None) -> 'StatsPlot[CategoricalResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_ggscatterstats",
         "kind": "function",
         "defined_in": "plotsalot.correlation",
-        "signature": "(analysis: 'CorrelationAnalysis', *, title: 'str | None' = None) -> 'StatsPlot[CorrelationResult]'"
+        "signature": "(analysis: 'CorrelationAnalysis', *, title: 'str | None' = None) -> 'StatsPlot[CorrelationResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_ggwithinstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison",
-        "signature": "(analysis: 'ComparisonAnalysis', *, title: 'str | None' = None, results_subtitle: 'bool' = True, show_subject_paths: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[ComparisonResult]'"
+        "signature": "(analysis: 'ComparisonAnalysis', *, title: 'str | None' = None, results_subtitle: 'bool' = True, show_subject_paths: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'StatsPlot[ComparisonResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_grouped_ggbarstats",
         "kind": "function",
         "defined_in": "plotsalot.categorical_grouped",
-        "signature": "(analysis: 'GroupedAnalysis[CategoricalAnalysis]', *, label: 'str' = 'percentage', title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[CategoricalResult]'"
+        "signature": "(analysis: 'GroupedAnalysis[CategoricalAnalysis]', *, label: 'str' = 'percentage', title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[CategoricalResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_grouped_ggbetweenstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison_grouped",
-        "signature": "(analysis: 'GroupedAnalysis[ComparisonAnalysis]', *, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[ComparisonResult]'"
+        "signature": "(analysis: 'GroupedAnalysis[ComparisonAnalysis]', *, title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[ComparisonResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_grouped_ggcorrmat",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(analysis: 'GroupedAnalysis[CorrelationMatrixAnalysis]', *, title: 'str | None' = None) -> 'GroupedStatsPlot[CorrelationMatrixResult]'"
+        "signature": "(analysis: 'GroupedAnalysis[CorrelationMatrixAnalysis]', *, title: 'str | None' = None) -> 'GroupedStatsPlot[CorrelationMatrixResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_grouped_ggdotplotstats",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(analysis: 'GroupedAnalysis[DotPlotAnalysis]', *, show_intervals: 'bool' = True, title: 'str | None' = None) -> 'GroupedStatsPlot[DotPlotResult]'"
+        "signature": "(analysis: 'GroupedAnalysis[DotPlotAnalysis]', *, show_intervals: 'bool' = True, title: 'str | None' = None) -> 'GroupedStatsPlot[DotPlotResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_grouped_gghistostats",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(analysis: 'GroupedAnalysis[HistogramAnalysis]', *, binwidth: 'float | None' = None, title: 'str | None' = None) -> 'GroupedStatsPlot[AnalysisResult]'"
+        "signature": "(analysis: 'GroupedAnalysis[HistogramAnalysis]', *, binwidth: 'float | None' = None, title: 'str | None' = None) -> 'GroupedStatsPlot[AnalysisResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_grouped_ggpiestats",
         "kind": "function",
         "defined_in": "plotsalot.categorical_grouped",
-        "signature": "(analysis: 'GroupedAnalysis[CategoricalAnalysis]', *, label: 'str' = 'percentage', title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[CategoricalResult]'"
+        "signature": "(analysis: 'GroupedAnalysis[CategoricalAnalysis]', *, label: 'str' = 'percentage', title: 'str | None' = None, results_subtitle: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[CategoricalResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_grouped_ggscatterstats",
         "kind": "function",
         "defined_in": "plotsalot.grouped",
-        "signature": "(analysis: 'GroupedAnalysis[CorrelationAnalysis]', *, title: 'str | None' = None) -> 'GroupedStatsPlot[CorrelationResult]'"
+        "signature": "(analysis: 'GroupedAnalysis[CorrelationAnalysis]', *, title: 'str | None' = None) -> 'GroupedStatsPlot[CorrelationResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "render_grouped_ggwithinstats",
         "kind": "function",
         "defined_in": "plotsalot.comparison_grouped",
-        "signature": "(analysis: 'GroupedAnalysis[ComparisonAnalysis]', *, title: 'str | None' = None, results_subtitle: 'bool' = True, show_subject_paths: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[ComparisonResult]'"
+        "signature": "(analysis: 'GroupedAnalysis[ComparisonAnalysis]', *, title: 'str | None' = None, results_subtitle: 'bool' = True, show_subject_paths: 'bool' = True, theme: 'StatsTheme | None' = None) -> 'GroupedStatsPlot[ComparisonResult]'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       },
       {
         "name": "select_categorical_table",
         "kind": "function",
         "defined_in": "plotsalot.categorical_data",
-        "signature": "(data: 'object', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000) -> 'CategoricalTable'"
+        "signature": "(data: 'object', x: 'str', y: 'str | None' = None, *, counts: 'str | None' = None, maximum_rows: 'int' = 1000000, maximum_levels: 'int' = 20, maximum_cells: 'int' = 400, maximum_total_count: 'int' = 1000000000) -> 'CategoricalTable'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "selector_function"
       },
       {
         "name": "select_coefficients",
         "kind": "function",
         "defined_in": "plotsalot.coefficient_data",
-        "signature": "(data: 'object', *, maximum_coefficients: 'int' = 500) -> 'CoefficientTable'"
+        "signature": "(data: 'object', *, maximum_coefficients: 'int' = 500) -> 'CoefficientTable'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "selector_function"
       },
       {
         "name": "select_numeric_pair",
         "kind": "function",
         "defined_in": "plotsalot.data",
-        "signature": "(data: 'object', x: 'str', y: 'str', *, minimum_size: 'int' = 4, require_variation: 'bool' = True, maximum_rows: 'int' = 1000000) -> 'PairedNumericSample'"
+        "signature": "(data: 'object', x: 'str', y: 'str', *, minimum_size: 'int' = 4, require_variation: 'bool' = True, maximum_rows: 'int' = 1000000) -> 'PairedNumericSample'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "selector_function"
       },
       {
         "name": "select_numeric_sample",
         "kind": "function",
         "defined_in": "plotsalot.data",
-        "signature": "(data: 'object', column: 'str', *, minimum_size: 'int' = 1, require_variation: 'bool' = False, maximum_rows: 'int' = 1000000) -> 'NumericSample'"
+        "signature": "(data: 'object', column: 'str', *, minimum_size: 'int' = 1, require_variation: 'bool' = False, maximum_rows: 'int' = 1000000) -> 'NumericSample'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "selector_function"
       },
       {
         "name": "select_posterior_coefficient_summaries",
         "kind": "function",
         "defined_in": "plotsalot.coefficient_summary_analysis",
-        "signature": "(data: 'object', *, maximum_coefficients: 'int' = 500) -> 'PosteriorCoefficientSummaryTable'"
+        "signature": "(data: 'object', *, maximum_coefficients: 'int' = 500) -> 'PosteriorCoefficientSummaryTable'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "selector_function"
       },
       {
         "name": "select_robust_coefficient_summaries",
         "kind": "function",
         "defined_in": "plotsalot.coefficient_summary_analysis",
-        "signature": "(data: 'object', *, maximum_coefficients: 'int' = 500) -> 'RobustCoefficientSummaryTable'"
+        "signature": "(data: 'object', *, maximum_coefficients: 'int' = 500) -> 'RobustCoefficientSummaryTable'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "selector_function"
       },
       {
         "name": "select_study_effects",
         "kind": "function",
         "defined_in": "plotsalot.coefficient_data",
-        "signature": "(data: 'object', *, maximum_studies: 'int' = 500) -> 'StudyEffectTable'"
+        "signature": "(data: 'object', *, maximum_studies: 'int' = 500) -> 'StudyEffectTable'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "selector_function"
       },
       {
         "name": "theme_ggstatsplot",
         "kind": "function",
         "defined_in": "plotsalot.theme",
-        "signature": "() -> 'StatsTheme'"
+        "signature": "() -> 'StatsTheme'",
+        "one_x_disposition": "stabilize",
+        "contract_category": "upstream_workflow_surface"
       }
     ]
   },

@@ -17,13 +17,16 @@ class RepositoryPolicyTests(unittest.TestCase):
             "docs/INTERPRETATION_AND_LIMITATIONS.md",
             "docs/API_STABILITY.md",
             "docs/M7_CALIBRATION_PLAN.md",
+            "docs/MIGRATING_TO_1_0.md",
             "docs/MILESTONE_7.md",
+            "docs/PUBLIC_API_REFERENCE.md",
             "docs/PUBLIC_CONTRACT_INVENTORY.md",
             "docs/README.md",
             "docs/RELEASING.md",
             "docs/USER_GUIDE.md",
             "docs/adr/ADR-007-public-api-schema-stability.md",
             "docs/evidence/M7A_PASS1_VERIFICATION.md",
+            "docs/evidence/M7A_PASS2_VERIFICATION.md",
             "docs/evidence/M7_VERIFICATION_LOOP.md",
             "docs/m7/compatibility-disposition.json",
             "docs/m7/public-contract.json",
@@ -172,6 +175,41 @@ class RepositoryPolicyTests(unittest.TestCase):
         )
         self.assertEqual(manifest["public_api"]["export_count"], len(symbols))
         self.assertEqual(
+            {symbol["one_x_disposition"] for symbol in symbols},
+            {"stabilize"},
+        )
+        self.assertEqual(
+            sum(manifest["public_api"]["category_counts"].values()),
+            len(symbols),
+        )
+        self.assertEqual(
+            manifest["public_api"]["category_counts"],
+            {
+                "analysis_container": 12,
+                "coded_exception": 1,
+                "plot_contract": 5,
+                "result_component": 27,
+                "result_protocol": 1,
+                "selected_data": 9,
+                "selector_function": 7,
+                "serialized_result": 25,
+                "shared_analysis_function": 1,
+                "upstream_workflow_surface": 56,
+            },
+        )
+        self.assertEqual(
+            set(manifest["public_api"]["category_counts"]),
+            set(manifest["public_api"]["categories"]),
+        )
+        self.assertEqual(
+            manifest["public_api"]["one_x_candidate"],
+            "retain_all_current_root_exports",
+        )
+        self.assertEqual(
+            manifest["public_api"]["breaking_changes_from_0_1_1"],
+            [],
+        )
+        self.assertEqual(
             {script["name"] for script in manifest["console_scripts"]},
             {
                 "plotsalot",
@@ -193,6 +231,29 @@ class RepositoryPolicyTests(unittest.TestCase):
             },
             {"main", "facet_{one_based_index}", "panel_{one_based_index}"},
         )
+
+    def test_current_compatibility_prose_does_not_redefer_m6_modes(self) -> None:
+        compatibility = (ROOT / "docs" / "compatibility.md").read_text(encoding="utf-8")
+
+        for current_statement in (
+            "fixed-trim robust and approved Bayesian modes added by M6",
+            "Winsorized robust and approved Bayesian correlation modes added by M6",
+            "fixed-trim Yuen/Welch–Yuen and approved Bayesian modes added by M6",
+            "classical count-table families plus approved fixed-total/fixed-row "
+            "Bayesian modes added by M6",
+            "now implemented under the approved M6C contract",
+        ):
+            with self.subTest(current_statement=current_statement):
+                self.assertIn(current_statement, compatibility)
+
+        for stale_statement in (
+            "nonparametric, robust, Bayesian, effect-size interval",
+            "robust/Bayesian modes, and other correlation methods deferred",
+            "correction, robust, and Bayesian modes are deferred",
+            "Robust/Bayesian meta-analysis, Bayes-factor captions",
+        ):
+            with self.subTest(stale_statement=stale_statement):
+                self.assertNotIn(stale_statement, compatibility)
 
 
 if __name__ == "__main__":

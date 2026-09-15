@@ -63,17 +63,17 @@
 | M7-F001 | `docs/evidence/M6C_PASS2_VERIFICATION.md`; exact-zero-heterogeneity conservative coverage | Current provisional rule depends on unknowable generating `tau` | Blocking | Open; M7-D2 plan approved, locked execution not started | Locked M7 artifacts and final owner disposition | Joshua Myers |
 | M7-F002 | `PROJECT_BRIEF.md` previously retained resolved 0.1.1/security questions | Planning state could misdirect M7 work | Major | Correct in M7 entry slice | Brief names only current decisions | Implementation owner |
 | M7-F003 | Retained stability fixtures are incomplete | Downstream compatibility promise is only partly enforceable | Blocking | M7-D3 policy accepted; generated manifest and drift check implemented, golden variants pending | Golden serialization, mutation, error, and semantic contract tests | Joshua Myers |
-| M7-F004 | Deferred capability prose spans several milestone-era sections | Older text can call an implemented M6 mode deferred | Major | Machine ledger accepted as authority; reconciliation pending | Reviewed ledger plus compatibility-doc reconciliation | Product owner |
+| M7-F004 | Deferred capability prose spanned several milestone-era sections | Older text could call an implemented M6 mode deferred | Major | Corrected in M7A pass 2; independent confirmation pending | Ledger/prose reconciliation tests and review | Product owner |
 
 ## Exit
 
-- Stop reason: M7 is active; begin M7A public-contract inventory.
+- Stop reason: M7A pass 2 technical candidate complete; independent review pending.
 - Current rubric result: all three entry decisions and the independent reviewer
   are confirmed; implementation evidence remains open.
 - Full quality gate: required after this entry slice and after every accepted
   implementation boundary.
-- Remaining uncertainty: the M7-D2 evidence-backed final disposition, exact
-  public manifest and fixtures, compatibility prose reconciliation, and final
-  1.0 candidate acceptance.
+- Remaining uncertainty: independent review of the 144-name stabilization
+  candidate, the M7-D2 evidence-backed final disposition, golden fixtures and
+  adversarial stability evidence, and final 1.0 candidate acceptance.
 - Approved entry facts are promoted to project memory; implementation and final
   release claims remain evidence-gated.

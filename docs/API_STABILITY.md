@@ -150,7 +150,7 @@ smallest safe response.
 Before the first 1.0 release is accepted, M7 must produce:
 
 - a generated public-name/signature manifest reviewed against documentation
-  (initial M7A inventory implemented in `m7/public-contract.json`);
+  (all 144 root names classified by M7A pass 2);
 - a console-script and exit-contract inventory (included in that manifest);
 - golden serialized examples for every emitted result variant;
 - schema validation and mutation tests for field, type, discriminator, and
@@ -158,5 +158,6 @@ Before the first 1.0 release is accepted, M7 must produce:
 - semantic plot/axes/extraction/composition contract tests;
 - an error/refusal inventory that separates stable types/codes from prose;
 - a `0.1.1` to 1.0 migration document, including an explicit “no change” entry
-  for every reviewed boundary that remains compatible; and
+  for every reviewed boundary that remains compatible (M7A baseline added;
+  final-candidate update still required); and
 - the M7-D3 owner approval recorded in the milestone and ADR.

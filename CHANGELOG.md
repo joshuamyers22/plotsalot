@@ -10,6 +10,9 @@ versioning for published package releases.
 - Added the M7A generated public-contract inventory and production drift gate
   for root exports and signatures, console scripts, serialized result types,
   schema identities and variants, semantic axes, and stable coded errors.
+- Classified all 144 existing root exports for 1.x stabilization, added the
+  generated public API reference and initial 0.1.1-to-1.0 migration baseline,
+  and reconciled compatibility prose with implemented M6 modes.
 
 ## 0.1.1 - 2026-09-15
 

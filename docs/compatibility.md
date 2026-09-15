@@ -10,8 +10,9 @@ stabilizes the existing adapted surface for all 22 exports, records explicit
 post-1.0 or rejected dispositions for remaining capability clusters, and is
 validated against the pinned upstream revision and public Python exports.
 Joshua Myers approved this 1.0 scope through M7-D1 on 2026-09-15. Milestone-era
-sections below are historical: later M6 implementation supersedes earlier text
-that called an implemented robust or Bayesian mode deferred.
+sections below retain milestone provenance, but their disposition text has been
+reconciled to the current M6 implementation so an implemented robust or Bayesian
+mode is never described as currently deferred.
 
 Definitions:
 
@@ -68,10 +69,10 @@ upstream arguments fail as unknown Python keyword arguments and are deferred.
 
 | Surface | Supported method/arguments | Explicit M2 disposition |
 |---|---|---|
-| `gghistostats` | one-sample parametric test, `test_value`, three alternatives, `conf_level`, `binwidth`, `title` | nonparametric, robust, Bayesian, effect-size interval, centrality controls, and arbitrary ggplot layers deferred |
-| `ggdotplotstats` | one-sample parametric annotation, per-label mean intervals, `show_intervals`, resource limits | other test families, interval families, label expressions, and arbitrary layers deferred |
-| `ggscatterstats` | two-sided Pearson test and Fisher interval | regression smoothing, marginal distributions, partial correlation, point labels, robust/Bayesian modes, and other correlation methods deferred |
-| `ggcorrmat` | Pearson, pairwise completeness, Holm or no adjustment, `sig_level` | other correlations, corrections, matrix layouts, partial correlations, and Bayesian output deferred |
+| `gghistostats` | one-sample parametric test, `test_value`, three alternatives, `conf_level`, `binwidth`, `title`; fixed-trim robust and approved Bayesian modes added by M6 | nonparametric modes, effect-size intervals, centrality controls, and arbitrary ggplot layers remain deferred |
+| `ggdotplotstats` | one-sample parametric annotation, per-label mean intervals, `show_intervals`, resource limits; fixed-trim robust and approved Bayesian modes added by M6 | other test and interval families, label expressions, and arbitrary layers remain deferred |
+| `ggscatterstats` | two-sided Pearson test and Fisher interval; Winsorized robust and approved Bayesian correlation modes added by M6 | regression smoothing, marginal distributions, partial correlation, point labels, and other correlation methods remain deferred |
+| `ggcorrmat` | Pearson, pairwise completeness, Holm or no adjustment, `sig_level`; Winsorized robust and approved Bayesian matrices added by M6 | other correlations, corrections, matrix layouts, and partial correlations remain deferred |
 | grouped M2 surfaces | one explicit group column, first-observed order, at most 20 groups, per-group rendering | pooled cross-group corrections, facets, nested groups, and partial success rejected/deferred |
 
 All M2 renderers use owned Matplotlib objects. Grouped functions return one
@@ -87,8 +88,8 @@ ignored.
 
 | Surface | Supported method/arguments | Explicit M3 disposition |
 |---|---|---|
-| `ggbetweenstats` | two-sided parametric mode; Welch t for two levels; Welch ANOVA for 3–20 levels; Welch pairwise t; Holm or no adjustment; pointwise mean and contrast intervals; Hedges' g or partial omega squared | upstream Games–Howell post-hoc comparisons are adapted to the approved Welch-plus-Holm family; equal-variance, nonparametric, robust, Bayesian, effect-size intervals, arbitrary contrasts, and arbitrary layers are deferred |
-| `ggwithinstats` | explicit `subject_id`; complete pairs/blocks; paired t for two conditions; repeated-measures ANOVA for 3–20; always-primary Greenhouse–Geisser correction; paired post-hoc t tests; Holm or no adjustment | omitted/inferred subjects and upstream row-index fallback are rejected; incomplete subjects are excluded from both inference and rendering; the omnibus effect is the approved F-to-partial-omega conversion, not upstream sums-of-squares output; other missingness, sphericity-switch, correction, robust, and Bayesian modes are deferred |
+| `ggbetweenstats` | two-sided parametric Welch family with Holm or no adjustment and pointwise intervals/effects; fixed-trim Yuen/Welch–Yuen and approved Bayesian modes added by M6 | upstream Games–Howell is adapted to Welch-plus-Holm; equal-variance, nonparametric, effect-size intervals, arbitrary contrasts, and arbitrary layers remain deferred |
+| `ggwithinstats` | explicit-subject complete-block parametric family; fixed-trim robust and approved Bayesian modes added by M6 | omitted/inferred subjects and row-index fallback are rejected; incomplete subjects are excluded from inference and rendering; other missingness populations, sphericity switching, and corrections remain deferred |
 | grouped comparison surfaces | one explicit outer-group column, first-observed outer-group order, deterministic inner-level order, at most 20 outer groups, per-group correction families, atomic failure | no adjustment is pooled across outer groups; nested grouping, partial success, and inferred subject scope are rejected/deferred |
 | `combine_plots` | individual or grouped plotsalot containers, deterministic automatic or explicit rectangular layout, `guides="keep"`, shared labels, titles/subtitles/captions, optional alphabetic/numeric panel tags, at most 20 flattened panels | source typed result objects and grouped identities are retained, while source figures are rasterized; guide collection, shared-axis inference, patchwork expressions, and arbitrary Matplotlib figures are deferred |
 | `theme_ggstatsplot` | immutable `StatsTheme` with local figure, axes, grid, text, and accent settings | returns/applies an owned Matplotlib style and never mutates `rcParams`; ggplot theme objects and pixel-identical styling are deferred |
@@ -109,7 +110,7 @@ typed result; visual differences do not imply separate inference.
 
 | Surface | Supported method/arguments | Explicit M4 disposition |
 |---|---|---|
-| `ggbarstats`, `ggpiestats` | raw or nonnegative integer `counts`; one-way Pearson goodness-of-fit with exact keyed `ratio`; two-way Pearson independence; binary paired exact-binomial inference; noncentral effect intervals; count/percentage labels | upstream Pearson omnibus statistics are retained; Pearson's C is adapted to Cohen's w/Cramér's V; upstream asymptotic McNemar is adapted to exact binomial/Cohen's g; continuity correction, nonparametric, robust, Bayesian, simulation, structural-zero, and multicategory paired paths are deferred |
+| `ggbarstats`, `ggpiestats` | classical count-table families plus approved fixed-total/fixed-row Bayesian modes added by M6 | Pearson's C is adapted to Cohen's w/Cramér's V and asymptotic McNemar to exact binomial/Cohen's g; continuity correction, nonparametric, robust, paired Bayesian, simulation, structural-zero, and multicategory paired paths remain deferred |
 | independent follow-ups | complete `x`-level pairwise Pearson family and per-`y` goodness-of-fit family; Holm or no adjustment; display filtering | upstream Fisher exact pairwise tests are adapted to Pearson behind the approved adequacy gate; upstream unadjusted stratum labels are adapted to a separate Holm family |
 | grouped categorical surfaces | one explicit outer group, first-observed group order, common `x` color domain, complete nested results, atomic failure | no correction is pooled across outer groups; partial success, nested grouping, and category-domain sampling are rejected/deferred |
 
@@ -152,11 +153,12 @@ metafor's normal and `adhoc` results at its iterative precision. Joshua Myers
 independently reviewed and accepted both tracks and the combined M5/`0.3`
 candidate on 2026-09-14.
 
-Robust/Bayesian meta-analysis, Bayes-factor captions, automatic term creation,
-heuristic duplicate-term concatenation, arbitrary model dispatch, ANOVA effect
-sizes, exponentiated/transformed parameters, ellipsis forwarding, and dynamic R
-plotting objects are deferred beyond M5. These classifications passed M5
-implementation evidence and accountable review.
+Robust/Bayesian coefficient and meta-analysis paths were deferred at M5 and are
+now implemented under the approved M6C contract below. Bayes-factor captions,
+automatic term creation, heuristic duplicate-term concatenation, arbitrary
+model dispatch, ANOVA effect sizes, exponentiated/transformed parameters,
+ellipsis forwarding, and dynamic R plotting objects remain deferred. The M5
+classifications passed their implementation evidence and accountable review.
 
 ## M6A robust-method disposition
 

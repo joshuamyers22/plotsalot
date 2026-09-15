@@ -94,7 +94,7 @@
 |---|---|---|---|
 | Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for published 0.1.1 |
 | Upstream is pinned | `docs/upstream/manifest.json` and hashes | Technical lead | Passing |
-| Public API inventory is complete | `docs/compatibility.md`, M7 machine ledger, and namespaces | Product owner | 22-export scope approved; generated 144-name/API/CLI/schema inventory active |
+| Public API inventory is complete | `docs/compatibility.md`, M7 machine ledger, and namespaces | Product owner | 22-export prose reconciled; all 144 root names classified for stabilization; independent review pending |
 | No R runtime dependency | Python-only isolated wheel smoke test | Technical lead | Passing for published 0.1.1 |
 | Statistical correctness | Method specs, analytic cases, R oracle, independent review | Joshua Myers | M0–M6 approved; M6C boundary disposition provisional until M7 |
 | MIT license posture | ADR-010 and qualified review | Joshua Myers | Approved |
