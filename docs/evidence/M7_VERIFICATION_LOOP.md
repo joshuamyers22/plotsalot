@@ -62,7 +62,7 @@
 |---|---|---|---|---|---|---|
 | M7-F001 | `docs/evidence/M6C_PASS2_VERIFICATION.md`; exact-zero-heterogeneity conservative coverage | Current provisional rule depends on unknowable generating `tau` | Blocking | Open; M7-D2 plan approved, locked execution not started | Locked M7 artifacts and final owner disposition | Joshua Myers |
 | M7-F002 | `PROJECT_BRIEF.md` previously retained resolved 0.1.1/security questions | Planning state could misdirect M7 work | Major | Correct in M7 entry slice | Brief names only current decisions | Implementation owner |
-| M7-F003 | No generated public manifest or retained stability fixtures | Downstream compatibility promise cannot yet be enforced | Blocking | M7-D3 policy accepted; inventory not started | Manifest and golden contract tests | Joshua Myers |
+| M7-F003 | Retained stability fixtures are incomplete | Downstream compatibility promise is only partly enforceable | Blocking | M7-D3 policy accepted; generated manifest and drift check implemented, golden variants pending | Golden serialization, mutation, error, and semantic contract tests | Joshua Myers |
 | M7-F004 | Deferred capability prose spans several milestone-era sections | Older text can call an implemented M6 mode deferred | Major | Machine ledger accepted as authority; reconciliation pending | Reviewed ledger plus compatibility-doc reconciliation | Product owner |
 
 ## Exit

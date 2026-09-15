@@ -149,8 +149,9 @@ smallest safe response.
 
 Before the first 1.0 release is accepted, M7 must produce:
 
-- a generated public-name/signature manifest reviewed against documentation;
-- a console-script and exit-contract inventory;
+- a generated public-name/signature manifest reviewed against documentation
+  (initial M7A inventory implemented in `m7/public-contract.json`);
+- a console-script and exit-contract inventory (included in that manifest);
 - golden serialized examples for every emitted result variant;
 - schema validation and mutation tests for field, type, discriminator, and
   unknown-property failures;

@@ -132,7 +132,7 @@ under a new threshold.
 | M7 contract and decision ledger | Owner-approved M7-D1 through M7-D3 | Accepted 2026-09-15 |
 | Machine-readable compatibility closure | Exact 22-export inventory test and unique disposition coverage | Scope approved; implementation reconciliation active |
 | Robust-meta boundary resolution | Locked experiment artifact, independent calculation/review, and owner disposition | Experiment authorized; no M7 evidence run completed |
-| Public API manifest | Generated/retained names and signatures compared in CI with reviewed exceptions | Not started |
+| Public API manifest | Generated/retained names and signatures compared in CI with reviewed exceptions | M7A pass 1 technical gate passed; independent review pending |
 | Schema stability fixtures | Golden serialized variants, schema validation, version/migration tests, and mutation rejection | Not started |
 | Error and refusal contract | Typed error/code inventory plus invalid, degenerate, ceiling, and atomic-group fault tests | Not started |
 | Platform/package gate | Python 3.11 and 3.12 isolated wheel/sdist install, import, public smoke, and metadata inspection | Existing 0.1.1 evidence; repeat for 1.0 candidate |

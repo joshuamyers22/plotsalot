@@ -18,12 +18,15 @@ class RepositoryPolicyTests(unittest.TestCase):
             "docs/API_STABILITY.md",
             "docs/M7_CALIBRATION_PLAN.md",
             "docs/MILESTONE_7.md",
+            "docs/PUBLIC_CONTRACT_INVENTORY.md",
             "docs/README.md",
             "docs/RELEASING.md",
             "docs/USER_GUIDE.md",
             "docs/adr/ADR-007-public-api-schema-stability.md",
+            "docs/evidence/M7A_PASS1_VERIFICATION.md",
             "docs/evidence/M7_VERIFICATION_LOOP.md",
             "docs/m7/compatibility-disposition.json",
+            "docs/m7/public-contract.json",
             "src/plotsalot/py.typed",
         }
 
@@ -153,6 +156,42 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertEqual(
             sum(gap["proposal"] == "rejected" for gap in gaps),
             19,
+        )
+
+    def test_m7_public_contract_inventory_has_required_boundaries(self) -> None:
+        manifest = json.loads(
+            (ROOT / "docs" / "m7" / "public-contract.json").read_text(encoding="utf-8")
+        )
+
+        import plotsalot
+
+        symbols = manifest["public_api"]["symbols"]
+        self.assertEqual(
+            {symbol["name"] for symbol in symbols},
+            set(plotsalot.__all__),
+        )
+        self.assertEqual(manifest["public_api"]["export_count"], len(symbols))
+        self.assertEqual(
+            {script["name"] for script in manifest["console_scripts"]},
+            {
+                "plotsalot",
+                "plotsalot-dataset",
+                "plotsalot-regression",
+                "plotsalot-validate",
+            },
+        )
+        self.assertEqual(len(manifest["schemas"]), 12)
+        self.assertEqual(
+            {error["name"] for error in manifest["stable_errors"]},
+            {"M6CMetaError"},
+        )
+        self.assertEqual(
+            {
+                contract.get("key", contract.get("key_pattern"))
+                for contract in manifest["semantic_axes"]
+                if "key_contract" not in contract
+            },
+            {"main", "facet_{one_based_index}", "panel_{one_based_index}"},
         )
 
 

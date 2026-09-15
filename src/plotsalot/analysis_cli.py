@@ -15,7 +15,7 @@ from .evidence import (
 )
 
 
-def main() -> int:
+def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="plotsalot-regression")
     parser.add_argument("input", type=Path)
     parser.add_argument("--response", required=True)
@@ -31,6 +31,11 @@ def main() -> int:
         "--covariance-type", choices=("nonrobust", "HC3"), default="HC3"
     )
     parser.add_argument("--output", required=True, type=Path)
+    return parser
+
+
+def main() -> int:
+    parser = _build_parser()
     args = parser.parse_args()
 
     try:

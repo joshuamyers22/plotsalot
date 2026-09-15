@@ -47,7 +47,7 @@ def _created_at(value: str, parser: argparse.ArgumentParser) -> datetime:
         parser.error(f"invalid --created-at-utc: {error}")
 
 
-def main() -> int:
+def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="plotsalot-dataset")
     subparsers = parser.add_subparsers(dest="command", required=True)
     publish = subparsers.add_parser("publish")
@@ -59,6 +59,11 @@ def main() -> int:
     publish.add_argument("--created-at-utc", required=True)
     verify = subparsers.add_parser("verify")
     verify.add_argument("dataset", type=Path)
+    return parser
+
+
+def main() -> int:
+    parser = _build_parser()
     args = parser.parse_args()
     contract = market_observation_contract()
 

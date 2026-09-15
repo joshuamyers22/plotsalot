@@ -8,9 +8,14 @@ from pathlib import Path
 from .ingest import load_csv
 
 
-def main() -> int:
+def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="plotsalot")
     parser.add_argument("input", type=Path)
+    return parser
+
+
+def main() -> int:
+    parser = _build_parser()
     args = parser.parse_args()
     dataset = load_csv(args.input)
     print(f"rows={len(dataset.observations)} sha256={dataset.source_sha256}")

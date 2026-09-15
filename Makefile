@@ -1,4 +1,4 @@
-.PHONY: setup format lint typecheck test docs check audit build oracle verify-oracle benchmark verify-benchmark
+.PHONY: setup format lint typecheck test docs public-contract update-public-contract check audit build oracle verify-oracle benchmark verify-benchmark
 setup:
 	uv sync --frozen --dev
 format:
@@ -13,7 +13,11 @@ test:
 	uv run coverage report
 docs:
 	uv run python tools/check_docs.py
-check: lint typecheck test docs
+public-contract:
+	uv run python tools/public_contract.py --check
+update-public-contract:
+	uv run python tools/public_contract.py --write
+check: lint typecheck test docs public-contract
 audit:
 	uv audit --preview-features audit-command --locked --no-dev
 	uv run python tools/check_licenses.py

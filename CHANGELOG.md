@@ -3,6 +3,14 @@
 Notable user-visible changes are recorded here. Plotsalot follows semantic
 versioning for published package releases.
 
+## Unreleased
+
+### Added
+
+- Added the M7A generated public-contract inventory and production drift gate
+  for root exports and signatures, console scripts, serialized result types,
+  schema identities and variants, semantic axes, and stable coded errors.
+
 ## 0.1.1 - 2026-09-15
 
 - Reorganized the package documentation around installation, getting started,
