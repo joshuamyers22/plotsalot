@@ -1,4 +1,4 @@
-.PHONY: setup format lint typecheck test docs public-contract update-public-contract check audit build oracle verify-oracle benchmark verify-benchmark
+.PHONY: setup format lint typecheck test docs public-contract update-public-contract check audit build oracle verify-oracle benchmark verify-benchmark m7b-smoke
 setup:
 	uv sync --frozen --dev
 format:
@@ -43,3 +43,5 @@ benchmark:
 	uv run python tools/verify_benchmark.py
 verify-benchmark:
 	uv run python tools/verify_benchmark.py
+m7b-smoke:
+	uv run python tools/calibrate_m7b.py --run smoke --workers 8

@@ -13,6 +13,9 @@ versioning for published package releases.
 - Classified all 144 existing root exports for 1.x stabilization, added the
   generated public API reference and initial 0.1.1-to-1.0 migration baseline,
   and reconciled compatibility prose with implemented M6 modes.
+- Added the locked M7B robust-meta boundary-calibration driver with immutable
+  scenario/seed identities, failure-inclusive summaries, sealed artifacts, and
+  a passing disposable 760-fit harness smoke.
 
 ## 0.1.1 - 2026-09-15
 

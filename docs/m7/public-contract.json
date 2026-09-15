@@ -1,6 +1,6 @@
 {
   "manifest_version": 1,
-  "status": "m7a_pass2_technical_candidate",
+  "status": "m7a_pass2_accepted",
   "generated_from": {
     "package": "src/plotsalot/__init__.py",
     "metadata": "pyproject.toml",

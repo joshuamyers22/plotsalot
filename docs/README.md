@@ -44,6 +44,7 @@ rules, uncertainty, failure behavior, and adaptation decisions.
 - [Verification and sign-off records](evidence/M6_RELEASE_VERIFICATION.md)
 - [M7A pass 1 verification](evidence/M7A_PASS1_VERIFICATION.md)
 - [M7A pass 2 verification](evidence/M7A_PASS2_VERIFICATION.md)
+- [M7B calibration harness verification](evidence/M7B_HARNESS_VERIFICATION.md)
 - [Pinned upstream manifest](upstream/README.md)
 - [Parquet dataset contract](PARQUET_DATASETS.md)
 - [Regression evidence contract](REGRESSION_EVIDENCE.md)

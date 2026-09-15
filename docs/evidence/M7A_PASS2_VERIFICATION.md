@@ -4,7 +4,8 @@
 - Scope: 1.x root-API classification, migration baseline, and compatibility
   prose reconciliation
 - Starting revision: `9c910d4`
-- Gate: implementation-owner technical gate passed; independent review pending
+- Gate: implementation-owner technical gate passed; independently accepted by
+  Joshua Myers on 2026-09-15
 
 ## Classification outcome
 
@@ -66,8 +67,8 @@ update.
 
 ## Gate disposition
 
-The M7A pass-2 technical gate passes. M7-F004 is corrected in maintained prose
-and awaits independent confirmation. This pass changes no statistical method,
+The M7A pass-2 technical gate passes. Joshua Myers independently accepted the
+candidate on 2026-09-15, closing M7-F004. This pass changes no statistical method,
 schema, callable signature, public name, or runtime behavior. It generates no
 M7B calibration evidence and does not accept the final 1.0 surface or release
 candidate.

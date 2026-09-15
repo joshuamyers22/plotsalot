@@ -1,6 +1,6 @@
 # Public API Reference
 
-- Status: M7A pass 2 technical candidate; independent review pending
+- Status: M7A pass 2 accepted by Joshua Myers on 2026-09-15
 - Machine source: [`m7/public-contract.json`](m7/public-contract.json)
 - Stability policy: [`API_STABILITY.md`](API_STABILITY.md)
 

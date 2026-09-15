@@ -1,6 +1,6 @@
 # Public Contract Inventory
 
-- Status: M7A pass 2 technical candidate; independent review pending
+- Status: M7A pass 2 accepted by Joshua Myers on 2026-09-15
 - Manifest: [`m7/public-contract.json`](m7/public-contract.json)
 - Human reference: [`PUBLIC_API_REFERENCE.md`](PUBLIC_API_REFERENCE.md)
 - Update command: `make update-public-contract`
@@ -27,7 +27,7 @@ The classified inventory contains:
 
 Pass 2 assigns every root export `one_x_disposition="stabilize"` and one of ten
 contract categories. All 144 names shipped in `0.1.1` remain in the 1.x
-technical candidate; no pre-1.0 removal or rename is proposed. The generated
+accepted candidate; no pre-1.0 removal or rename is proposed. The generated
 human reference lists every classified name and its normative documentation.
 
 ## Review meaning

@@ -27,6 +27,7 @@ class RepositoryPolicyTests(unittest.TestCase):
             "docs/adr/ADR-007-public-api-schema-stability.md",
             "docs/evidence/M7A_PASS1_VERIFICATION.md",
             "docs/evidence/M7A_PASS2_VERIFICATION.md",
+            "docs/evidence/M7B_HARNESS_VERIFICATION.md",
             "docs/evidence/M7_VERIFICATION_LOOP.md",
             "docs/m7/compatibility-disposition.json",
             "docs/m7/public-contract.json",
@@ -169,6 +170,7 @@ class RepositoryPolicyTests(unittest.TestCase):
         import plotsalot
 
         symbols = manifest["public_api"]["symbols"]
+        self.assertEqual(manifest["status"], "m7a_pass2_accepted")
         self.assertEqual(
             {symbol["name"] for symbol in symbols},
             set(plotsalot.__all__),

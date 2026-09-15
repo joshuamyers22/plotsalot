@@ -94,7 +94,7 @@
 |---|---|---|---|
 | Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for published 0.1.1 |
 | Upstream is pinned | `docs/upstream/manifest.json` and hashes | Technical lead | Passing |
-| Public API inventory is complete | `docs/compatibility.md`, M7 machine ledger, and namespaces | Product owner | 22-export prose reconciled; all 144 root names classified for stabilization; independent review pending |
+| Public API inventory is complete | `docs/compatibility.md`, M7 machine ledger, and namespaces | Product owner | M7A pass 2 accepted; 22-export prose reconciled and all 144 root names retained for stabilization |
 | No R runtime dependency | Python-only isolated wheel smoke test | Technical lead | Passing for published 0.1.1 |
 | Statistical correctness | Method specs, analytic cases, R oracle, independent review | Joshua Myers | M0–M6 approved; M6C boundary disposition provisional until M7 |
 | MIT license posture | ADR-010 and qualified review | Joshua Myers | Approved |
@@ -104,5 +104,5 @@
 
 | Question | Decision deadline | Owner | ADR |
 |---|---|---|---|
-| Select the final M6C robust-meta disposition from the locked experiment evidence | M7B close | Joshua Myers | M7-D2 / ADR-005 |
+| Select the final M6C robust-meta disposition after the locked mapping, confirmation, and independent review | M7B close | Joshua Myers | M7-D2 / ADR-005 |
 | Accept the exact hardened candidate as plotsalot 1.0 | M7 exit | Joshua Myers | M7 contract |

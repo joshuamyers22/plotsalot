@@ -514,7 +514,7 @@ def build_manifest() -> dict[str, Any]:
     ]
     return {
         "manifest_version": 1,
-        "status": "m7a_pass2_technical_candidate",
+        "status": "m7a_pass2_accepted",
         "generated_from": {
             "package": "src/plotsalot/__init__.py",
             "metadata": "pyproject.toml",
@@ -579,7 +579,7 @@ def render_reference(manifest: Mapping[str, Any]) -> str:
     lines = [
         "# Public API Reference",
         "",
-        "- Status: M7A pass 2 technical candidate; independent review pending",
+        "- Status: M7A pass 2 accepted by Joshua Myers on 2026-09-15",
         "- Machine source: [`m7/public-contract.json`](m7/public-contract.json)",
         "- Stability policy: [`API_STABILITY.md`](API_STABILITY.md)",
         "",
