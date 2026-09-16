@@ -1,6 +1,6 @@
 # Project Brief
 
-- Status: M0–M7 implementation complete; 1.0 technical candidate awaiting final owner acceptance
+- Status: M0–M7 and the 1.0.0 product gate complete; publication pending
 - Last updated: 2026-09-15
 
 ## Outcome
@@ -92,16 +92,16 @@
 
 | Requirement | Verification | Owner | Status |
 |---|---|---|---|
-| Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for 1.0 technical candidate |
+| Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for accepted 1.0.0 candidate |
 | Upstream is pinned | `docs/upstream/manifest.json` and hashes | Technical lead | Passing |
 | Public API and schema inventory is complete | M7 machine ledger, public manifest, and golden corpus | Product owner | M7A–M7C complete; all 144 root names retained, 51 goldens cover 25 result types and 49 discriminator triples |
-| No R runtime dependency | Python-only isolated wheel/sdist smoke tests | Technical lead | Passing on Python 3.11 and 3.12 for 1.0 technical candidate |
+| No R runtime dependency | Python-only isolated wheel/sdist smoke tests | Technical lead | Passing on Python 3.11 and 3.12 for accepted 1.0.0 candidate |
 | Statistical correctness | Method specs, analytic cases, R oracle, independent review | Joshua Myers | M0–M6 approved; M7B reclassified robust aggregate meta-analysis as experimental for 1.0 |
 | MIT license posture | ADR-010 and qualified review | Joshua Myers | Approved |
-| Trusted package publication | OIDC release workflow, hashes, metadata, and clean-index smoke | Joshua Myers | 0.1.1 published; 1.0 tag/publication waits for final acceptance |
+| Trusted package publication | OIDC release workflow, hashes, metadata, and clean-index smoke | Joshua Myers | 0.1.1 published; accepted 1.0.0 awaits tag/publication |
 
-## Open decisions
+## Resolved decisions
 
 | Question | Decision deadline | Owner | ADR |
 |---|---|---|---|
-| Accept the exact hardened candidate as plotsalot 1.0 | M7 exit | Joshua Myers | M7 contract |
+| Accept the exact hardened candidate as plotsalot 1.0 | Accepted 2026-09-15 | Joshua Myers | M7 contract and `docs/evidence/M7D_INDEPENDENT_REVIEW.md` |

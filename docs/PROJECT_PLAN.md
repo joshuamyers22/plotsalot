@@ -23,9 +23,11 @@ current-state summary.
 M7A–M7D implementation is complete. The milestone classifies every upstream
 export, reclassifies fixed-Student-t4 robust aggregate meta-analysis as
 experimental from retained calibration evidence, establishes the 1.x API/schema
-contract, and retains exact-candidate package evidence. The final 1.0 owner
-acceptance and the subsequent protected tag/publication are separate remaining
-actions. Version `0.1.1` was published to PyPI through the protected GitHub
+contract, and retains exact-candidate package evidence. Joshua Myers
+independently reviewed and accepted the exact 1.0.0 technical candidate on
+2026-09-15, closing M7 and the 1.0 product gate. The subsequent protected tag,
+publication, and post-publication verification are separate delivery actions.
+Version `0.1.1` was published to PyPI through the protected GitHub
 trusted-publishing workflow on 2026-09-15.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months

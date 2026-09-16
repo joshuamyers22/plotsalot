@@ -1,6 +1,6 @@
 # Milestone M7: Compatibility Closure and 1.0 Hardening
 
-- Status: M7D technical candidate complete 2026-09-15; final owner acceptance pending
+- Status: complete; M7 and 1.0 candidate accepted 2026-09-15
 - Contract date: 2026-09-15
 - Target duration: 4–6 weeks after entry approval
 - Product and statistical owner: Joshua Myers
@@ -142,7 +142,7 @@ under a new threshold.
 | Platform/package gate | Python 3.11 and 3.12 isolated wheel/sdist install, import, public smoke, and metadata inspection | Passed for 1.0.0 technical candidate; retained in `evidence/M7D_RELEASE_VERIFICATION.md` |
 | Oracle and benchmark gate | Applicable pinned-oracle, replay, calibration, schema, and retained performance checks | Passed for 1.0.0 technical candidate |
 | Documentation closure | Getting started, user guide, compatibility, limitations, migration, security, and release docs agree | Complete for technical candidate |
-| Independent review and acceptance | Finding ledger closed; product/statistical and release acceptance recorded separately | Review packet ready in `evidence/M7D_INDEPENDENT_REVIEW.md`; final owner decision pending |
+| Independent review and acceptance | Finding ledger closed; product/statistical and release acceptance recorded separately | Joshua Myers independently reviewed and accepted the final 1.0.0 candidate 2026-09-15 |
 
 ## Verification loop and stop rules
 
@@ -179,3 +179,9 @@ signatures, result variants, schemas, semantic plot contracts, and errors are
 documented and tested; the full clean-tree production/reproducibility gate
 passes; every blocking review finding is closed; and Joshua Myers separately
 approves the statistical disposition and the final 1.0 release candidate.
+
+All exit conditions were satisfied on 2026-09-15. Joshua Myers separately
+approved the M7B statistical disposition and independently reviewed and accepted
+the exact `e682d9d` 1.0.0 technical candidate. Tagging, protected deployment
+approval, publication, and post-publication verification remain delivery actions
+rather than milestone acceptance conditions.

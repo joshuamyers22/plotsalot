@@ -3,7 +3,7 @@
 - Candidate date: 2026-09-15
 - Candidate version: `1.0.0`
 - Technical outcome: passed
-- Accountable final 1.0 acceptance: pending Joshua Myers
+- Accountable final 1.0 acceptance: approved by Joshua Myers, 2026-09-15
 
 ## Candidate boundary
 
@@ -83,8 +83,9 @@ PyPI hashes must be compared after publication under `RELEASING.md`.
 
 ## Acceptance boundary
 
-This record does not self-approve independent review or the final 1.0 product
-decision. Joshua Myers must review the exact candidate using
-`M7D_INDEPENDENT_REVIEW.md` and explicitly accept it. Only then should an
-annotated `v1.0.0` tag be pushed; that tag triggers the protected GitHub release
-and PyPI deployment workflow.
+Joshua Myers independently reviewed and accepted the exact `e682d9d` technical
+candidate on 2026-09-15, closing M7 and the 1.0 product gate. The sign-off-only
+documentation commit changes no package source, metadata, schema, workflow, or
+public contract. Tagging and publication remain separate delivery actions: an
+annotated `v1.0.0` tag will trigger the protected GitHub release and PyPI
+deployment workflow.

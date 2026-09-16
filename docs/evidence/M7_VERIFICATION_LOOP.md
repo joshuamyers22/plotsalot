@@ -75,9 +75,9 @@
   Python 3.11/3.12 installs are retained or machine checked.
 - Full quality gate: passed for the M7D candidate and remains enforced in CI and
   the stable-tag release workflow.
-- Remaining uncertainty: Joshua Myers must independently review and accept the
-  exact final 1.0 candidate. Tagging, the protected PyPI deployment approval,
-  publication, and post-publication hash/install verification follow that
-  acceptance and are not implementation evidence.
-- Approved entry facts are promoted to project memory; implementation and final
-  release claims remain evidence-gated.
+- Accountable review: Joshua Myers independently reviewed and accepted the exact
+  `e682d9d` 1.0.0 technical candidate on 2026-09-15; M7 and the 1.0 product gate
+  are complete.
+- Remaining delivery work: tagging, the protected PyPI deployment approval,
+  publication, and post-publication hash/install verification are separate from
+  the completed implementation and acceptance evidence.
