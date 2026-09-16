@@ -78,6 +78,6 @@
 - Accountable review: Joshua Myers independently reviewed and accepted the exact
   `e682d9d` 1.0.0 technical candidate on 2026-09-15; M7 and the 1.0 product gate
   are complete.
-- Remaining delivery work: tagging, the protected PyPI deployment approval,
-  publication, and post-publication hash/install verification are separate from
-  the completed implementation and acceptance evidence.
+- Delivery closeout: annotated tag `v1.0.0`, protected PyPI deployment approval,
+  publication, GitHub/PyPI hash reconciliation, and a no-cache installed-package
+  smoke all completed successfully after milestone acceptance.

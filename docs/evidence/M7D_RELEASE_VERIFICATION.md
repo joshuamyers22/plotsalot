@@ -86,6 +86,30 @@ PyPI hashes must be compared after publication under `RELEASING.md`.
 Joshua Myers independently reviewed and accepted the exact `e682d9d` technical
 candidate on 2026-09-15, closing M7 and the 1.0 product gate. The sign-off-only
 documentation commit changes no package source, metadata, schema, workflow, or
-public contract. Tagging and publication remain separate delivery actions: an
-annotated `v1.0.0` tag will trigger the protected GitHub release and PyPI
-deployment workflow.
+public contract. Tagging and publication were separately authorized delivery
+actions; the subsequently pushed annotated `v1.0.0` tag triggered the protected
+GitHub release and PyPI deployment workflow.
+
+## Publication closeout
+
+Publication completed on 2026-09-15 America/Indiana/Indianapolis (2026-09-16
+UTC):
+
+- annotated tag `v1.0.0` points to sign-off commit `bad099b`, whose only change
+  from the accepted `e682d9d` technical candidate is the owner decision record;
+- release workflow `35043264726` passed its build, GitHub release, and protected
+  PyPI trusted-publishing jobs;
+- the GitHub release contains exactly the wheel, sdist, CycloneDX SBOM, and
+  SHA-256 manifest;
+- PyPI contains exactly `plotsalot-1.0.0-py3-none-any.whl` with SHA-256
+  `df6b78a9dff0be407690783b48732cc86782eb1fda4ce4e40b291014c5cdca43`
+  and `plotsalot-1.0.0.tar.gz` with SHA-256
+  `18638be65e7635e2527a7ed66af11be1846006d778c1c3c259f23a2429fb1502`;
+- both PyPI hashes match the GitHub checksum manifest, and neither file is
+  yanked;
+- PyPI reports version `1.0.0`, Python `>=3.11`, MIT license metadata, and the
+  intended project URLs; and
+- a no-cache Python 3.12 installation resolved `plotsalot==1.0.0` from PyPI and
+  passed the installed public smoke from `site-packages` with all 144 exports.
+
+The release and post-publication recovery gates are complete.

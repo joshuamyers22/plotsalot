@@ -59,9 +59,9 @@ Valid `0.1.1` runtime payloads do not need a data migration.
 ## Release boundary
 
 M7A–M7D retain the public inventory, robust-meta experimental reclassification,
-adversarial compatibility suite, and exact-candidate package evidence. Tagging
-and publishing remain separate delivery actions under the protected release
-workflow.
+adversarial compatibility suite, and exact-candidate package evidence. Version
+`1.0.0` was tagged and published through the protected trusted-publishing
+workflow after independent owner acceptance.
 
 Capabilities marked post-1.0 or rejected in the
 [compatibility ledger](m7/compatibility-disposition.json) were never part of the

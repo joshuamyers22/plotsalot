@@ -1,6 +1,6 @@
 # Milestone M7: Compatibility Closure and 1.0 Hardening
 
-- Status: complete; M7 and 1.0 candidate accepted 2026-09-15
+- Status: complete; plotsalot 1.0.0 accepted, published, and verified 2026-09-15
 - Contract date: 2026-09-15
 - Target duration: 4–6 weeks after entry approval
 - Product and statistical owner: Joshua Myers
@@ -182,6 +182,7 @@ approves the statistical disposition and the final 1.0 release candidate.
 
 All exit conditions were satisfied on 2026-09-15. Joshua Myers separately
 approved the M7B statistical disposition and independently reviewed and accepted
-the exact `e682d9d` 1.0.0 technical candidate. Tagging, protected deployment
-approval, publication, and post-publication verification remain delivery actions
-rather than milestone acceptance conditions.
+the exact `e682d9d` 1.0.0 technical candidate. Annotated tag `v1.0.0` points to
+the sign-off commit `bad099b`; the protected workflow published the retained
+wheel and sdist through PyPI trusted publishing, and the release hashes,
+metadata, and no-cache installed-package smoke were verified.

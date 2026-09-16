@@ -25,10 +25,11 @@ export, reclassifies fixed-Student-t4 robust aggregate meta-analysis as
 experimental from retained calibration evidence, establishes the 1.x API/schema
 contract, and retains exact-candidate package evidence. Joshua Myers
 independently reviewed and accepted the exact 1.0.0 technical candidate on
-2026-09-15, closing M7 and the 1.0 product gate. The subsequent protected tag,
-publication, and post-publication verification are separate delivery actions.
-Version `0.1.1` was published to PyPI through the protected GitHub
-trusted-publishing workflow on 2026-09-15.
+2026-09-15, closing M7 and the 1.0 product gate. Version `1.0.0` was subsequently
+tagged, published to PyPI through the protected GitHub trusted-publishing
+workflow, and verified against the GitHub release checksums and a no-cache
+installed-package smoke. Version `0.1.1` remains the first public package
+release.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months
 with two Python engineers and a part-time statistical-methods reviewer.
