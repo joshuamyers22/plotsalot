@@ -1,6 +1,6 @@
 # Milestone M7: Compatibility Closure and 1.0 Hardening
 
-- Status: active; M7-D1 through M7-D3 and M7A–M7C complete 2026-09-15; M7D next
+- Status: M7D technical candidate complete 2026-09-15; final owner acceptance pending
 - Contract date: 2026-09-15
 - Target duration: 4–6 weeks after entry approval
 - Product and statistical owner: Joshua Myers
@@ -139,10 +139,10 @@ under a new threshold.
 | Public API manifest | Generated/retained names and signatures compared in CI with reviewed exceptions | All 144 names retained: 137 stable and seven experimental robust-meta names |
 | Schema stability fixtures | Golden serialized variants, schema validation, version/migration tests, and mutation rejection | Complete; 51 examples cover 25 result types and 49 discriminator triples |
 | Error and refusal contract | Typed error/code inventory plus invalid, degenerate, ceiling, and atomic-group fault tests | Complete; 16 coded M6C failures reconciled and representative refusal classes replayed |
-| Platform/package gate | Python 3.11 and 3.12 isolated wheel/sdist install, import, public smoke, and metadata inspection | Existing 0.1.1 evidence; repeat for 1.0 candidate |
-| Oracle and benchmark gate | Applicable pinned-oracle, replay, calibration, schema, and retained performance checks | Existing baseline; repeat after changed boundaries |
-| Documentation closure | Getting started, user guide, compatibility, limitations, migration, security, and release docs agree | Partial |
-| Independent review and acceptance | Finding ledger closed; product/statistical and release acceptance recorded separately | M7B statistical review complete; final candidate review not started |
+| Platform/package gate | Python 3.11 and 3.12 isolated wheel/sdist install, import, public smoke, and metadata inspection | Passed for 1.0.0 technical candidate; retained in `evidence/M7D_RELEASE_VERIFICATION.md` |
+| Oracle and benchmark gate | Applicable pinned-oracle, replay, calibration, schema, and retained performance checks | Passed for 1.0.0 technical candidate |
+| Documentation closure | Getting started, user guide, compatibility, limitations, migration, security, and release docs agree | Complete for technical candidate |
+| Independent review and acceptance | Finding ledger closed; product/statistical and release acceptance recorded separately | Review packet ready in `evidence/M7D_INDEPENDENT_REVIEW.md`; final owner decision pending |
 
 ## Verification loop and stop rules
 

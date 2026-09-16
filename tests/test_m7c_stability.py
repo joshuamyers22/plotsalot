@@ -132,7 +132,7 @@ class M7CGoldenSchemaTests(unittest.TestCase):
     def test_golden_corpus_covers_every_result_type_and_discriminator(self) -> None:
         entries = cast(list[dict[str, Any]], self.catalog["entries"])
         self.assertEqual(self.catalog["catalog_version"], 1)
-        self.assertEqual(self.catalog["generated_with_version"], "0.1.1")
+        self.assertEqual(self.catalog["generated_with_version"], "1.0.0")
         self.assertEqual(len(entries), 51)
         self.assertEqual(len({cast(str, entry["id"]) for entry in entries}), 51)
         self.assertEqual(

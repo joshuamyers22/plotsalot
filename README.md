@@ -5,10 +5,10 @@ structured, extractable results. It provides Polars-first analysis workflows and
 Matplotlib figures inspired by the public behavior of
 [`ggstatsplot`](https://github.com/IndrajeetPatil/ggstatsplot).
 
-The project is pre-1.0 alpha software. Its classical, robust, Bayesian,
-categorical, coefficient, and meta-analysis families have passed their recorded
-M0–M6 gates, and M7A–M7C compatibility hardening is complete; M7D release
-closeout remains. Fixed-
+Plotsalot 1.0 defines a stable public contract for its documented classical,
+robust, Bayesian, categorical, coefficient, and meta-analysis families. Those
+families and the 1.0 package candidate have passed their recorded M0–M7
+technical gates. Fixed-
 Student-t4 robust aggregate meta-analysis is retained as experimental for 1.0
 after its locked M7 calibration; other supported modes follow their documented
 stability classifications. Do not treat a successful computation or plot as

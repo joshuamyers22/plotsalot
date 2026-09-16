@@ -16486,6 +16486,6 @@
       "stability": "stable"
     }
   ],
-  "generated_with_version": "0.1.1",
+  "generated_with_version": "1.0.0",
   "purpose": "M7C retained serialized-result compatibility corpus"
 }

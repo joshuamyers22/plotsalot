@@ -1,6 +1,6 @@
 [project]
 name = "plotsalot"
-version = "0.1.1"
+version = "1.0.0"
 description = "Statistical visualizations and distribution diagnostics for Python"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -15,7 +15,7 @@ keywords = [
     "ggstatsplot",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Operating System :: MacOS",

@@ -89,9 +89,12 @@ Use the [compatibility matrix](compatibility.md) before migrating an analysis.
 Unsupported upstream parameters or modes are deferred or rejected; they are not
 silently approximated.
 
-## Pre-1.0 stability
+## 1.x stability
 
-Result schemas are versioned, but the public Python API is not yet covered by a
-1.0 compatibility promise. Review the [changelog](../CHANGELOG.md), pin an exact
-package version for consequential work, and retain serialized method and
-provenance metadata with downstream artifacts.
+Documented public names, signatures, stable result variants, schemas, console
+scripts, semantic axes, and coded errors are covered by the
+[1.x stability policy](API_STABILITY.md). The dedicated robust-meta types and
+schema-v2 variant are experimental and excluded from that promise. Review the
+[changelog](../CHANGELOG.md), pin an exact package version for consequential
+work, and retain serialized method and provenance metadata with downstream
+artifacts.

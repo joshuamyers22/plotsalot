@@ -1,6 +1,6 @@
 {
   "manifest_version": 1,
-  "status": "m7c_hardening_complete",
+  "status": "one_zero_release_candidate",
   "generated_from": {
     "package": "src/plotsalot/__init__.py",
     "metadata": "pyproject.toml",
@@ -11,7 +11,7 @@
   },
   "distribution": {
     "name": "plotsalot",
-    "version": "0.1.1",
+    "version": "1.0.0",
     "requires_python": ">=3.11"
   },
   "public_api": {
@@ -2328,7 +2328,7 @@
   ],
   "golden_results": {
     "path": "docs/m7/golden-results.json",
-    "sha256": "2cb3742538693b1a349792ee918e34d36fe49de1e50bade16c36f3100be90bda",
+    "sha256": "4e91d4283ada430b4ca623be59bb7e82b03379ab9a9b2016d9f40fd55ab6742c",
     "entry_count": 51,
     "result_type_count": 25,
     "discriminator_count": 49,

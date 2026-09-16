@@ -20,3 +20,28 @@ jobs:
       - run: uv sync --frozen --dev
       - run: make check
       - run: make audit build
+
+  installed-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.12.5"
+      - run: uv build --clear --no-sources
+      - name: Smoke installed wheel and sdist
+        env:
+          PYTHON_VERSION: ${{ matrix.python-version }}
+        run: |
+          for artifact in dist/*.whl dist/*.tar.gz; do
+            artifact_kind="${artifact##*.}"
+            smoke_environment=".venv-package-smoke-${PYTHON_VERSION}-${artifact_kind}"
+            uv venv --python "$PYTHON_VERSION" "$smoke_environment"
+            uv pip install --python "$smoke_environment/bin/python" "$artifact"
+            "$smoke_environment/bin/python" tools/smoke_installed.py --expected-version "$(uv version --short)"
+          done

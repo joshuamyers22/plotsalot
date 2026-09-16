@@ -12,7 +12,7 @@ on 2026-09-13. This repository executes that plan through the following gates.
 | M4 | Categorical bar/pie families ([detail](MILESTONE_4.md)) | 3–4 weeks |
 | M5 | Coefficients and approved frequentist meta-analysis ([detail](MILESTONE_5.md)) | 4–6 weeks |
 | M6 | Robust and Bayesian methods ([detail](MILESTONE_6.md)) | 8–13 weeks |
-| M7 | Compatibility closure, hardening, documentation, 1.0 ([active contract](MILESTONE_7.md)) | 4–6 weeks |
+| M7 | Compatibility closure, hardening, documentation, 1.0 ([contract](MILESTONE_7.md)) | 4–6 weeks |
 
 M0 through M6 are complete. Joshua Myers approved each method family and the
 final combined M6/`0.4` candidate by 2026-09-15 after the retained technical,
@@ -20,13 +20,13 @@ adversarial, oracle, benchmark, and installed-artifact gates passed. The detaile
 history remains in the milestone and evidence records rather than in this plan's
 current-state summary.
 
-M7 compatibility closure and 1.0 hardening are next. It must revisit the
-provisional M6C conservative-coverage disposition for `k<20` or generating
-`tau=0`, finish every deferred compatibility classification required for 1.0,
-and establish the public API/schema stability boundary. Joshua Myers approved
-the M7 entry contract, compatibility ledger, locked calibration experiment, and
-stability policy without revision on 2026-09-15. Version `0.1.1` was published to
-PyPI through the protected GitHub trusted-publishing workflow on 2026-09-15.
+M7A–M7D implementation is complete. The milestone classifies every upstream
+export, reclassifies fixed-Student-t4 robust aggregate meta-analysis as
+experimental from retained calibration evidence, establishes the 1.x API/schema
+contract, and retains exact-candidate package evidence. The final 1.0 owner
+acceptance and the subsequent protected tag/publication are separate remaining
+actions. Version `0.1.1` was published to PyPI through the protected GitHub
+trusted-publishing workflow on 2026-09-15.
 
 Total planning estimate: 42–58 engineer-weeks, or roughly 6–8 calendar months
 with two Python engineers and a part-time statistical-methods reviewer.

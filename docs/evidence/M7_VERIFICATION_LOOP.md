@@ -67,15 +67,17 @@
 
 ## Exit
 
-- Stop reason: M7C complete; M7D release-candidate closeout is the next and
-  final evidence-changing track.
-- Current rubric result: all three entry decisions and M7A–M7C are complete;
-  the public surface, robust-meta exception, serialized variants, schemas,
-  error inventory, migration replay, and semantic axes are retained in CI.
-- Full quality gate: required after this entry slice and after every accepted
-  implementation boundary.
-- Remaining uncertainty: M7D exact-candidate platform/package, oracle,
-  benchmark, documentation, security, independent-review evidence, and final
-  1.0 candidate acceptance.
+- Stop reason: the fourth and final evidence-changing pass is complete; repeat
+  only for a changed candidate or a new reviewer finding.
+- Current rubric result: all technical rows pass for the 1.0.0 candidate. The
+  public surface, robust-meta exception, serialized variants, schemas, error
+  inventory, migration replay, semantic axes, artifact contents, and isolated
+  Python 3.11/3.12 installs are retained or machine checked.
+- Full quality gate: passed for the M7D candidate and remains enforced in CI and
+  the stable-tag release workflow.
+- Remaining uncertainty: Joshua Myers must independently review and accept the
+  exact final 1.0 candidate. Tagging, the protected PyPI deployment approval,
+  publication, and post-publication hash/install verification follow that
+  acceptance and are not implementation evidence.
 - Approved entry facts are promoted to project memory; implementation and final
   release claims remain evidence-gated.

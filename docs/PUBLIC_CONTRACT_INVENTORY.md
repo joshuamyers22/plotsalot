@@ -1,14 +1,14 @@
 # Public Contract Inventory
 
-- Status: M7C API/schema hardening complete on 2026-09-15
+- Status: 1.0 release contract
 - Manifest: [`m7/public-contract.json`](m7/public-contract.json)
 - Human reference: [`PUBLIC_API_REFERENCE.md`](PUBLIC_API_REFERENCE.md)
 - Golden corpus: [`m7/golden-results.json`](m7/golden-results.json)
 - Update command: `make update-public-contract`
 - Drift check: `make public-contract`, included in `make check`
 
-The retained manifest records the exact candidate surface that M7 will review
-and harden for 1.0. It is generated deterministically from package metadata,
+The retained manifest records the exact public surface hardened for 1.0. It is
+generated deterministically from package metadata,
 `plotsalot.__all__`, runtime signatures and dataclass fields, internal CLI
 parsers, checked-in JSON schemas, and literal public error codes.
 
@@ -28,8 +28,8 @@ The classified inventory contains:
 - `M6CMetaError`, its stable `code` attribute, and all 16 currently reachable
   literal error codes.
 
-All 144 names shipped in `0.1.1` remain in the 1.x accepted candidate; no
-pre-1.0 removal or rename is proposed. M7B supersedes the all-stable M7A
+All 144 names shipped in `0.1.1` remain in the 1.x contract; no removal or
+rename was introduced. M7B supersedes the all-stable M7A
 candidate for seven dedicated robust-meta names: `RobustMetaAnalysis`,
 `RobustMetaResult`, and the five nested `RobustMeta*Result` records are marked
 `one_x_disposition="experimental"`. The other 137 names remain `stabilize`.

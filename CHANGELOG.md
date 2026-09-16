@@ -5,6 +5,8 @@ versioning for published package releases.
 
 ## Unreleased
 
+## 1.0.0 - 2026-09-15
+
 ### Added
 
 - Added the M7A generated public-contract inventory and production drift gate
@@ -30,6 +32,24 @@ versioning for published package releases.
   semantic-axis checks across all 25 result types and 49 discriminator triples.
 - Corrected pre-1.0 schema declarations for grouped robust results, composition
   limits, and Bayesian unknown properties without changing emitted payloads.
+- Added self-cleaning release builds, archive-content and metadata verification,
+  and installed wheel smoke coverage on Python 3.11 and 3.12.
+
+### Compatibility
+
+- Established the accepted 1.x API and schema stability policy for 137 stable
+  root exports, 24 stable serialized result types, four console scripts, and
+  the documented semantic plotting and coded-error boundaries.
+- Retained all 144 names and all valid calls shipped in 0.1.1; the seven
+  dedicated robust-meta names and their serialized variant remain available
+  but are explicitly experimental rather than stable 1.x contracts.
+
+### Known limitations
+
+- Fixed-Student-t4 robust aggregate meta-analysis is experimental and may be
+  replaced or removed outside the stable 1.x compatibility promise.
+- Nonparametric families, broad fitted-model dispatch, arbitrary ggplot layer
+  compatibility, and capabilities classified as post-1.0 remain out of scope.
 
 ## 0.1.1 - 2026-09-15
 

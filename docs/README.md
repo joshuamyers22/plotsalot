@@ -1,8 +1,10 @@
 # Documentation
 
-Plotsalot documentation is organized by reader intent. The package is pre-1.0;
-public behavior is defined by source, tests, approved method specifications, and
-versioned result schemas rather than by similarity to the upstream R interface.
+Plotsalot documentation is organized by reader intent. The stable 1.x public
+behavior is defined by the generated public manifest, tests, approved method
+specifications, and versioned result schemas rather than by similarity to the
+upstream R interface. The robust aggregate meta-analysis exception is explicitly
+experimental.
 
 ## Start here
 
@@ -31,7 +33,7 @@ rules, uncertainty, failure behavior, and adaptation decisions.
 ## Development and evidence
 
 - [Project plan](PROJECT_PLAN.md)
-- [M7 active contract](MILESTONE_7.md)
+- [M7 and 1.0 contract](MILESTONE_7.md)
 - [1.x API and schema stability policy](API_STABILITY.md)
 - [M7 public contract inventory](PUBLIC_CONTRACT_INVENTORY.md)
 - [Public API reference](PUBLIC_API_REFERENCE.md)
@@ -50,6 +52,8 @@ rules, uncertainty, failure behavior, and adaptation decisions.
 - [M7B independent review and owner disposition](evidence/M7B_INDEPENDENT_REVIEW.md)
 - [M7B sign-off](evidence/M7B_SIGNOFF.md)
 - [M7C API/schema hardening verification](evidence/M7C_VERIFICATION.md)
+- [M7D release-candidate verification](evidence/M7D_RELEASE_VERIFICATION.md)
+- [M7D independent-review checklist](evidence/M7D_INDEPENDENT_REVIEW.md)
 - [Pinned upstream manifest](upstream/README.md)
 - [Parquet dataset contract](PARQUET_DATASETS.md)
 - [Regression evidence contract](REGRESSION_EVIDENCE.md)

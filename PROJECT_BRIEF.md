@@ -1,6 +1,6 @@
 # Project Brief
 
-- Status: M0–M6 and public 0.1.1 complete; M7A–M7C complete, M7D next
+- Status: M0–M7 implementation complete; 1.0 technical candidate awaiting final owner acceptance
 - Last updated: 2026-09-15
 
 ## Outcome
@@ -92,13 +92,13 @@
 
 | Requirement | Verification | Owner | Status |
 |---|---|---|---|
-| Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for published 0.1.1 |
+| Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for 1.0 technical candidate |
 | Upstream is pinned | `docs/upstream/manifest.json` and hashes | Technical lead | Passing |
 | Public API and schema inventory is complete | M7 machine ledger, public manifest, and golden corpus | Product owner | M7A–M7C complete; all 144 root names retained, 51 goldens cover 25 result types and 49 discriminator triples |
-| No R runtime dependency | Python-only isolated wheel smoke test | Technical lead | Passing for published 0.1.1 |
+| No R runtime dependency | Python-only isolated wheel/sdist smoke tests | Technical lead | Passing on Python 3.11 and 3.12 for 1.0 technical candidate |
 | Statistical correctness | Method specs, analytic cases, R oracle, independent review | Joshua Myers | M0–M6 approved; M7B reclassified robust aggregate meta-analysis as experimental for 1.0 |
 | MIT license posture | ADR-010 and qualified review | Joshua Myers | Approved |
-| Trusted package publication | OIDC release workflow, hashes, metadata, and clean-index smoke | Joshua Myers | 0.1.1 published and verified |
+| Trusted package publication | OIDC release workflow, hashes, metadata, and clean-index smoke | Joshua Myers | 0.1.1 published; 1.0 tag/publication waits for final acceptance |
 
 ## Open decisions
 

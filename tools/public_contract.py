@@ -576,7 +576,7 @@ def build_manifest() -> dict[str, Any]:
     ]
     return {
         "manifest_version": 1,
-        "status": "m7c_hardening_complete",
+        "status": "one_zero_release_candidate",
         "generated_from": {
             "package": "src/plotsalot/__init__.py",
             "metadata": "pyproject.toml",
@@ -651,12 +651,12 @@ def render_reference(manifest: Mapping[str, Any]) -> str:
     lines = [
         "# Public API Reference",
         "",
-        "- Status: M7C API/schema hardening complete on 2026-09-15",
+        "- Status: 1.0 release contract",
         "- Machine source: [`m7/public-contract.json`](m7/public-contract.json)",
         "- Stability policy: [`API_STABILITY.md`](API_STABILITY.md)",
         "",
         "This reference classifies every name exported through `plotsalot.__all__`.",
-        "The 1.x candidate retains all 144 names already shipped in `0.1.1`; M7A",
+        "Plotsalot 1.0 retains all 144 names already shipped in `0.1.1`; M7A",
         "found no accidental wildcard, leading-underscore, test, benchmark, or oracle",
         "export. Exact signatures and dataclass fields are retained in the machine",
         "manifest and checked by `make public-contract`.",
@@ -717,10 +717,11 @@ def render_reference(manifest: Mapping[str, Any]) -> str:
             "The retained manifest marks 137 names `stabilize` and seven dedicated",
             "robust-meta names `experimental`. All 144 `0.1.1` names remain importable",
             "and no removal or rename is introduced. This classification does not",
-            "independently approve the final 1.0 candidate. M7C retains 51 golden",
+            "by itself record final owner release acceptance. M7C retains 51 golden",
             "examples across all 25 result types and 49 schema/discriminator triples,",
             "with mutation, refusal, migration-replay, and semantic-axis tests.",
-            "M7D platform/package gates and final owner acceptance remain required.",
+            "M7D platform/package gates passed; final owner acceptance is recorded",
+            "separately before the protected release tag is created.",
             "",
         ]
     )

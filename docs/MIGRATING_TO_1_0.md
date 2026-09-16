@@ -1,10 +1,10 @@
 # Migrating from 0.1.1 to 1.0
 
-- Status: M7C-hardened 1.0 migration candidate
+- Status: 1.0 migration contract
 - Source inventory: [`PUBLIC_API_REFERENCE.md`](PUBLIC_API_REFERENCE.md)
 - Stability policy: [`API_STABILITY.md`](API_STABILITY.md)
 
-The current 1.0 technical candidate preserves every root name shipped in
+Plotsalot 1.0 preserves every root name shipped in
 `plotsalot 0.1.1`. No import, function/class name, public signature, console
 script, serialized schema, semantic axes key, or stable coded exception is
 removed or renamed by M7A pass 2.
@@ -26,7 +26,7 @@ Bayesian aggregate modes are separate methods, not automatic substitutes.
 
 ## Reviewed no-change boundaries
 
-| Boundary | 0.1.1 to current 1.0 candidate | Consumer action |
+| Boundary | 0.1.1 to 1.0 | Consumer action |
 |---|---|---|
 | 56 upstream-workflow Python surfaces | No removal or rename | None |
 | Shared analysis and seven selector functions | No removal or rename | None |
@@ -52,16 +52,16 @@ M7C found three declaration gaps without changing runtime serialization:
   fields and rejects unknown top-level properties.
 
 These corrected documents, 51 retained golden examples, and the mutation suite
-form the proposed 1.0 baseline. A consumer that copied a `0.1.1` schema should
-replace it with the matching 1.0 candidate schema before validating 1.0 output.
+form the 1.0 baseline. A consumer that copied a `0.1.1` schema should replace it
+with the matching 1.0 schema before validating 1.0 output.
 Valid `0.1.1` runtime payloads do not need a data migration.
 
-## Still provisional
+## Release boundary
 
-This is not the final 1.0 migration statement. M7A–M7C are complete, including
-the robust-meta experimental reclassification and adversarial compatibility
-suite. M7D must still verify the exact release candidate and obtain final owner
-acceptance.
+M7A–M7D retain the public inventory, robust-meta experimental reclassification,
+adversarial compatibility suite, and exact-candidate package evidence. Tagging
+and publishing remain separate delivery actions under the protected release
+workflow.
 
 Capabilities marked post-1.0 or rejected in the
 [compatibility ledger](m7/compatibility-disposition.json) were never part of the

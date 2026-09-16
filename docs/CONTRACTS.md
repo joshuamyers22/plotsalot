@@ -69,7 +69,7 @@ directional probabilities partition one within `1e-12` absolute tolerance.
 version, an analysis identity, and a JSON-safe `to_dict` representation. Each
 plot family owns a concrete frozen result type and a checked-in schema rather
 than forcing unrelated methods into a universal bag of optional fields.
-The proposed 1.0 boundary is exercised by the retained M7C corpus in
+The 1.0 boundary is exercised by the retained M7C corpus in
 `docs/m7/golden-results.json`; its exact coverage and hash are recorded in the
 generated public manifest.
 

@@ -199,7 +199,7 @@ class RepositoryPolicyTests(unittest.TestCase):
         import plotsalot
 
         symbols = manifest["public_api"]["symbols"]
-        self.assertEqual(manifest["status"], "m7c_hardening_complete")
+        self.assertEqual(manifest["status"], "one_zero_release_candidate")
         self.assertEqual(
             {symbol["name"] for symbol in symbols},
             set(plotsalot.__all__),

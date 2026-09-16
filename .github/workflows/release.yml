@@ -24,6 +24,17 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: uv run python tools/verify_release.py --tag "$RELEASE_TAG"
       - run: make check audit build
+      - name: Smoke installed wheel and sdist on supported Python versions
+        run: |
+          for python_version in 3.11 3.12; do
+            for artifact in dist/*.whl dist/*.tar.gz; do
+              artifact_kind="${artifact##*.}"
+              smoke_environment=".venv-package-smoke-${python_version}-${artifact_kind}"
+              uv venv --python "$python_version" "$smoke_environment"
+              uv pip install --python "$smoke_environment/bin/python" "$artifact"
+              "$smoke_environment/bin/python" tools/smoke_installed.py --expected-version "$(uv version --short)"
+            done
+          done
       - uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
         with:
           path: ./dist

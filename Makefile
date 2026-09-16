@@ -1,4 +1,4 @@
-.PHONY: setup format lint typecheck test docs public-contract update-public-contract update-m7c-golden check audit build oracle verify-oracle benchmark verify-benchmark m7b-smoke
+.PHONY: setup format lint typecheck test docs public-contract update-public-contract update-m7c-golden check audit build verify-artifacts oracle verify-oracle benchmark verify-benchmark m7b-smoke
 setup:
 	uv sync --frozen --dev
 format:
@@ -24,7 +24,10 @@ audit:
 	uv audit --preview-features audit-command --locked --no-dev
 	uv run python tools/check_licenses.py
 build:
-	uv build --no-sources
+	uv build --clear --no-sources
+	$(MAKE) verify-artifacts
+verify-artifacts:
+	uv run python tools/verify_artifacts.py
 oracle:
 	docker build --platform linux/arm64 --build-arg GGSTATSPLOT_REVISION=7a724cd0ab55668b9d0b2e84b12c711c5be68ac8 -t plotsalot-r-oracle:m0 -f oracle/Dockerfile .
 	docker run --rm --platform linux/arm64 -v "$(CURDIR):/work" plotsalot-r-oracle:m0
