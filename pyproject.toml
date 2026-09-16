@@ -56,7 +56,7 @@ dev = [
     "coverage==7.16.1",
     "jsonschema==4.25.1",
     "pyright==1.1.411",
-    "ruff==0.16.5",
+    "ruff==0.16.7",
 ]
 
 [tool.ruff]
