@@ -60,22 +60,21 @@
 
 | ID | Location and evidence | Consequence | Severity | Current disposition | Acceptance check | Owner |
 |---|---|---|---|---|---|---|
-| M7-F001 | `docs/evidence/M6C_PASS2_VERIFICATION.md`; M7 mapping and confirmation artifacts | Current provisional rule depends on unknowable generating `tau`; one mapping fit failed ambiguously | Blocking | Both locked artifacts retained; reaffirmation blocked, independent review and owner disposition pending | Independent review and final owner disposition | Joshua Myers |
+| M7-F001 | `docs/evidence/M6C_PASS2_VERIFICATION.md`; M7 mapping and confirmation artifacts | Current provisional rule depends on unknowable generating `tau`; one mapping fit failed ambiguously | Blocking | Closed; Joshua Myers independently reviewed and approved experimental reclassification for 1.0 on 2026-09-15 | Machine ledger, migration guidance, and public manifest identify the experimental boundary | Joshua Myers |
 | M7-F002 | `PROJECT_BRIEF.md` previously retained resolved 0.1.1/security questions | Planning state could misdirect M7 work | Major | Correct in M7 entry slice | Brief names only current decisions | Implementation owner |
 | M7-F003 | Retained stability fixtures are incomplete | Downstream compatibility promise is only partly enforceable | Blocking | M7-D3 policy accepted; generated manifest and drift check implemented, golden variants pending | Golden serialization, mutation, error, and semantic contract tests | Joshua Myers |
 | M7-F004 | Deferred capability prose spanned several milestone-era sections | Older text could call an implemented M6 mode deferred | Major | Closed; M7A pass 2 independently accepted 2026-09-15 | Ledger/prose reconciliation tests and review | Product owner |
 
 ## Exit
 
-- Stop reason: mapping and confirmation retained; independent review and owner
-  disposition are the next evidence-changing actions.
+- Stop reason: M7B complete; M7C adversarial API/schema stability is the next
+  evidence-changing track.
 - Current rubric result: all three entry decisions and M7A are accepted; M7B
-  harness controls and both locked evidence runs pass retention checks, but
-  reaffirmation is blocked and independent review/final disposition remain open.
+  harness controls and both locked evidence runs pass retention checks; the
+  final robust-meta disposition is accepted as experimental for 1.0.
 - Full quality gate: required after this entry slice and after every accepted
   implementation boundary.
-- Remaining uncertainty: the M7-D2 locked mapping and confirmation evidence,
-  independent review and final statistical disposition, golden fixtures and
-  adversarial stability evidence, and final 1.0 candidate acceptance.
+- Remaining uncertainty: M7C golden fixtures and adversarial stability evidence,
+  M7D release evidence, and final 1.0 candidate acceptance.
 - Approved entry facts are promoted to project memory; implementation and final
   release claims remain evidence-gated.

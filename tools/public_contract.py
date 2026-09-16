@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 MANIFEST = ROOT / "docs" / "m7" / "public-contract.json"
 REFERENCE = ROOT / "docs" / "PUBLIC_API_REFERENCE.md"
+EXPERIMENTAL_DISPOSITION = "experimental"
 CONTRACT_CATEGORIES: dict[str, dict[str, object]] = {
     "upstream_workflow_surface": {
         "reason": "Approved Python surface for one of the 22 pinned upstream exports.",
@@ -371,6 +372,32 @@ def _upstream_workflow_surfaces() -> set[str]:
     }
 
 
+def _experimental_features() -> list[dict[str, Any]]:
+    ledger_path = ROOT / "docs" / "m7" / "compatibility-disposition.json"
+    ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    features = ledger.get("one_zero_feature_exceptions")
+    if not isinstance(features, list) or not features:
+        raise ValueError("compatibility ledger requires feature exceptions")
+    if any(
+        not isinstance(feature, dict)
+        or feature.get("disposition") != EXPERIMENTAL_DISPOSITION
+        for feature in features
+    ):
+        raise ValueError("unsupported 1.x feature exception disposition")
+    return features
+
+
+def _experimental_public_names() -> set[str]:
+    names = [
+        name
+        for feature in _experimental_features()
+        for name in feature.get("dedicated_public_types", [])
+    ]
+    if len(names) != len(set(names)):
+        raise ValueError("experimental public names must be unique")
+    return set(names)
+
+
 def _contract_category(symbol: Mapping[str, Any], workflow: set[str]) -> str:
     name = symbol["name"]
     if name in workflow:
@@ -386,7 +413,9 @@ def _contract_category(symbol: Mapping[str, Any], workflow: set[str]) -> str:
     return matches[0]
 
 
-def _classify_symbols(symbols: list[dict[str, Any]]) -> dict[str, int]:
+def _classify_symbols(
+    symbols: list[dict[str, Any]],
+) -> tuple[dict[str, int], dict[str, int]]:
     workflow = _upstream_workflow_surfaces()
     public_names = {symbol["name"] for symbol in symbols}
     if missing := workflow - public_names:
@@ -400,22 +429,30 @@ def _classify_symbols(symbols: list[dict[str, Any]]) -> dict[str, int]:
         )
     if missing := declared - public_names:
         raise ValueError(f"classified names are not public: {sorted(missing)}")
+    experimental = _experimental_public_names()
+    if missing := experimental - public_names:
+        raise ValueError(f"experimental names are not public: {sorted(missing)}")
     expected_categories = set(CONTRACT_CATEGORIES) - {"upstream_workflow_surface"}
     if set(CATEGORY_MEMBERS) != expected_categories:
         raise ValueError("explicit category membership tables are incomplete")
     counts: Counter[str] = Counter()
+    disposition_counts: Counter[str] = Counter()
     for symbol in symbols:
         category = _contract_category(symbol, workflow)
-        symbol["one_x_disposition"] = "stabilize"
+        disposition = (
+            EXPERIMENTAL_DISPOSITION if symbol["name"] in experimental else "stabilize"
+        )
+        symbol["one_x_disposition"] = disposition
         symbol["contract_category"] = category
         counts[category] += 1
+        disposition_counts[disposition] += 1
     if set(counts) != set(CONTRACT_CATEGORIES):
         missing = sorted(set(CONTRACT_CATEGORIES) - set(counts))
         extra = sorted(set(counts) - set(CONTRACT_CATEGORIES))
         raise ValueError(
             f"contract category mismatch: missing={missing}, extra={extra}"
         )
-    return dict(sorted(counts.items()))
+    return dict(sorted(counts.items())), dict(sorted(disposition_counts.items()))
 
 
 def _coded_error_values() -> dict[str, list[str]]:
@@ -506,7 +543,7 @@ def build_manifest() -> dict[str, Any]:
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     project = pyproject["project"]
     symbols, errors = _public_symbols()
-    category_counts = _classify_symbols(symbols)
+    category_counts, disposition_counts = _classify_symbols(symbols)
     serializable = [
         symbol["name"]
         for symbol in symbols
@@ -514,7 +551,7 @@ def build_manifest() -> dict[str, Any]:
     ]
     return {
         "manifest_version": 1,
-        "status": "m7a_pass2_accepted",
+        "status": "m7b_reclassification_accepted",
         "generated_from": {
             "package": "src/plotsalot/__init__.py",
             "metadata": "pyproject.toml",
@@ -529,13 +566,21 @@ def build_manifest() -> dict[str, Any]:
         },
         "public_api": {
             "export_count": len(symbols),
-            "one_x_candidate": "retain_all_current_root_exports",
+            "one_x_candidate": "retain_all_root_exports_with_experimental_robust_meta",
             "breaking_changes_from_0_1_1": [],
             "category_counts": category_counts,
+            "disposition_counts": disposition_counts,
             "categories": CONTRACT_CATEGORIES,
             "symbols": symbols,
         },
+        "experimental_features": _experimental_features(),
         "serialized_result_types": serializable,
+        "stable_serialized_result_types": [
+            name for name in serializable if name not in _experimental_public_names()
+        ],
+        "experimental_serialized_result_types": [
+            name for name in serializable if name in _experimental_public_names()
+        ],
         "schemas": _schemas(),
         "console_scripts": _console_scripts(project),
         "semantic_axes": [
@@ -579,12 +624,12 @@ def render_reference(manifest: Mapping[str, Any]) -> str:
     lines = [
         "# Public API Reference",
         "",
-        "- Status: M7A pass 2 accepted by Joshua Myers on 2026-09-15",
+        "- Status: M7B reclassification accepted by Joshua Myers on 2026-09-15",
         "- Machine source: [`m7/public-contract.json`](m7/public-contract.json)",
         "- Stability policy: [`API_STABILITY.md`](API_STABILITY.md)",
         "",
         "This reference classifies every name exported through `plotsalot.__all__`.",
-        "The 1.x candidate retains all 144 names already shipped in `0.1.1`; pass 2",
+        "The 1.x candidate retains all 144 names already shipped in `0.1.1`; M7A",
         "found no accidental wildcard, leading-underscore, test, benchmark, or oracle",
         "export. Exact signatures and dataclass fields are retained in the machine",
         "manifest and checked by `make public-contract`.",
@@ -615,18 +660,38 @@ def render_reference(manifest: Mapping[str, Any]) -> str:
                 + ", ".join(f"`{path}`" for path in details["documentation"])
                 + ".",
                 "",
-                ", ".join(f"`{symbol['name']}`" for symbol in grouped[category]) + ".",
+                ", ".join(
+                    f"`{symbol['name']}`"
+                    + (
+                        " *(experimental)*"
+                        if symbol["one_x_disposition"] == EXPERIMENTAL_DISPOSITION
+                        else ""
+                    )
+                    for symbol in grouped[category]
+                )
+                + ".",
                 "",
             ]
         )
     lines.extend(
         [
+            "## Experimental 1.0 exception",
+            "",
+            "The fixed-Student-t4 robust aggregate meta-analysis selected with",
+            '`meta_analytic_effect=True, type="robust"` remains available but is',
+            "experimental for 1.0. Its seven dedicated `RobustMeta*` names are",
+            "marked above. The containing `ggcoefstats`, `analyze_ggcoefstats`, and",
+            "`render_ggcoefstats` callables remain stable for their supported",
+            "non-experimental modes; the robust-meta method meaning and serialized",
+            "variant are excluded from the 1.x compatibility promise.",
+            "",
             "## Review and migration rule",
             "",
-            'Every listed name has `one_x_disposition="stabilize"` in the retained',
-            "manifest. That technical disposition preserves the `0.1.1` root surface",
-            "and introduces no removal or rename. It does not independently approve",
-            "the final 1.0 candidate: statistical disposition, golden serialization,",
+            "The retained manifest marks 137 names `stabilize` and seven dedicated",
+            "robust-meta names `experimental`. All 144 `0.1.1` names remain importable",
+            "and no removal or rename is introduced. This classification does not",
+            "independently approve the final 1.0 candidate: statistical disposition,",
+            "golden serialization,",
             "error and semantic rendering evidence, platform gates, and owner",
             "acceptance remain required by M7.",
             "",

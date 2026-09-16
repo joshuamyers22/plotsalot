@@ -5,8 +5,8 @@
 - Driver revision: `d272aea402b77144d2ce2ef9cdaf52743e53916f`
 - Artifact: `m7b-robust-meta-mapping.json`
 - SHA-256: `fb556565ca1d1184a1780410a78aa8444a1b3b26546147088dbde6c93f7ee076`
-- Gate: retained with a predeclared reaffirmation blocker; confirmation remains
-  required
+- Gate: retained with a predeclared reaffirmation blocker; confirmation and
+  independent review complete, experimental reclassification approved
 
 ## Execution identity
 
@@ -60,9 +60,8 @@ The approved plan states that any fit failure blocks reaffirmation unless its
 cause is corrected and the entire locked run is replaced under a new,
 owner-approved experiment version, while preserving this artifact. Therefore
 option 1, reaffirmation of the current interval, is blocked by this mapping
-result. This record does not choose replacement or reclassification and does
-not authorize a rerun.
+result. Joshua Myers later reviewed both locked artifacts and selected
+experimental reclassification for 1.0; no rerun is authorized.
 
-The independently seeded confirmation run remains mandatory regardless of the
-mapping outcome. It will run once only after this artifact and seal are committed
-and its clean-tree preflight verifies the mapping digest.
+The independently seeded confirmation subsequently ran once from the committed,
+sealed mapping artifact and verified this mapping digest.

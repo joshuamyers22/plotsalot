@@ -72,3 +72,7 @@ candidate on 2026-09-15, closing M7-F004. This pass changes no statistical metho
 schema, callable signature, public name, or runtime behavior. It generates no
 M7B calibration evidence and does not accept the final 1.0 surface or release
 candidate.
+
+M7B later superseded only the all-stable disposition: after locked evidence and
+independent review, seven dedicated robust-meta names became experimental for
+1.0. All 144 names remain retained without a removal or rename.

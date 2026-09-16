@@ -215,16 +215,15 @@ model adapter or posterior-draw input.
 |---|---|---|
 | robust coefficients | caller-reported point/confidence interval plus explicit unverified method/tuning/interval provenance; no reconstructed test | Adapted strict summary profile; fitted robust objects remain deferred |
 | posterior coefficients | caller-reported median/equal-tail credible interval/directional probability partition plus explicit unverified model/prior/computation provenance | Adapted estimation-only profile; draws, fitted objects, and reconstructed BF remain deferred |
-| robust aggregate meta-analysis | fixed-Student-t4 independent-study hierarchy; deterministic multistart ML and profile-likelihood inference; latent weights retained; no automatic outlier flag or prediction interval | Adapted sensitivity model; automatic selection/deletion and hidden tuning are rejected |
+| robust aggregate meta-analysis | fixed-Student-t4 independent-study hierarchy; deterministic multistart ML and profile-likelihood inference; latent weights retained; no automatic outlier flag or prediction interval | **Experimental for 1.0** after the locked M7B mapping retained an ambiguous-optimum failure; runtime behavior and strict no-fallback refusal are retained, but its dedicated types and serialized variant are outside the stable 1.x promise |
 | Bayesian aggregate meta-analysis | normal-normal hierarchy; caller-supplied proper normal/half-normal scales; numeric BF10, posterior heterogeneity, true-effect prediction, four sensitivity fits, bounded quadrature | Adapted proper-prior native model; universal/data-derived priors and MCMC are rejected |
 
 Joshua Myers approved these entry classifications without revision on
 2026-09-15. The robust and posterior coefficient analysis profiles passed the
-M6C pass-1 technical gate. Both aggregate engines are implemented, but one
-predeclared small-study and one confirmation zero-heterogeneity coverage cell
-remain retained findings. Joshua Myers provisionally accepted a conservative
-rule limited to `k<20` or generating `tau=0`, with mandatory M7 review; pass 2
-therefore passed. The shared semantic renderer, exact result extraction,
-heterogeneous composition, and resource benchmark now pass their technical
-gate. Joshua Myers independently reviewed and accepted these M6C compatibility
-dispositions on 2026-09-15.
+M6C pass-1 technical gate. Both aggregate engines are implemented. The M7
+mapping and confirmation retained no undercoverage flags, but one mapping fit
+failed with `robust_meta_ambiguous_optimum`; the approved plan therefore blocked
+reaffirmation. After independent review, Joshua Myers reclassified robust
+aggregate meta-analysis as experimental for 1.0 on 2026-09-15. The shared
+semantic renderer, exact result extraction, heterogeneous composition, and
+resource benchmark retain their accepted technical evidence.

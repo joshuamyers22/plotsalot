@@ -59,11 +59,13 @@ specifications. Numeric BF10 values are oriented toward H1 over H0; qualitative
 evidence labels are deliberately not supplied. Sensitivity records do not prove
 that the selected prior family is appropriate.
 
-The M6C robust meta-analysis calibration evidence retained conservative
-zero-heterogeneity boundary findings. The accepted disposition is provisional
-and must be revisited during M7 before 1.0. See the
-[M6C method specification](M6C_STATISTICAL_METHODS.md) and retained evidence for
-the exact boundary.
+M7 robust meta-analysis calibration retained one ambiguous-optimum fit failure
+in 76,000 mapping fits, no undercoverage flags, and conservative regions in both
+mapping and confirmation. Joshua Myers therefore approved experimental status
+for 1.0 after independent review. Its result is a sensitivity analysis, not a
+stable 1.x method or serialization contract; callers should pin the package,
+retain provenance, and handle coded failure without fallback. See the
+[M6C method specification](M6C_STATISTICAL_METHODS.md) and retained M7B evidence.
 
 ## Coefficients and meta-analysis
 

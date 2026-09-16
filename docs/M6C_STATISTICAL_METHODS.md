@@ -1,6 +1,6 @@
 # M6C Coefficient and Meta-analysis Method Proposal
 
-- Status: accepted 2026-09-15; provisional boundary rule requires M7 review
+- Status: accepted M6 implementation; M7B reclassified R4-M as experimental for 1.0
 - Version: 0.1.0
 - Date: 2026-09-15
 - Product/statistical owner: Joshua Myers
@@ -146,6 +146,12 @@ credible level, and `caller_reported_unverified` source. It emits no
 fails. Intervals are pointwise; no simultaneous or multiplicity claim is made.
 
 ## R4-M: fixed-Student-t robust aggregate meta-analysis
+
+**1.0 status:** experimental. M7 retained the implementation and its strict
+failure behavior but excluded this method, its seven dedicated `RobustMeta*`
+types, and its schema-v2 serialized variant from the stable 1.x promise after a
+locked mapping fit failed with `robust_meta_ambiguous_optimum`. This status does
+not weaken any estimator, convergence, work, or no-fallback rule below.
 
 ### Role and study population
 
@@ -574,6 +580,14 @@ This owner disposition clears the pass-2 calibration gate without modifying or
 relabeling either retained artifact. It is explicitly temporary governance
 debt: M7/1.0 hardening must reconsider the boundary calibration and record a
 final disposition.
+
+M7 completed that reconsideration on 2026-09-15. After reviewing the sealed
+76,000-fit mapping and independent-seed 40,000-fit confirmation, Joshua Myers
+approved reclassification of R4-M as experimental for 1.0. The mapping's single
+`robust_meta_ambiguous_optimum` failure blocks reaffirmation under the approved
+plan even though neither retained run triggered an undercoverage flag. The
+estimator and strict refusal behavior remain unchanged; only the 1.x stability
+boundary changes.
 
 At the method-entry gate, this approval authorized M6C implementation and
 acceptance-fixture construction only. Independent review, M6C acceptance,

@@ -7,9 +7,11 @@ Matplotlib figures inspired by the public behavior of
 
 The project is pre-1.0 alpha software. Its classical, robust, Bayesian,
 categorical, coefficient, and meta-analysis families have passed their recorded
-M0–M6 technical and statistical gates, but M7 compatibility closure and 1.0
-hardening remain. Do not treat a successful computation or plot as automatic
-validation of a statistical model or a substantive conclusion.
+M0–M6 gates, but M7 compatibility closure and 1.0 hardening remain. Fixed-
+Student-t4 robust aggregate meta-analysis is retained as experimental for 1.0
+after its locked M7 calibration; other supported modes follow their documented
+stability classifications. Do not treat a successful computation or plot as
+automatic validation of a statistical model or a substantive conclusion.
 
 ## Install
 

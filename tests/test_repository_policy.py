@@ -31,6 +31,7 @@ class RepositoryPolicyTests(unittest.TestCase):
             "docs/evidence/M7B_CONFIRMATION_VERIFICATION.md",
             "docs/evidence/M7B_INDEPENDENT_REVIEW.md",
             "docs/evidence/M7B_MAPPING_VERIFICATION.md",
+            "docs/evidence/M7B_SIGNOFF.md",
             "docs/evidence/m7b-robust-meta-confirmation.json",
             "docs/evidence/m7b-robust-meta-confirmation.json.sha256",
             "docs/evidence/m7b-robust-meta-mapping.json",
@@ -168,6 +169,25 @@ class RepositoryPolicyTests(unittest.TestCase):
             sum(gap["proposal"] == "rejected" for gap in gaps),
             19,
         )
+        exceptions = ledger["one_zero_feature_exceptions"]
+        self.assertEqual(len(exceptions), 1)
+        robust_meta = exceptions[0]
+        self.assertEqual(robust_meta["id"], "M7B-EXP-001")
+        self.assertEqual(robust_meta["disposition"], "experimental")
+        self.assertEqual(robust_meta["upstream_export"], "ggcoefstats")
+        self.assertEqual(
+            robust_meta["selector"],
+            {"meta_analytic_effect": True, "type": "robust"},
+        )
+        self.assertEqual(
+            robust_meta["approval"],
+            {
+                "decision": "M7-D2-reclassify",
+                "owner": "Joshua Myers",
+                "reviewed": True,
+                "approved_at": "2026-09-15",
+            },
+        )
 
     def test_m7_public_contract_inventory_has_required_boundaries(self) -> None:
         manifest = json.loads(
@@ -177,15 +197,34 @@ class RepositoryPolicyTests(unittest.TestCase):
         import plotsalot
 
         symbols = manifest["public_api"]["symbols"]
-        self.assertEqual(manifest["status"], "m7a_pass2_accepted")
+        self.assertEqual(manifest["status"], "m7b_reclassification_accepted")
         self.assertEqual(
             {symbol["name"] for symbol in symbols},
             set(plotsalot.__all__),
         )
         self.assertEqual(manifest["public_api"]["export_count"], len(symbols))
         self.assertEqual(
-            {symbol["one_x_disposition"] for symbol in symbols},
-            {"stabilize"},
+            manifest["public_api"]["disposition_counts"],
+            {
+                "experimental": 7,
+                "stabilize": 137,
+            },
+        )
+        self.assertEqual(
+            {
+                symbol["name"]
+                for symbol in symbols
+                if symbol["one_x_disposition"] == "experimental"
+            },
+            {
+                "RobustMetaAnalysis",
+                "RobustMetaAnalysisResult",
+                "RobustMetaConvergenceResult",
+                "RobustMetaPooledResult",
+                "RobustMetaResult",
+                "RobustMetaStartResult",
+                "RobustMetaStudyResult",
+            },
         )
         self.assertEqual(
             sum(manifest["public_api"]["category_counts"].values()),
@@ -212,7 +251,7 @@ class RepositoryPolicyTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["public_api"]["one_x_candidate"],
-            "retain_all_current_root_exports",
+            "retain_all_root_exports_with_experimental_robust_meta",
         )
         self.assertEqual(
             manifest["public_api"]["breaking_changes_from_0_1_1"],
@@ -228,6 +267,10 @@ class RepositoryPolicyTests(unittest.TestCase):
             },
         )
         self.assertEqual(len(manifest["schemas"]), 12)
+        self.assertEqual(
+            manifest["experimental_serialized_result_types"], ["RobustMetaResult"]
+        )
+        self.assertEqual(len(manifest["stable_serialized_result_types"]), 24)
         self.assertEqual(
             {error["name"] for error in manifest["stable_errors"]},
             {"M6CMetaError"},
@@ -251,6 +294,7 @@ class RepositoryPolicyTests(unittest.TestCase):
             "classical count-table families plus approved fixed-total/fixed-row "
             "Bayesian modes added by M6",
             "now implemented under the approved M6C contract",
+            "Experimental for 1.0",
         ):
             with self.subTest(current_statement=current_statement):
                 self.assertIn(current_statement, compatibility)
@@ -263,6 +307,22 @@ class RepositoryPolicyTests(unittest.TestCase):
         ):
             with self.subTest(stale_statement=stale_statement):
                 self.assertNotIn(stale_statement, compatibility)
+
+    def test_m7b_independent_review_records_accepted_reclassification(self) -> None:
+        review = (ROOT / "docs" / "evidence" / "M7B_INDEPENDENT_REVIEW.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn(
+            "Status: independently reviewed and approved; reclassify selected",
+            review,
+        )
+        self.assertEqual(review.count("- [x]"), 8)
+        self.assertNotIn("- [ ]", review)
+        self.assertIn(
+            "selected **Reclassify** on\n2026-09-15",
+            review,
+        )
 
 
 if __name__ == "__main__":

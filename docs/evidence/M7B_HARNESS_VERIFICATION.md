@@ -23,7 +23,7 @@ warning, or fallback behavior. Its fixed run identities are:
 |---|---:|---:|---:|---:|---|
 | Disposable smoke | `2026091530` | 38 | 20 | 760 | Never acceptance evidence |
 | Locked mapping | `2026091531` | 38 | 2,000 | 76,000 | Retained; reaffirmation blocker |
-| Locked confirmation | `2026091532` | 8 | 5,000 | 40,000 | Retained; independent review pending |
+| Locked confirmation | `2026091532` | 8 | 5,000 | 40,000 | Retained and independently reviewed |
 
 The mapping grid has 30 primary cells, two translation cells, two 500-study
 cells, two paired reversed-grid fits, and two piecewise-log standard-error
@@ -80,5 +80,5 @@ then retained unchanged and is documented separately in
 `M7B_MAPPING_VERIFICATION.md`. Its single fit failure blocks reaffirmation under
 the approved rule. The confirmation was then retained unchanged and is
 documented in `M7B_CONFIRMATION_VERIFICATION.md`. No observed coverage informed
-a threshold or implementation change. Independent review and the owner's
-replace, reclassify, or versioned-correction disposition remain open.
+a threshold or implementation change. Joshua Myers independently reviewed the
+evidence and approved experimental reclassification for 1.0 on 2026-09-15.

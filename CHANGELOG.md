@@ -10,7 +10,7 @@ versioning for published package releases.
 - Added the M7A generated public-contract inventory and production drift gate
   for root exports and signatures, console scripts, serialized result types,
   schema identities and variants, semantic axes, and stable coded errors.
-- Classified all 144 existing root exports for 1.x stabilization, added the
+- Initially classified all 144 existing root exports for 1.x stabilization, added the
   generated public API reference and initial 0.1.1-to-1.0 migration baseline,
   and reconciled compatibility prose with implemented M6 modes.
 - Added the locked M7B robust-meta boundary-calibration driver with immutable
@@ -21,7 +21,10 @@ versioning for published package releases.
   no cell triggered the predeclared undercoverage flag.
 - Retained the independently seeded 40,000-fit M7B confirmation artifact with
   no failures or undercoverage flags and four conservatively flagged focal
-  cells; final method disposition awaits independent owner review.
+  cells.
+- Reclassified fixed-Student-t4 robust aggregate meta-analysis as experimental
+  for 1.0 after independent owner review, without changing its estimator,
+  strict coded failures, or no-fallback behavior.
 
 ## 0.1.1 - 2026-09-15
 

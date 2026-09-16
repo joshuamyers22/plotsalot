@@ -1,6 +1,6 @@
 # Public Contract Inventory
 
-- Status: M7A pass 2 accepted by Joshua Myers on 2026-09-15
+- Status: M7B reclassification accepted by Joshua Myers on 2026-09-15
 - Manifest: [`m7/public-contract.json`](m7/public-contract.json)
 - Human reference: [`PUBLIC_API_REFERENCE.md`](PUBLIC_API_REFERENCE.md)
 - Update command: `make update-public-contract`
@@ -25,10 +25,13 @@ The classified inventory contains:
 - `M6CMetaError`, its stable `code` attribute, and all 16 currently reachable
   literal error codes.
 
-Pass 2 assigns every root export `one_x_disposition="stabilize"` and one of ten
-contract categories. All 144 names shipped in `0.1.1` remain in the 1.x
-accepted candidate; no pre-1.0 removal or rename is proposed. The generated
-human reference lists every classified name and its normative documentation.
+All 144 names shipped in `0.1.1` remain in the 1.x accepted candidate; no
+pre-1.0 removal or rename is proposed. M7B supersedes the all-stable M7A
+candidate for seven dedicated robust-meta names: `RobustMetaAnalysis`,
+`RobustMetaResult`, and the five nested `RobustMeta*Result` records are marked
+`one_x_disposition="experimental"`. The other 137 names remain `stabilize`.
+The generated human reference lists every classified name, disposition, and
+normative documentation.
 
 ## Review meaning
 

@@ -1,11 +1,11 @@
 # Public API Reference
 
-- Status: M7A pass 2 accepted by Joshua Myers on 2026-09-15
+- Status: M7B reclassification accepted by Joshua Myers on 2026-09-15
 - Machine source: [`m7/public-contract.json`](m7/public-contract.json)
 - Stability policy: [`API_STABILITY.md`](API_STABILITY.md)
 
 This reference classifies every name exported through `plotsalot.__all__`.
-The 1.x candidate retains all 144 names already shipped in `0.1.1`; pass 2
+The 1.x candidate retains all 144 names already shipped in `0.1.1`; M7A
 found no accidental wildcard, leading-underscore, test, benchmark, or oracle
 export. Exact signatures and dataclass fields are retained in the machine
 manifest and checked by `make public-contract`.
@@ -62,7 +62,7 @@ Top-level typed result with a versioned JSON-safe representation.
 
 Normative documentation: `docs/CONTRACTS.md`, `schemas/`.
 
-`AnalysisResult`, `BayesianCategoricalResult`, `BayesianComparisonResult`, `BayesianCorrelationMatrixResult`, `BayesianCorrelationResult`, `BayesianDotPlotResult`, `BayesianMetaResult`, `BayesianOneSampleResult`, `CategoricalResult`, `CoefficientResult`, `CoefficientTableResult`, `ComparisonResult`, `CompositionResult`, `CorrelationMatrixResult`, `CorrelationResult`, `DotPlotResult`, `GroupedResult`, `PosteriorCoefficientTableResult`, `RobustCoefficientTableResult`, `RobustComparisonResult`, `RobustCorrelationMatrixResult`, `RobustCorrelationResult`, `RobustDotPlotResult`, `RobustMetaResult`, `RobustOneSampleResult`.
+`AnalysisResult`, `BayesianCategoricalResult`, `BayesianComparisonResult`, `BayesianCorrelationMatrixResult`, `BayesianCorrelationResult`, `BayesianDotPlotResult`, `BayesianMetaResult`, `BayesianOneSampleResult`, `CategoricalResult`, `CoefficientResult`, `CoefficientTableResult`, `ComparisonResult`, `CompositionResult`, `CorrelationMatrixResult`, `CorrelationResult`, `DotPlotResult`, `GroupedResult`, `PosteriorCoefficientTableResult`, `RobustCoefficientTableResult`, `RobustComparisonResult`, `RobustCorrelationMatrixResult`, `RobustCorrelationResult`, `RobustDotPlotResult`, `RobustMetaResult` *(experimental)*, `RobustOneSampleResult`.
 
 ### `result_component`
 
@@ -70,7 +70,7 @@ Typed field record exposed by a supported public result contract.
 
 Normative documentation: `docs/CONTRACTS.md`, `docs/README.md`.
 
-`BayesianEvidenceResult`, `BayesianMetaEvidenceResult`, `BayesianMetaFitResult`, `BayesianMetaPriorResult`, `BayesianMetaQuadratureResult`, `BayesianMetaStudyResult`, `BayesianPosteriorSummary`, `CategoricalSampleAudit`, `M6CMetaResourceLimits`, `M6CWorkResult`, `MetaAnalysisResult`, `MetaStudyIdentityResult`, `PairwiseComparisonResult`, `PosteriorCoefficientProvenanceResult`, `PosteriorCoefficientSummaryResult`, `PosteriorCoefficientTermResult`, `RepeatedSampleAudit`, `ResamplingResult`, `ResourceLimits`, `RobustCoefficientProvenanceResult`, `RobustCoefficientTermResult`, `RobustMetaAnalysisResult`, `RobustMetaConvergenceResult`, `RobustMetaPooledResult`, `RobustMetaStartResult`, `RobustMetaStudyResult`, `TrimmedKernelResult`.
+`BayesianEvidenceResult`, `BayesianMetaEvidenceResult`, `BayesianMetaFitResult`, `BayesianMetaPriorResult`, `BayesianMetaQuadratureResult`, `BayesianMetaStudyResult`, `BayesianPosteriorSummary`, `CategoricalSampleAudit`, `M6CMetaResourceLimits`, `M6CWorkResult`, `MetaAnalysisResult`, `MetaStudyIdentityResult`, `PairwiseComparisonResult`, `PosteriorCoefficientProvenanceResult`, `PosteriorCoefficientSummaryResult`, `PosteriorCoefficientTermResult`, `RepeatedSampleAudit`, `ResamplingResult`, `ResourceLimits`, `RobustCoefficientProvenanceResult`, `RobustCoefficientTermResult`, `RobustMetaAnalysisResult` *(experimental)*, `RobustMetaConvergenceResult` *(experimental)*, `RobustMetaPooledResult` *(experimental)*, `RobustMetaStartResult` *(experimental)*, `RobustMetaStudyResult` *(experimental)*, `TrimmedKernelResult`.
 
 ### `analysis_container`
 
@@ -78,7 +78,7 @@ Typed analysis/render handoff preserving exact data-result identity.
 
 Normative documentation: `docs/CONTRACTS.md`.
 
-`BayesianMetaAnalysis`, `CategoricalAnalysis`, `CoefficientAnalysis`, `ComparisonAnalysis`, `CorrelationAnalysis`, `CorrelationMatrixAnalysis`, `DotPlotAnalysis`, `GroupedAnalysis`, `HistogramAnalysis`, `ReportedCoefficientAnalysis`, `RobustMetaAnalysis`, `TableCoefficientAnalysis`.
+`BayesianMetaAnalysis`, `CategoricalAnalysis`, `CoefficientAnalysis`, `ComparisonAnalysis`, `CorrelationAnalysis`, `CorrelationMatrixAnalysis`, `DotPlotAnalysis`, `GroupedAnalysis`, `HistogramAnalysis`, `ReportedCoefficientAnalysis`, `RobustMetaAnalysis` *(experimental)*, `TableCoefficientAnalysis`.
 
 ### `selected_data`
 
@@ -112,11 +112,22 @@ Normative documentation: `docs/API_STABILITY.md`, `docs/M6C_STATISTICAL_METHODS.
 
 `M6CMetaError`.
 
+## Experimental 1.0 exception
+
+The fixed-Student-t4 robust aggregate meta-analysis selected with
+`meta_analytic_effect=True, type="robust"` remains available but is
+experimental for 1.0. Its seven dedicated `RobustMeta*` names are
+marked above. The containing `ggcoefstats`, `analyze_ggcoefstats`, and
+`render_ggcoefstats` callables remain stable for their supported
+non-experimental modes; the robust-meta method meaning and serialized
+variant are excluded from the 1.x compatibility promise.
+
 ## Review and migration rule
 
-Every listed name has `one_x_disposition="stabilize"` in the retained
-manifest. That technical disposition preserves the `0.1.1` root surface
-and introduces no removal or rename. It does not independently approve
-the final 1.0 candidate: statistical disposition, golden serialization,
+The retained manifest marks 137 names `stabilize` and seven dedicated
+robust-meta names `experimental`. All 144 `0.1.1` names remain importable
+and no removal or rename is introduced. This classification does not
+independently approve the final 1.0 candidate: statistical disposition,
+golden serialization,
 error and semantic rendering evidence, platform gates, and owner
 acceptance remain required by M7.

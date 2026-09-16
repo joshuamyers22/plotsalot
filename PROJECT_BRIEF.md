@@ -94,9 +94,9 @@
 |---|---|---|---|
 | Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for published 0.1.1 |
 | Upstream is pinned | `docs/upstream/manifest.json` and hashes | Technical lead | Passing |
-| Public API inventory is complete | `docs/compatibility.md`, M7 machine ledger, and namespaces | Product owner | M7A pass 2 accepted; 22-export prose reconciled and all 144 root names retained for stabilization |
+| Public API inventory is complete | `docs/compatibility.md`, M7 machine ledger, and namespaces | Product owner | M7A/M7B accepted; all 144 root names retained, with 137 stable and seven dedicated robust-meta names experimental |
 | No R runtime dependency | Python-only isolated wheel smoke test | Technical lead | Passing for published 0.1.1 |
-| Statistical correctness | Method specs, analytic cases, R oracle, independent review | Joshua Myers | M0–M6 approved; M6C boundary disposition provisional until M7 |
+| Statistical correctness | Method specs, analytic cases, R oracle, independent review | Joshua Myers | M0–M6 approved; M7B reclassified robust aggregate meta-analysis as experimental for 1.0 |
 | MIT license posture | ADR-010 and qualified review | Joshua Myers | Approved |
 | Trusted package publication | OIDC release workflow, hashes, metadata, and clean-index smoke | Joshua Myers | 0.1.1 published and verified |
 
@@ -104,5 +104,4 @@
 
 | Question | Decision deadline | Owner | ADR |
 |---|---|---|---|
-| Select replace, reclassify, or a versioned correction investigation for M6C robust meta after independent review; locked mapping and confirmation are retained and reaffirmation is blocked | M7B close | Joshua Myers | M7-D2 / ADR-005 |
 | Accept the exact hardened candidate as plotsalot 1.0 | M7 exit | Joshua Myers | M7 contract |

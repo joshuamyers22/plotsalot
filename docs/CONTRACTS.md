@@ -154,6 +154,12 @@ confidence, credible, pooled, and predictive semantic roles using retained
 result values only. Extraction and mixed classical/robust/Bayesian composition
 preserve the exact result objects.
 
+For 1.0, the robust aggregate branch and its seven dedicated `RobustMeta*`
+types are experimental rather than stable contracts. This classification does
+not alter the owned table/result identity, strict coded failure, bounded work,
+or no-fallback invariants. The classical and Bayesian coefficient/meta
+contracts remain within their documented stable boundary.
+
 ## Plot boundary
 
 `StatsPlot` pairs a structured result with its Matplotlib figure, named axes,

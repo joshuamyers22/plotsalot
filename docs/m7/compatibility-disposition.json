@@ -20,6 +20,40 @@
       "rejected"
     ]
   },
+  "one_zero_feature_exceptions": [
+    {
+      "id": "M7B-EXP-001",
+      "feature": "fixed-Student-t4 robust aggregate meta-analysis",
+      "disposition": "experimental",
+      "upstream_export": "ggcoefstats",
+      "python_surfaces": ["ggcoefstats", "analyze_ggcoefstats", "render_ggcoefstats"],
+      "selector": {"meta_analytic_effect": true, "type": "robust"},
+      "dedicated_public_types": [
+        "RobustMetaAnalysis",
+        "RobustMetaAnalysisResult",
+        "RobustMetaConvergenceResult",
+        "RobustMetaPooledResult",
+        "RobustMetaResult",
+        "RobustMetaStartResult",
+        "RobustMetaStudyResult"
+      ],
+      "serialized_contract": {
+        "schema": "schemas/coefficient-result.schema.json",
+        "schema_version": 2,
+        "analysis": "ggcoefstats_meta_analysis",
+        "mode": "robust"
+      },
+      "runtime_behavior": "retained_without_estimator_or_fallback_change",
+      "one_x_promise": "excluded_from_stable_method_and_serialized_variant_compatibility",
+      "rationale": "The locked M7B mapping retained one robust_meta_ambiguous_optimum failure, which blocks reaffirmation under the approved experiment plan.",
+      "approval": {
+        "decision": "M7-D2-reclassify",
+        "owner": "Joshua Myers",
+        "reviewed": true,
+        "approved_at": "2026-09-15"
+      }
+    }
+  ],
   "exports": [
     {
       "upstream_export": "combine_plots",

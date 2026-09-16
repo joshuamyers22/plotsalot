@@ -1,6 +1,6 @@
 # Milestone M7: Compatibility Closure and 1.0 Hardening
 
-- Status: active; M7-D1 through M7-D3 and M7A accepted 2026-09-15
+- Status: active; M7-D1 through M7-D3, M7A, and M7B accepted 2026-09-15
 - Contract date: 2026-09-15
 - Target duration: 4–6 weeks after entry approval
 - Product and statistical owner: Joshua Myers
@@ -82,6 +82,10 @@ The boundary follows these rules:
 
 - Existing supported classical, robust, Bayesian, grouped, extraction,
   composition, and theme behavior is in the 1.0 stabilization boundary.
+- Fixed-Student-t4 robust aggregate meta-analysis is the sole M7B exception: it
+  remains available but is experimental for 1.0, including its seven dedicated
+  public types and serialized result variant. The rest of `ggcoefstats` remains
+  in the stabilization boundary.
 - A feature is not required for 1.0 merely because an older milestone called it
   deferred. The ledger must say whether it is a post-1.0 candidate or rejected
   by the product architecture.
@@ -131,14 +135,14 @@ under a new threshold.
 |---|---|---|
 | M7 contract and decision ledger | Owner-approved M7-D1 through M7-D3 | Accepted 2026-09-15 |
 | Machine-readable compatibility closure | Exact 22-export inventory test and unique disposition coverage | M7A pass 2 accepted 2026-09-15 |
-| Robust-meta boundary resolution | Locked experiment artifact, independent calculation/review, and owner disposition | Mapping and confirmation retained; reaffirmation blocked, owner disposition pending |
-| Public API manifest | Generated/retained names and signatures compared in CI with reviewed exceptions | All 144 names classified for stabilization; M7A pass 2 accepted 2026-09-15 |
+| Robust-meta boundary resolution | Locked experiment artifact, independent calculation/review, and owner disposition | Complete; experimental reclassification approved 2026-09-15 |
+| Public API manifest | Generated/retained names and signatures compared in CI with reviewed exceptions | All 144 names retained: 137 stable and seven experimental robust-meta names |
 | Schema stability fixtures | Golden serialized variants, schema validation, version/migration tests, and mutation rejection | Not started |
 | Error and refusal contract | Typed error/code inventory plus invalid, degenerate, ceiling, and atomic-group fault tests | Not started |
 | Platform/package gate | Python 3.11 and 3.12 isolated wheel/sdist install, import, public smoke, and metadata inspection | Existing 0.1.1 evidence; repeat for 1.0 candidate |
 | Oracle and benchmark gate | Applicable pinned-oracle, replay, calibration, schema, and retained performance checks | Existing baseline; repeat after changed boundaries |
 | Documentation closure | Getting started, user guide, compatibility, limitations, migration, security, and release docs agree | Partial |
-| Independent review and acceptance | Finding ledger closed; product/statistical and release acceptance recorded separately | Not started |
+| Independent review and acceptance | Finding ledger closed; product/statistical and release acceptance recorded separately | M7B statistical review complete; final candidate review not started |
 
 ## Verification loop and stop rules
 

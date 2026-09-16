@@ -6,8 +6,8 @@
 - Artifact: `m7b-robust-meta-confirmation.json`
 - SHA-256: `ea1bac057f7fb4b43b030a5f8b3b13f51d165bb073d62f7bdbf0c27ade4ecf7a`
 - Mapping SHA-256: `fb556565ca1d1184a1780410a78aa8444a1b3b26546147088dbde6c93f7ee076`
-- Gate: locked execution complete; independent review and owner disposition
-  pending
+- Gate: locked execution complete; independently reviewed and reclassified as
+  experimental by Joshua Myers on 2026-09-15
 
 ## Execution identity
 
@@ -56,9 +56,10 @@ scenario, seed, method, or implementation was changed after inspection.
 Confirmation adds independent-seed precision but does not clear the mapping
 failure. Under the approved version-1 plan, the retained
 `robust_meta_ambiguous_optimum` mapping failure blocks reaffirmation of the
-current interval. Replacement or reclassification remains an owner decision;
-correction and a new experiment would require an owner-approved versioned plan
-and new seeds while retaining both current artifacts.
+current interval. After independent review, Joshua Myers selected
+reclassification as experimental for 1.0 on 2026-09-15. A future stable method
+would require a new approved specification and evidence plan while retaining
+both current artifacts.
 
 The artifact regression test fixes the confirmation source revision and digest,
 its mapping-digest chain, all eight denominators, zero failures, zero

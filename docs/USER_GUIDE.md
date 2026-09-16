@@ -150,6 +150,13 @@ forms. The aggregate meta-analysis path accepts independent study summaries on
 one declared comparable scale; it does not derive effects from raw outcomes or
 silently change estimators.
 
+Fixed-Student-t4 robust aggregate meta-analysis
+(`meta_analytic_effect=True, type="robust"`) is experimental for 1.0. It remains
+available with strict coded failure and no estimator fallback, but its dedicated
+types and serialized variant are not stable 1.x contracts. Pin plotsalot and
+retain provenance when using it. Classical and Bayesian aggregate modes are
+separate methods rather than fallback replacements.
+
 ## Robust and Bayesian modes
 
 Robust modes use the approved fixed-20%-trim/Winsorization contracts. Bayesian

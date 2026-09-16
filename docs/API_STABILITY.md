@@ -50,11 +50,30 @@ Names imported only from internal modules, leading-underscore names, test
 helpers, oracle/benchmark tools, and undocumented object internals are not
 public merely because Python permits access to them.
 
+## Experimental public surface
+
+An explicitly experimental feature may remain importable in 1.0 without
+receiving the stable statistical and serialized-result promise above. Its call
+selector, dedicated types, schema branch, rationale, and owner approval must be
+listed in the machine-readable M7 compatibility ledger and generated public
+manifest. Experimental status is not permission for silent fallback, uncoded
+failure, unbounded work, or misleading documentation.
+
+The sole 1.0 exception is fixed-Student-t4 robust aggregate meta-analysis,
+selected by `meta_analytic_effect=True, type="robust"`. The containing
+`ggcoefstats`, `analyze_ggcoefstats`, and `render_ggcoefstats` names remain stable
+for supported non-experimental modes. The seven dedicated `RobustMeta*` public
+types and the schema-v2 robust-meta result variant remain available but are not
+promised compatible across 1.x minor releases. A change or removal must still
+be documented with recovery or reanalysis guidance, but does not require the
+normal stable-surface deprecation window.
+
 ## Serialized-result rules
 
-Serialized results use an explicit schema discriminator. M7 must retain a
-golden example for every supported variant and validate it against the matching
-schema.
+Stable serialized results use an explicit schema discriminator. M7 must retain
+a golden example for every supported variant and validate it against the
+matching schema. Experimental variants are retained and tested separately but
+do not acquire stable-variant status merely by sharing a schema file.
 
 - A published schema file is immutable. Correcting it requires a new schema
   version rather than silently changing the meaning accepted by an old version.
@@ -150,7 +169,7 @@ smallest safe response.
 Before the first 1.0 release is accepted, M7 must produce:
 
 - a generated public-name/signature manifest reviewed against documentation
-  (all 144 root names classified by M7A pass 2);
+  (all 144 root names classified; 137 stable and seven experimental after M7B);
 - a console-script and exit-contract inventory (included in that manifest);
 - golden serialized examples for every emitted result variant;
 - schema validation and mutation tests for field, type, discriminator, and

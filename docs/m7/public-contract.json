@@ -1,6 +1,6 @@
 {
   "manifest_version": 1,
-  "status": "m7a_pass2_accepted",
+  "status": "m7b_reclassification_accepted",
   "generated_from": {
     "package": "src/plotsalot/__init__.py",
     "metadata": "pyproject.toml",
@@ -15,7 +15,7 @@
   },
   "public_api": {
     "export_count": 144,
-    "one_x_candidate": "retain_all_current_root_exports",
+    "one_x_candidate": "retain_all_root_exports_with_experimental_robust_meta",
     "breaking_changes_from_0_1_1": [],
     "category_counts": {
       "analysis_container": 12,
@@ -28,6 +28,10 @@
       "serialized_result": 25,
       "shared_analysis_function": 1,
       "upstream_workflow_surface": 56
+    },
+    "disposition_counts": {
+      "experimental": 7,
+      "stabilize": 137
     },
     "categories": {
       "upstream_workflow_surface": {
@@ -1456,7 +1460,7 @@
           "result"
         ],
         "has_to_dict": false,
-        "one_x_disposition": "stabilize",
+        "one_x_disposition": "experimental",
         "contract_category": "analysis_container"
       },
       {
@@ -1476,7 +1480,7 @@
           "convergence"
         ],
         "has_to_dict": false,
-        "one_x_disposition": "stabilize",
+        "one_x_disposition": "experimental",
         "contract_category": "result_component"
       },
       {
@@ -1502,7 +1506,7 @@
           "converged"
         ],
         "has_to_dict": false,
-        "one_x_disposition": "stabilize",
+        "one_x_disposition": "experimental",
         "contract_category": "result_component"
       },
       {
@@ -1523,7 +1527,7 @@
           "prediction_absence_reason"
         ],
         "has_to_dict": false,
-        "one_x_disposition": "stabilize",
+        "one_x_disposition": "experimental",
         "contract_category": "result_component"
       },
       {
@@ -1554,7 +1558,7 @@
           "warnings"
         ],
         "has_to_dict": true,
-        "one_x_disposition": "stabilize",
+        "one_x_disposition": "experimental",
         "contract_category": "serialized_result"
       },
       {
@@ -1574,7 +1578,7 @@
           "boundary"
         ],
         "has_to_dict": false,
-        "one_x_disposition": "stabilize",
+        "one_x_disposition": "experimental",
         "contract_category": "result_component"
       },
       {
@@ -1594,7 +1598,7 @@
           "weighted_contribution"
         ],
         "has_to_dict": false,
-        "one_x_disposition": "stabilize",
+        "one_x_disposition": "experimental",
         "contract_category": "result_component"
       },
       {
@@ -2224,6 +2228,47 @@
       }
     ]
   },
+  "experimental_features": [
+    {
+      "id": "M7B-EXP-001",
+      "feature": "fixed-Student-t4 robust aggregate meta-analysis",
+      "disposition": "experimental",
+      "upstream_export": "ggcoefstats",
+      "python_surfaces": [
+        "ggcoefstats",
+        "analyze_ggcoefstats",
+        "render_ggcoefstats"
+      ],
+      "selector": {
+        "meta_analytic_effect": true,
+        "type": "robust"
+      },
+      "dedicated_public_types": [
+        "RobustMetaAnalysis",
+        "RobustMetaAnalysisResult",
+        "RobustMetaConvergenceResult",
+        "RobustMetaPooledResult",
+        "RobustMetaResult",
+        "RobustMetaStartResult",
+        "RobustMetaStudyResult"
+      ],
+      "serialized_contract": {
+        "schema": "schemas/coefficient-result.schema.json",
+        "schema_version": 2,
+        "analysis": "ggcoefstats_meta_analysis",
+        "mode": "robust"
+      },
+      "runtime_behavior": "retained_without_estimator_or_fallback_change",
+      "one_x_promise": "excluded_from_stable_method_and_serialized_variant_compatibility",
+      "rationale": "The locked M7B mapping retained one robust_meta_ambiguous_optimum failure, which blocks reaffirmation under the approved experiment plan.",
+      "approval": {
+        "decision": "M7-D2-reclassify",
+        "owner": "Joshua Myers",
+        "reviewed": true,
+        "approved_at": "2026-09-15"
+      }
+    }
+  ],
   "serialized_result_types": [
     "AnalysisResult",
     "BayesianCategoricalResult",
@@ -2250,6 +2295,35 @@
     "RobustDotPlotResult",
     "RobustMetaResult",
     "RobustOneSampleResult"
+  ],
+  "stable_serialized_result_types": [
+    "AnalysisResult",
+    "BayesianCategoricalResult",
+    "BayesianComparisonResult",
+    "BayesianCorrelationMatrixResult",
+    "BayesianCorrelationResult",
+    "BayesianDotPlotResult",
+    "BayesianMetaResult",
+    "BayesianOneSampleResult",
+    "CategoricalResult",
+    "CoefficientResult",
+    "CoefficientTableResult",
+    "ComparisonResult",
+    "CompositionResult",
+    "CorrelationMatrixResult",
+    "CorrelationResult",
+    "DotPlotResult",
+    "GroupedResult",
+    "PosteriorCoefficientTableResult",
+    "RobustCoefficientTableResult",
+    "RobustComparisonResult",
+    "RobustCorrelationMatrixResult",
+    "RobustCorrelationResult",
+    "RobustDotPlotResult",
+    "RobustOneSampleResult"
+  ],
+  "experimental_serialized_result_types": [
+    "RobustMetaResult"
   ],
   "schemas": [
     {

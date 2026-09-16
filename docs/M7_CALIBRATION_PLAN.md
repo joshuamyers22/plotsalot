@@ -1,7 +1,7 @@
 # M7 Robust Meta-analysis Calibration Plan
 
-- Status: approved version 1; mapping and confirmation retained, reaffirmation
-  blocked, independent review and owner disposition pending
+- Status: complete; mapping and confirmation retained, reaffirmation blocked,
+  experimental reclassification approved after independent review
 - Date: 2026-09-15
 - Applies to: fixed-Student-t4 aggregate robust meta-analysis only
 - Prior evidence: `evidence/M6C_PASS2_VERIFICATION.md` and retained JSON artifacts
@@ -180,3 +180,12 @@ fits, 16 workers, 36 aggregate runner-hours, and 5 MiB per retained summary;
 and Joshua Myers as independent reviewer of the Codex-authored driver and
 evidence. Final owner disposition is recorded only after both locked artifacts
 and the independent review exist.
+
+## Final disposition
+
+Both locked artifacts were retained unchanged and digest-chained. The mapping
+recorded one `robust_meta_ambiguous_optimum` fit failure, blocking reaffirmation
+under the predeclared rule; confirmation recorded no failures. Neither run had
+an undercoverage flag. Joshua Myers independently reviewed the driver and
+evidence and approved experimental reclassification for 1.0 on 2026-09-15.
+The runtime estimator and strict failure behavior remain unchanged.
