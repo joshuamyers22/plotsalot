@@ -60,18 +60,18 @@
 
 | ID | Location and evidence | Consequence | Severity | Current disposition | Acceptance check | Owner |
 |---|---|---|---|---|---|---|
-| M7-F001 | `docs/evidence/M6C_PASS2_VERIFICATION.md`; M7 mapping artifact | Current provisional rule depends on unknowable generating `tau`; one mapping fit failed ambiguously | Blocking | Mapping retained; reaffirmation blocked, confirmation and owner replace/reclassify disposition pending | Locked confirmation, independent review, and final owner disposition | Joshua Myers |
+| M7-F001 | `docs/evidence/M6C_PASS2_VERIFICATION.md`; M7 mapping and confirmation artifacts | Current provisional rule depends on unknowable generating `tau`; one mapping fit failed ambiguously | Blocking | Both locked artifacts retained; reaffirmation blocked, independent review and owner disposition pending | Independent review and final owner disposition | Joshua Myers |
 | M7-F002 | `PROJECT_BRIEF.md` previously retained resolved 0.1.1/security questions | Planning state could misdirect M7 work | Major | Correct in M7 entry slice | Brief names only current decisions | Implementation owner |
 | M7-F003 | Retained stability fixtures are incomplete | Downstream compatibility promise is only partly enforceable | Blocking | M7-D3 policy accepted; generated manifest and drift check implemented, golden variants pending | Golden serialization, mutation, error, and semantic contract tests | Joshua Myers |
 | M7-F004 | Deferred capability prose spanned several milestone-era sections | Older text could call an implemented M6 mode deferred | Major | Closed; M7A pass 2 independently accepted 2026-09-15 | Ledger/prose reconciliation tests and review | Product owner |
 
 ## Exit
 
-- Stop reason: locked mapping retained with a reaffirmation blocker; locked
-  confirmation is the next evidence-changing action.
+- Stop reason: mapping and confirmation retained; independent review and owner
+  disposition are the next evidence-changing actions.
 - Current rubric result: all three entry decisions and M7A are accepted; M7B
-  harness controls and mapping retention pass, but confirmation and final
-  disposition remain open.
+  harness controls and both locked evidence runs pass retention checks, but
+  reaffirmation is blocked and independent review/final disposition remain open.
 - Full quality gate: required after this entry slice and after every accepted
   implementation boundary.
 - Remaining uncertainty: the M7-D2 locked mapping and confirmation evidence,

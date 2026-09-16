@@ -244,5 +244,53 @@ class M7BMappingEvidenceTests(unittest.TestCase):
         self.assertLessEqual(artifact.stat().st_size, 5 * 1024 * 1024)
 
 
+class M7BConfirmationEvidenceTests(unittest.TestCase):
+    def test_locked_confirmation_is_chained_complete_and_unchanged(self) -> None:
+        mapping = ROOT / "docs" / "evidence" / "m7b-robust-meta-mapping.json"
+        artifact = ROOT / "docs" / "evidence" / "m7b-robust-meta-confirmation.json"
+        payload = json.loads(artifact.read_text())
+
+        self.assertEqual(payload["schema_version"], 1)
+        self.assertEqual(payload["plan_version"], 1)
+        self.assertEqual(payload["run"], "confirmation")
+        self.assertEqual(payload["status"], "completed_pending_independent_review")
+        self.assertEqual(payload["decision_disposition"], "not_decided")
+        self.assertEqual(
+            payload["source_commit"],
+            "f951d101d18edcf147030a4ca080b2221ce32481",
+        )
+        self.assertTrue(payload["source_tree_clean"])
+        self.assertEqual(payload["seed_root"], CONFIRMATION_SEED)
+        self.assertEqual(payload["cases_per_cell"], CONFIRMATION_CASES)
+        self.assertEqual(payload["scenario_count"], 8)
+        self.assertEqual(payload["total_fits"], 40_000)
+        self.assertEqual(len(payload["cells"]), 8)
+        self.assertEqual(sum(cell["failures"] for cell in payload["cells"]), 0)
+        self.assertFalse(any(cell["undercoverage"] for cell in payload["cells"]))
+        self.assertEqual(
+            {
+                cell["scenario"]["scenario_id"]
+                for cell in payload["cells"]
+                if cell["conservative"]
+            },
+            {
+                "primary-k010-tau-0p0000-mu-0p0000-linear",
+                "primary-k020-tau-0p0000-mu-0p0000-linear",
+                "primary-k050-tau-0p0000-mu-0p0000-linear",
+                "primary-k020-tau-0p0250-mu-0p0000-linear",
+            },
+        )
+
+        mapping_digest = hashlib.sha256(mapping.read_bytes()).hexdigest()
+        self.assertEqual(payload["mapping_artifact_sha256"], mapping_digest)
+        digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        sealed_digest, sealed_name = (
+            artifact.with_suffix(".json.sha256").read_text().split()
+        )
+        self.assertEqual(sealed_digest, digest)
+        self.assertEqual(sealed_name, artifact.name)
+        self.assertLessEqual(artifact.stat().st_size, 5 * 1024 * 1024)
+
+
 if __name__ == "__main__":
     unittest.main()

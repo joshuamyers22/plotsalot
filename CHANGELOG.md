@@ -19,6 +19,9 @@ versioning for published package releases.
 - Retained the one-time 76,000-fit M7B mapping artifact unchanged; its single
   ambiguous-optimum failure blocks reaffirmation under the approved plan, while
   no cell triggered the predeclared undercoverage flag.
+- Retained the independently seeded 40,000-fit M7B confirmation artifact with
+  no failures or undercoverage flags and four conservatively flagged focal
+  cells; final method disposition awaits independent owner review.
 
 ## 0.1.1 - 2026-09-15
 

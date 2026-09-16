@@ -131,7 +131,7 @@ under a new threshold.
 |---|---|---|
 | M7 contract and decision ledger | Owner-approved M7-D1 through M7-D3 | Accepted 2026-09-15 |
 | Machine-readable compatibility closure | Exact 22-export inventory test and unique disposition coverage | M7A pass 2 accepted 2026-09-15 |
-| Robust-meta boundary resolution | Locked experiment artifact, independent calculation/review, and owner disposition | Mapping retained with one fit-failure blocker; confirmation pending |
+| Robust-meta boundary resolution | Locked experiment artifact, independent calculation/review, and owner disposition | Mapping and confirmation retained; reaffirmation blocked, owner disposition pending |
 | Public API manifest | Generated/retained names and signatures compared in CI with reviewed exceptions | All 144 names classified for stabilization; M7A pass 2 accepted 2026-09-15 |
 | Schema stability fixtures | Golden serialized variants, schema validation, version/migration tests, and mutation rejection | Not started |
 | Error and refusal contract | Typed error/code inventory plus invalid, degenerate, ceiling, and atomic-group fault tests | Not started |
