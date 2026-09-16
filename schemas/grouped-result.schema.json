@@ -19,16 +19,22 @@
     "analysis": {
       "enum": [
         "grouped_gghistostats_one_sample_parametric",
+        "grouped_gghistostats_one_sample_robust",
         "grouped_gghistostats_one_sample_bayesian",
         "grouped_ggdotplotstats_one_sample_parametric",
+        "grouped_ggdotplotstats_one_sample_robust",
         "grouped_ggdotplotstats_one_sample_bayesian",
         "grouped_ggscatterstats_pearson",
+        "grouped_ggscatterstats_winsorized",
         "grouped_ggscatterstats_bayesian_pearson",
         "grouped_ggcorrmat_pearson",
+        "grouped_ggcorrmat_winsorized",
         "grouped_ggcorrmat_bayesian_pearson",
         "grouped_ggbetweenstats_welch",
+        "grouped_ggbetweenstats_robust",
         "grouped_ggbetweenstats_bayesian",
         "grouped_ggwithinstats_parametric",
+        "grouped_ggwithinstats_robust",
         "grouped_ggwithinstats_bayesian",
         "grouped_categorical_classical",
         "grouped_categorical_bayesian"
@@ -82,6 +88,7 @@
               { "$ref": "correlation-matrix-result.schema.json" },
               { "$ref": "comparison-result.schema.json" },
               { "$ref": "categorical-result.schema.json" },
+              { "$ref": "robust-result.schema.json" },
               { "$ref": "bayesian-result.schema.json" }
             ]
           }
@@ -127,6 +134,18 @@
     "warnings": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
+    },
+    "resampling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root_seed", "calculated_work", "maximum_resample_work"],
+      "properties": {
+        "root_seed": {"type": "integer", "minimum": 0},
+        "calculated_work": {"type": "integer", "minimum": 1},
+        "maximum_resample_work": {
+          "type": "integer", "minimum": 1, "maximum": 500000000
+        }
+      }
     },
     "bayesian": {
       "type": "object",

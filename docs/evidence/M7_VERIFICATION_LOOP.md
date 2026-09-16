@@ -62,19 +62,20 @@
 |---|---|---|---|---|---|---|
 | M7-F001 | `docs/evidence/M6C_PASS2_VERIFICATION.md`; M7 mapping and confirmation artifacts | Current provisional rule depends on unknowable generating `tau`; one mapping fit failed ambiguously | Blocking | Closed; Joshua Myers independently reviewed and approved experimental reclassification for 1.0 on 2026-09-15 | Machine ledger, migration guidance, and public manifest identify the experimental boundary | Joshua Myers |
 | M7-F002 | `PROJECT_BRIEF.md` previously retained resolved 0.1.1/security questions | Planning state could misdirect M7 work | Major | Correct in M7 entry slice | Brief names only current decisions | Implementation owner |
-| M7-F003 | Retained stability fixtures are incomplete | Downstream compatibility promise is only partly enforceable | Blocking | M7-D3 policy accepted; generated manifest and drift check implemented, golden variants pending | Golden serialization, mutation, error, and semantic contract tests | Joshua Myers |
+| M7-F003 | Retained stability fixtures were incomplete | Downstream compatibility promise was only partly enforceable | Blocking | Closed in M7C; 51 goldens cover 25 result types and 49 discriminator triples, with schema mutation, error/refusal, migration replay, and semantic-axis checks | `docs/evidence/M7C_VERIFICATION.md` and `tests/test_m7c_stability.py` | Joshua Myers |
 | M7-F004 | Deferred capability prose spanned several milestone-era sections | Older text could call an implemented M6 mode deferred | Major | Closed; M7A pass 2 independently accepted 2026-09-15 | Ledger/prose reconciliation tests and review | Product owner |
 
 ## Exit
 
-- Stop reason: M7B complete; M7C adversarial API/schema stability is the next
-  evidence-changing track.
-- Current rubric result: all three entry decisions and M7A are accepted; M7B
-  harness controls and both locked evidence runs pass retention checks; the
-  final robust-meta disposition is accepted as experimental for 1.0.
+- Stop reason: M7C complete; M7D release-candidate closeout is the next and
+  final evidence-changing track.
+- Current rubric result: all three entry decisions and M7A–M7C are complete;
+  the public surface, robust-meta exception, serialized variants, schemas,
+  error inventory, migration replay, and semantic axes are retained in CI.
 - Full quality gate: required after this entry slice and after every accepted
   implementation boundary.
-- Remaining uncertainty: M7C golden fixtures and adversarial stability evidence,
-  M7D release evidence, and final 1.0 candidate acceptance.
+- Remaining uncertainty: M7D exact-candidate platform/package, oracle,
+  benchmark, documentation, security, independent-review evidence, and final
+  1.0 candidate acceptance.
 - Approved entry facts are promoted to project memory; implementation and final
   release claims remain evidence-gated.

@@ -1,12 +1,13 @@
 {
   "manifest_version": 1,
-  "status": "m7b_reclassification_accepted",
+  "status": "m7c_hardening_complete",
   "generated_from": {
     "package": "src/plotsalot/__init__.py",
     "metadata": "pyproject.toml",
     "schemas": "schemas/*.json",
     "cli_parsers": "src/plotsalot/*_cli.py and src/plotsalot/cli.py",
-    "compatibility_scope": "docs/m7/compatibility-disposition.json"
+    "compatibility_scope": "docs/m7/compatibility-disposition.json",
+    "golden_results": "docs/m7/golden-results.json"
   },
   "distribution": {
     "name": "plotsalot",
@@ -2325,6 +2326,17 @@
   "experimental_serialized_result_types": [
     "RobustMetaResult"
   ],
+  "golden_results": {
+    "path": "docs/m7/golden-results.json",
+    "sha256": "2cb3742538693b1a349792ee918e34d36fe49de1e50bade16c36f3100be90bda",
+    "entry_count": 51,
+    "result_type_count": 25,
+    "discriminator_count": 49,
+    "stability_counts": {
+      "experimental": 1,
+      "stable": 50
+    }
+  },
   "schemas": [
     {
       "path": "schemas/analysis-result.schema.json",
@@ -2348,7 +2360,7 @@
       "role": "serialized_result",
       "id": "https://plotsalot.dev/schemas/bayesian-result.schema.json",
       "title": "plotsalot M6B Bayesian result",
-      "sha256": "3846a78b1e11aa4de3a6b2509213ea2174ae6b955eb7185ea6454a3707a4f42e",
+      "sha256": "2543bd7bf3d0a650418c01cdba1b2f926aaa954e6484b8b210ada66853605e49",
       "variants": [
         {
           "schema_version": 3,
@@ -2452,7 +2464,7 @@
       "role": "serialized_result",
       "id": "https://plotsalot.dev/schemas/composition-result.schema.json",
       "title": "plotsalot composition result schema v1",
-      "sha256": "f398843b67419cf3efeca58405794b94a9f85c07fcd6e94aa49adc7b5b8ea56d",
+      "sha256": "43344a741107a84e7d6c973f31747dc1c936aeca31f7773da650d774edfe3490",
       "variants": [
         {
           "schema_version": 1,
@@ -2504,7 +2516,7 @@
       "role": "serialized_result",
       "id": "https://plotsalot.dev/schemas/grouped-result.schema.json",
       "title": "plotsalot grouped result schema v1",
-      "sha256": "89a2475adc3c652491daa1fce5cb1e17cb35dd7b3140fa26ba049cf716078274",
+      "sha256": "3522bfc0291b4b5eb4a384fef77d08219d79a8cb50c561c97611361ced1c0f64",
       "variants": [
         {
           "schema_version": 1,
@@ -2520,6 +2532,10 @@
         },
         {
           "schema_version": 1,
+          "analysis": "grouped_ggbetweenstats_robust"
+        },
+        {
+          "schema_version": 1,
           "analysis": "grouped_ggbetweenstats_welch"
         },
         {
@@ -2532,11 +2548,19 @@
         },
         {
           "schema_version": 1,
+          "analysis": "grouped_ggcorrmat_winsorized"
+        },
+        {
+          "schema_version": 1,
           "analysis": "grouped_ggdotplotstats_one_sample_bayesian"
         },
         {
           "schema_version": 1,
           "analysis": "grouped_ggdotplotstats_one_sample_parametric"
+        },
+        {
+          "schema_version": 1,
+          "analysis": "grouped_ggdotplotstats_one_sample_robust"
         },
         {
           "schema_version": 1,
@@ -2548,6 +2572,10 @@
         },
         {
           "schema_version": 1,
+          "analysis": "grouped_gghistostats_one_sample_robust"
+        },
+        {
+          "schema_version": 1,
           "analysis": "grouped_ggscatterstats_bayesian_pearson"
         },
         {
@@ -2556,11 +2584,19 @@
         },
         {
           "schema_version": 1,
+          "analysis": "grouped_ggscatterstats_winsorized"
+        },
+        {
+          "schema_version": 1,
           "analysis": "grouped_ggwithinstats_bayesian"
         },
         {
           "schema_version": 1,
           "analysis": "grouped_ggwithinstats_parametric"
+        },
+        {
+          "schema_version": 1,
+          "analysis": "grouped_ggwithinstats_robust"
         }
       ]
     },

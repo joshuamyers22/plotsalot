@@ -25,6 +25,11 @@ versioning for published package releases.
 - Reclassified fixed-Student-t4 robust aggregate meta-analysis as experimental
   for 1.0 after independent owner review, without changing its estimator,
   strict coded failures, or no-fallback behavior.
+- Added the M7C 51-example serialized-result corpus, Draft 2020-12 validation,
+  adversarial schema mutations, migration replay, refusal inventory, and
+  semantic-axis checks across all 25 result types and 49 discriminator triples.
+- Corrected pre-1.0 schema declarations for grouped robust results, composition
+  limits, and Bayesian unknown properties without changing emitted payloads.
 
 ## 0.1.1 - 2026-09-15
 

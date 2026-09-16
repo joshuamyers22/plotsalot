@@ -49,6 +49,7 @@ rules, uncertainty, failure behavior, and adaptation decisions.
 - [M7B locked confirmation verification](evidence/M7B_CONFIRMATION_VERIFICATION.md)
 - [M7B independent review and owner disposition](evidence/M7B_INDEPENDENT_REVIEW.md)
 - [M7B sign-off](evidence/M7B_SIGNOFF.md)
+- [M7C API/schema hardening verification](evidence/M7C_VERIFICATION.md)
 - [Pinned upstream manifest](upstream/README.md)
 - [Parquet dataset contract](PARQUET_DATASETS.md)
 - [Regression evidence contract](REGRESSION_EVIDENCE.md)

@@ -1,4 +1,4 @@
-.PHONY: setup format lint typecheck test docs public-contract update-public-contract check audit build oracle verify-oracle benchmark verify-benchmark m7b-smoke
+.PHONY: setup format lint typecheck test docs public-contract update-public-contract update-m7c-golden check audit build oracle verify-oracle benchmark verify-benchmark m7b-smoke
 setup:
 	uv sync --frozen --dev
 format:
@@ -17,6 +17,8 @@ public-contract:
 	uv run python tools/public_contract.py --check
 update-public-contract:
 	uv run python tools/public_contract.py --write
+update-m7c-golden:
+	uv run python tools/m7c_golden.py --write
 check: lint typecheck test docs public-contract
 audit:
 	uv audit --preview-features audit-command --locked --no-dev

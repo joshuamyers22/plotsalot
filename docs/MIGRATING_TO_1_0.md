@@ -1,6 +1,6 @@
 # Migrating from 0.1.1 to 1.0
 
-- Status: M7B-updated 1.0 migration candidate
+- Status: M7C-hardened 1.0 migration candidate
 - Source inventory: [`PUBLIC_API_REFERENCE.md`](PUBLIC_API_REFERENCE.md)
 - Stability policy: [`API_STABILITY.md`](API_STABILITY.md)
 
@@ -38,15 +38,30 @@ Bayesian aggregate modes are separate methods, not automatic substitutes.
 | `StructuredResult` | Protocol retained | None |
 | `M6CMetaError` | Exception type, `code`, and 16 codes retained | Match `code`, not message prose |
 | Four console scripts | Names, command paths, arguments, exit meanings, and artifact schemas retained | None |
-| 12 checked-in schemas | Existing bytes and 43 variant discriminators retained | Keep validating against the matching published schema |
+| 12 checked-in schemas | No schema identifier or emitted discriminator/version pair was removed; 49 distinct triples are retained | Validate against the corrected candidate schemas and select variants by both `schema_version` and `analysis` |
+
+## Pre-1.0 schema-document corrections
+
+M7C found three declaration gaps without changing runtime serialization:
+
+- `grouped-result.schema.json` now declares the six already-emitted grouped
+  robust identities, their robust nested results, and resampling work record;
+- `composition-result.schema.json` no longer requires two resource-limit fields
+  that `CompositionResult.to_dict()` has never emitted; and
+- `bayesian-result.schema.json` declares all emitted top-level and computation
+  fields and rejects unknown top-level properties.
+
+These corrected documents, 51 retained golden examples, and the mutation suite
+form the proposed 1.0 baseline. A consumer that copied a `0.1.1` schema should
+replace it with the matching 1.0 candidate schema before validating 1.0 output.
+Valid `0.1.1` runtime payloads do not need a data migration.
 
 ## Still provisional
 
-This is not the final 1.0 migration statement. M7B is closed with the robust-meta
-experimental reclassification above. M7C must add golden serialized fixtures
-and adversarial compatibility tests; any resulting change must update this
-document with an affected-name/variant list and an explicit consumer action
-before 1.0 acceptance.
+This is not the final 1.0 migration statement. M7A–M7C are complete, including
+the robust-meta experimental reclassification and adversarial compatibility
+suite. M7D must still verify the exact release candidate and obtain final owner
+acceptance.
 
 Capabilities marked post-1.0 or rejected in the
 [compatibility ledger](m7/compatibility-disposition.json) were never part of the

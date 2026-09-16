@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 MANIFEST = ROOT / "docs" / "m7" / "public-contract.json"
 REFERENCE = ROOT / "docs" / "PUBLIC_API_REFERENCE.md"
+GOLDEN_RESULTS = ROOT / "docs" / "m7" / "golden-results.json"
 EXPERIMENTAL_DISPOSITION = "experimental"
 CONTRACT_CATEGORIES: dict[str, dict[str, object]] = {
     "upstream_workflow_surface": {
@@ -323,7 +324,7 @@ def _public_symbols() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 
     symbols: list[dict[str, Any]] = []
     errors: list[dict[str, Any]] = []
-    error_codes = _coded_error_values()
+    error_codes = coded_error_values()
     for name in sorted(exported):
         value = getattr(package, name)
         if inspect.isclass(value) and issubclass(value, BaseException):
@@ -455,7 +456,7 @@ def _classify_symbols(
     return dict(sorted(counts.items())), dict(sorted(disposition_counts.items()))
 
 
-def _coded_error_values() -> dict[str, list[str]]:
+def coded_error_values() -> dict[str, list[str]]:
     values: dict[str, set[str]] = {}
     for path in sorted((SRC / "plotsalot").glob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -539,6 +540,30 @@ def _schemas() -> list[dict[str, Any]]:
     return contracts
 
 
+def _golden_results() -> dict[str, Any]:
+    raw = GOLDEN_RESULTS.read_bytes()
+    catalog = json.loads(raw)
+    entries = catalog.get("entries")
+    if not isinstance(entries, list) or not entries:
+        raise ValueError("M7C golden corpus requires retained entries")
+    identifiers = [entry.get("id") for entry in entries if isinstance(entry, dict)]
+    if len(identifiers) != len(entries) or len(set(identifiers)) != len(entries):
+        raise ValueError("M7C golden entry identifiers must be complete and unique")
+    discriminators = {
+        (entry["schema"], entry["schema_version"], entry["analysis"])
+        for entry in entries
+    }
+    stability_counts = Counter(entry["stability"] for entry in entries)
+    return {
+        "path": GOLDEN_RESULTS.relative_to(ROOT).as_posix(),
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "entry_count": len(entries),
+        "result_type_count": len({entry["result_type"] for entry in entries}),
+        "discriminator_count": len(discriminators),
+        "stability_counts": dict(sorted(stability_counts.items())),
+    }
+
+
 def build_manifest() -> dict[str, Any]:
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     project = pyproject["project"]
@@ -551,13 +576,14 @@ def build_manifest() -> dict[str, Any]:
     ]
     return {
         "manifest_version": 1,
-        "status": "m7b_reclassification_accepted",
+        "status": "m7c_hardening_complete",
         "generated_from": {
             "package": "src/plotsalot/__init__.py",
             "metadata": "pyproject.toml",
             "schemas": "schemas/*.json",
             "cli_parsers": "src/plotsalot/*_cli.py and src/plotsalot/cli.py",
             "compatibility_scope": "docs/m7/compatibility-disposition.json",
+            "golden_results": "docs/m7/golden-results.json",
         },
         "distribution": {
             "name": project["name"],
@@ -581,6 +607,7 @@ def build_manifest() -> dict[str, Any]:
         "experimental_serialized_result_types": [
             name for name in serializable if name in _experimental_public_names()
         ],
+        "golden_results": _golden_results(),
         "schemas": _schemas(),
         "console_scripts": _console_scripts(project),
         "semantic_axes": [
@@ -624,7 +651,7 @@ def render_reference(manifest: Mapping[str, Any]) -> str:
     lines = [
         "# Public API Reference",
         "",
-        "- Status: M7B reclassification accepted by Joshua Myers on 2026-09-15",
+        "- Status: M7C API/schema hardening complete on 2026-09-15",
         "- Machine source: [`m7/public-contract.json`](m7/public-contract.json)",
         "- Stability policy: [`API_STABILITY.md`](API_STABILITY.md)",
         "",
@@ -690,10 +717,10 @@ def render_reference(manifest: Mapping[str, Any]) -> str:
             "The retained manifest marks 137 names `stabilize` and seven dedicated",
             "robust-meta names `experimental`. All 144 `0.1.1` names remain importable",
             "and no removal or rename is introduced. This classification does not",
-            "independently approve the final 1.0 candidate: statistical disposition,",
-            "golden serialization,",
-            "error and semantic rendering evidence, platform gates, and owner",
-            "acceptance remain required by M7.",
+            "independently approve the final 1.0 candidate. M7C retains 51 golden",
+            "examples across all 25 result types and 49 schema/discriminator triples,",
+            "with mutation, refusal, migration-replay, and semantic-axis tests.",
+            "M7D platform/package gates and final owner acceptance remain required.",
             "",
         ]
     )

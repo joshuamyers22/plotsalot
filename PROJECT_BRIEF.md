@@ -1,6 +1,6 @@
 # Project Brief
 
-- Status: M0–M6 and public 0.1.1 complete; M7 active
+- Status: M0–M6 and public 0.1.1 complete; M7A–M7C complete, M7D next
 - Last updated: 2026-09-15
 
 ## Outcome
@@ -94,7 +94,7 @@
 |---|---|---|---|
 | Repository is generated and reproducible | `uv.lock`, `make check`, `uv build` | Technical lead | Passing for published 0.1.1 |
 | Upstream is pinned | `docs/upstream/manifest.json` and hashes | Technical lead | Passing |
-| Public API inventory is complete | `docs/compatibility.md`, M7 machine ledger, and namespaces | Product owner | M7A/M7B accepted; all 144 root names retained, with 137 stable and seven dedicated robust-meta names experimental |
+| Public API and schema inventory is complete | M7 machine ledger, public manifest, and golden corpus | Product owner | M7A–M7C complete; all 144 root names retained, 51 goldens cover 25 result types and 49 discriminator triples |
 | No R runtime dependency | Python-only isolated wheel smoke test | Technical lead | Passing for published 0.1.1 |
 | Statistical correctness | Method specs, analytic cases, R oracle, independent review | Joshua Myers | M0–M6 approved; M7B reclassified robust aggregate meta-analysis as experimental for 1.0 |
 | MIT license posture | ADR-010 and qualified review | Joshua Myers | Approved |

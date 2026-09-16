@@ -32,12 +32,14 @@ class RepositoryPolicyTests(unittest.TestCase):
             "docs/evidence/M7B_INDEPENDENT_REVIEW.md",
             "docs/evidence/M7B_MAPPING_VERIFICATION.md",
             "docs/evidence/M7B_SIGNOFF.md",
+            "docs/evidence/M7C_VERIFICATION.md",
             "docs/evidence/m7b-robust-meta-confirmation.json",
             "docs/evidence/m7b-robust-meta-confirmation.json.sha256",
             "docs/evidence/m7b-robust-meta-mapping.json",
             "docs/evidence/m7b-robust-meta-mapping.json.sha256",
             "docs/evidence/M7_VERIFICATION_LOOP.md",
             "docs/m7/compatibility-disposition.json",
+            "docs/m7/golden-results.json",
             "docs/m7/public-contract.json",
             "src/plotsalot/py.typed",
         }
@@ -197,7 +199,7 @@ class RepositoryPolicyTests(unittest.TestCase):
         import plotsalot
 
         symbols = manifest["public_api"]["symbols"]
-        self.assertEqual(manifest["status"], "m7b_reclassification_accepted")
+        self.assertEqual(manifest["status"], "m7c_hardening_complete")
         self.assertEqual(
             {symbol["name"] for symbol in symbols},
             set(plotsalot.__all__),
@@ -271,6 +273,13 @@ class RepositoryPolicyTests(unittest.TestCase):
             manifest["experimental_serialized_result_types"], ["RobustMetaResult"]
         )
         self.assertEqual(len(manifest["stable_serialized_result_types"]), 24)
+        golden = manifest["golden_results"]
+        self.assertEqual(golden["path"], "docs/m7/golden-results.json")
+        self.assertEqual(len(golden["sha256"]), 64)
+        self.assertEqual(golden["entry_count"], 51)
+        self.assertEqual(golden["result_type_count"], 25)
+        self.assertEqual(golden["discriminator_count"], 49)
+        self.assertEqual(golden["stability_counts"], {"experimental": 1, "stable": 50})
         self.assertEqual(
             {error["name"] for error in manifest["stable_errors"]},
             {"M6CMetaError"},

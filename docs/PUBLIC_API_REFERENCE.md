@@ -1,6 +1,6 @@
 # Public API Reference
 
-- Status: M7B reclassification accepted by Joshua Myers on 2026-09-15
+- Status: M7C API/schema hardening complete on 2026-09-15
 - Machine source: [`m7/public-contract.json`](m7/public-contract.json)
 - Stability policy: [`API_STABILITY.md`](API_STABILITY.md)
 
@@ -127,7 +127,7 @@ variant are excluded from the 1.x compatibility promise.
 The retained manifest marks 137 names `stabilize` and seven dedicated
 robust-meta names `experimental`. All 144 `0.1.1` names remain importable
 and no removal or rename is introduced. This classification does not
-independently approve the final 1.0 candidate: statistical disposition,
-golden serialization,
-error and semantic rendering evidence, platform gates, and owner
-acceptance remain required by M7.
+independently approve the final 1.0 candidate. M7C retains 51 golden
+examples across all 25 result types and 49 schema/discriminator triples,
+with mutation, refusal, migration-replay, and semantic-axis tests.
+M7D platform/package gates and final owner acceptance remain required.
