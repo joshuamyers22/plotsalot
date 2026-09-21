@@ -48,7 +48,7 @@ Changelog = "https://github.com/joshuamyers22/plotsalot/blob/main/CHANGELOG.md"
 "plotsalot-dataset" = "plotsalot.dataset_cli:main"
 
 [build-system]
-requires = ["hatchling==1.32.0"]
+requires = ["hatchling==1.32.3"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
