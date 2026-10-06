@@ -5,6 +5,8 @@ versioning for published package releases.
 
 ## Unreleased
 
+- Allow Polars 2.x and lock Polars 2.0.0 for reproducible development.
+
 ## 1.0.0 - 2026-09-15
 
 ### Added
